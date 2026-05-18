@@ -1,0 +1,17 @@
+RewriteEngine On
+RewriteBase /biovital/
+
+# Redirigir www a no-www (opcional)
+RewriteCond %{HTTP_HOST} ^www\.(.*)$ [NC]
+RewriteRule ^(.*)$ http://%1/$1 [R=301,L]
+
+# Si el archivo o directorio existe, sírvelo directamente
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+# Redirigir todo lo demás a index.php
+RewriteRule ^(.*)$ index.php [QSA,L]
+
+# Error 404 personalizado
+ErrorDocument 404 /biovital/index.php
