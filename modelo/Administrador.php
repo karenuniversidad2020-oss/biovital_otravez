@@ -10,17 +10,18 @@ class Administrador {
         $this->acceso = $db->pdo;
     }
     
-    function obtener_datos($id) {
-        $sql = "SELECT ra.*, tp.nombre_tipo 
-                FROM registro_administrador ra
-                INNER JOIN tipo_paciente tp ON ra.administrador_tipo = tp.id_tipo_us 
-                WHERE ra.id_administrador = :id";
-        $query = $this->acceso->prepare($sql);
-        $query->execute(array(':id' => $id));
-        $this->objetos = $query->fetchAll();
-        return $this->objetos;
-    }
-    
+    // modelo/Administrador.php - Método obtener_datos
+function obtener_datos($id) {
+    $sql = "SELECT ra.*, tp.nombre_tipo 
+            FROM registro_administrador ra
+            INNER JOIN tipo_paciente tp ON ra.administrador_tipo = tp.id_tipo_us 
+            WHERE ra.id_administrador = :id";
+    $query = $this->acceso->prepare($sql);
+    $query->execute(array(':id' => $id));
+    $this->objetos = $query->fetchAll();
+    return $this->objetos;
+}
+
     function editar($id_administrador, $telefono, $direccion, $correo, $sexo, $adicional) {
         $sql = "UPDATE registro_administrador SET 
                 telefono_administrador = :telefono,
@@ -40,18 +41,25 @@ class Administrador {
         ));
     }
     
-    function cambiar_photo($id_administrador, $nombre) {   
-        $sql = "SELECT avatar_administrador FROM registro_administrador WHERE id_administrador = :id";
-        $query = $this->acceso->prepare($sql);
-        $query->execute(array(':id' => $id_administrador));
-        $this->objetos = $query->fetchAll();    
-        
-        $sql = "UPDATE registro_administrador SET avatar_administrador = :nombre WHERE id_administrador = :id";
-        $query = $this->acceso->prepare($sql);
-        $query->execute(array(':id' => $id_administrador, ':nombre' => $nombre));  
-        return $this->objetos;   
-    }
+    // modelo/Administrador.php
+     function cambiar_photo($id_administrador, $nombre) {   
+    // Primero obtener el avatar actual
+    $sql = "SELECT avatar_administrador FROM registro_administrador WHERE id_administrador = :id";
+    $query = $this->acceso->prepare($sql);
+    $query->execute(array(':id' => $id_administrador));
+    $resultado = $query->fetch(PDO::FETCH_OBJ);
     
+    $avatar_anterior = $resultado ? $resultado->avatar_administrador : 'avatarDES.jpg';
+    
+    // Actualizar con el nuevo avatar
+    $sql = "UPDATE registro_administrador SET avatar_administrador = :nombre WHERE id_administrador = :id";
+    $query = $this->acceso->prepare($sql);
+    $query->execute(array(':id' => $id_administrador, ':nombre' => $nombre));
+    
+    // Retornar el avatar anterior para poder eliminar el archivo
+    return $avatar_anterior;
+}
+
     function crear($nombre, $apellidos, $fecha_nacimiento, $cedula, $telefono, $direccion, $correo, $sexo, $adicional, $password_hash, $tipo, $avatar) {
         try {
             $sql = "SELECT id_administrador FROM registro_administrador WHERE cedula_administrador = :cedula OR correo_administrador = :correo";

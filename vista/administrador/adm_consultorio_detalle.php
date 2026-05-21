@@ -6,6 +6,7 @@ if($_SESSION['us_tipo'] != 4 || $_SESSION['rol'] != 'administrador'){
 }
 
 $nombre_usuario = $_SESSION['nombre_us'] ?? 'Administrador';
+// Obtener el ID de la URL (GET)
 $id_consultorio = isset($_GET['id']) ? intval($_GET['id']) : 0;
 ?>
 <!DOCTYPE html>
@@ -81,9 +82,9 @@ $id_consultorio = isset($_GET['id']) ? intval($_GET['id']) : 0;
     </a>
     <div class="sidebar">
         <div class="user-panel mt-3 pb-3 mb-3 d-flex">
-            <div class="image">
-                <img id="avatar4" src="<?php echo APP_URL; ?>/img/avatar.png" class="img-circle elevation-2" alt="User Image">
-            </div>
+           <div class="image">
+    <img id="avatar_nav" src="<?php echo APP_URL; ?>/img/avatar.png" class="img-circle elevation-2" alt="User Image">
+</div>
             <div class="info">
                 <a href="#" class="d-block"><?php echo htmlspecialchars($nombre_usuario); ?></a>
             </div>
@@ -137,6 +138,7 @@ $id_consultorio = isset($_GET['id']) ? intval($_GET['id']) : 0;
     </div>
 </aside>
 
+
 <!-- Content Wrapper -->
 <div class="content-wrapper">
     <section class="content-header">
@@ -159,7 +161,6 @@ $id_consultorio = isset($_GET['id']) ? intval($_GET['id']) : 0;
     <section class="content">
         <div class="container-fluid">
             <input type="hidden" id="id_consultorio" value="<?php echo $id_consultorio; ?>">
-            
             <div class="row">
                 <div class="col-md-4">
                     <div class="card card-primary card-outline">

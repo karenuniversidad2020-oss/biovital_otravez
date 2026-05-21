@@ -10,33 +10,34 @@ class Consultorio {
         $this->acceso = $db->pdo;
     }
     
-    // Listar todos los consultorios
-    function listar($busqueda = '') {
-        try {
-            $sql = "SELECT c.*, 
-                    (SELECT COUNT(*) FROM consultorio_medicos cm WHERE cm.id_consultorio = c.id_consultorio AND cm.activo = 1) as total_medicos
-                    FROM consultorios c 
-                    WHERE c.activo = 1";
-            
-            if(!empty($busqueda)) {
-                $sql .= " AND (c.nombre LIKE :busqueda OR c.ciudad LIKE :busqueda OR c.direccion_detallada LIKE :busqueda)";
-                $query = $this->acceso->prepare($sql);
-                $query->execute(array(':busqueda' => "%$busqueda%"));
-            } else {
-                $query = $this->acceso->prepare($sql);
-                $query->execute();
-            }
-            
-            $this->objetos = $query->fetchAll();
-            return $this->objetos;
-        } catch(PDOException $e) {
-            error_log("Error en listar consultorios: " . $e->getMessage());
-            return array();
+   
+    // ==================== CONSULTORIOS ====================
+function listar($busqueda = '') {
+    try {
+        $sql = "SELECT c.*, 
+                (SELECT COUNT(*) FROM consultorio_medicos cm WHERE cm.id_consultorio = c.id_consultorio AND cm.activo = 1) as total_medicos
+                FROM consultorios c 
+                WHERE c.activo = 1";
+        
+        if(!empty($busqueda)) {
+            $sql .= " AND (c.nombre LIKE :busqueda OR c.ciudad LIKE :busqueda OR c.direccion_detallada LIKE :busqueda)";
+            $query = $this->acceso->prepare($sql);
+            $query->execute(array(':busqueda' => "%$busqueda%"));
+        } else {
+            $query = $this->acceso->prepare($sql);
+            $query->execute();
         }
+        
+        $this->objetos = $query->fetchAll();
+        return $this->objetos;
+    } catch(PDOException $e) {
+        error_log("Error en listar consultorios: " . $e->getMessage());
+        return array();
     }
+}
     
     // Obtener total de consultorios activos
-    function totalActivos() {
+   function totalActivos() {
         try {
             $sql = "SELECT COUNT(*) as total FROM consultorios WHERE activo = 1";
             $query = $this->acceso->prepare($sql);
@@ -61,52 +62,8 @@ class Consultorio {
         }
     }
     
-    // Obtener especialidades del consultorio
-    function obtenerEspecialidades($id_consultorio) {
-        try {
-            $sql = "SELECT especialidad FROM consultorio_especialidades WHERE id_consultorio = :id";
-            $query = $this->acceso->prepare($sql);
-            $query->execute(array(':id' => $id_consultorio));
-            return $query->fetchAll();
-        } catch(PDOException $e) {
-            return array();
-        }
-    }
-    
-    // Obtener médicos asignados al consultorio
-    function obtenerMedicos($id_consultorio) {
-        try {
-            $sql = "SELECT cm.*, rm.nombre_medico, rm.apellido_medico, rm.cedula_medico, rm.telefono_medico
-                    FROM consultorio_medicos cm
-                    INNER JOIN registro_medico rm ON cm.id_medico = rm.id_medico
-                    WHERE cm.id_consultorio = :id AND cm.activo = 1";
-            $query = $this->acceso->prepare($sql);
-            $query->execute(array(':id' => $id_consultorio));
-            return $query->fetchAll();
-        } catch(PDOException $e) {
-            return array();
-        }
-    }
-    
-    // Obtener horarios del consultorio
-    function obtenerHorarios($id_consultorio) {
-        try {
-            $sql = "SELECT ch.*, 
-                    CONCAT(rm.nombre_medico, ' ', rm.apellido_medico) as nombre_medico
-                    FROM consultorio_horarios ch
-                    LEFT JOIN registro_medico rm ON ch.id_medico = rm.id_medico
-                    WHERE ch.id_consultorio = :id AND ch.activo = 1
-                    ORDER BY FIELD(ch.dia_semana, 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'), ch.turno";
-            $query = $this->acceso->prepare($sql);
-            $query->execute(array(':id' => $id_consultorio));
-            return $query->fetchAll();
-        } catch(PDOException $e) {
-            return array();
-        }
-    }
-    
-    function crear($nombre, $descripcion, $apertura, $cierre, $telefono, $email, 
-               $id_estado, $id_ciudad, $id_municipio, $id_parroquia, $direccion, $especialidades) {
+     function crear($nombre, $descripcion, $apertura, $cierre, $telefono, $email, 
+                   $id_estado, $id_ciudad, $id_municipio, $id_parroquia, $direccion, $especialidades) {
     try {
         // Obtener los nombres de ubicación para guardarlos también como texto
         $estado_nombre = $this->getNombreEstado($id_estado);
@@ -167,42 +124,9 @@ class Consultorio {
         echo 'error_bd';
     }
 }
-
-// Funciones auxiliares para obtener nombres
-function getNombreEstado($id_estado) {
-    $sql = "SELECT estado FROM estados WHERE id_estado = :id";
-    $query = $this->acceso->prepare($sql);
-    $query->execute(array(':id' => $id_estado));
-    $resultado = $query->fetch();
-    return $resultado ? $resultado->estado : '';
-}
-
-function getNombreCiudad($id_ciudad) {
-    $sql = "SELECT ciudad FROM ciudades WHERE id_ciudad = :id";
-    $query = $this->acceso->prepare($sql);
-    $query->execute(array(':id' => $id_ciudad));
-    $resultado = $query->fetch();
-    return $resultado ? $resultado->ciudad : '';
-}
-
-function getNombreMunicipio($id_municipio) {
-    $sql = "SELECT municipio FROM municipios WHERE id_municipio = :id";
-    $query = $this->acceso->prepare($sql);
-    $query->execute(array(':id' => $id_municipio));
-    $resultado = $query->fetch();
-    return $resultado ? $resultado->municipio : '';
-}
-
-function getNombreParroquia($id_parroquia) {
-    $sql = "SELECT parroquia FROM parroquias WHERE id_parroquia = :id";
-    $query = $this->acceso->prepare($sql);
-    $query->execute(array(':id' => $id_parroquia));
-    $resultado = $query->fetch();
-    return $resultado ? $resultado->parroquia : '';
-}
-    
     // Editar consultorio
-    function editar($id_consultorio, $nombre, $descripcion, $apertura, $cierre, $telefono, $email, $estado, $ciudad, $municipio, $parroquia, $direccion, $especialidades) {
+ function editar($id_consultorio, $nombre, $descripcion, $apertura, $cierre, $telefono, $email, 
+                    $estado, $ciudad, $municipio, $parroquia, $direccion, $especialidades) {
         try {
             $sql = "UPDATE consultorios SET 
                     nombre = :nombre,
@@ -256,9 +180,10 @@ function getNombreParroquia($id_parroquia) {
             echo 'error_bd';
         }
     }
+
     
     // Eliminar consultorio (borrado lógico)
-    function eliminar($id_consultorio) {
+   function eliminar($id_consultorio) {
         try {
             $sql = "UPDATE consultorios SET activo = 0 WHERE id_consultorio = :id";
             $query = $this->acceso->prepare($sql);
@@ -267,10 +192,54 @@ function getNombreParroquia($id_parroquia) {
         } catch(PDOException $e) {
             echo 'error';
         }
+    }  
+ // Obtener especialidades del consultorio
+  function obtenerEspecialidades($id_consultorio) {
+        try {
+            $sql = "SELECT especialidad FROM consultorio_especialidades WHERE id_consultorio = :id";
+            $query = $this->acceso->prepare($sql);
+            $query->execute(array(':id' => $id_consultorio));
+            return $query->fetchAll();
+        } catch(PDOException $e) {
+            return array();
+        }
     }
+ function obtenerListaEspecialidades() {
+        return [
+            'Cardiología', 'Pediatría', 'Dermatología', 'Ginecología', 'Traumatología',
+            'Oftalmología', 'Medicina General', 'Neurología', 'Psiquiatría', 'Gastroenterología',
+            'Urología', 'Otorrinolaringología', 'Neumología', 'Endocrinología', 'Reumatología',
+            'Nefrología', 'Oncología', 'Hematología', 'Medicina Interna', 'Anestesiología', 'Radiología'
+        ];
+    }
+     // ==================== MÉDICOS ====================
     
-    // Asignar médico a consultorio
-    function asignarMedico($id_consultorio, $id_medico) {
+    function obtenerMedicos($id_consultorio) {
+        try {
+            $sql = "SELECT cm.*, rm.nombre_medico, rm.apellido_medico, rm.cedula_medico, rm.telefono_medico
+                    FROM consultorio_medicos cm
+                    INNER JOIN registro_medico rm ON cm.id_medico = rm.id_medico
+                    WHERE cm.id_consultorio = :id AND cm.activo = 1";
+            $query = $this->acceso->prepare($sql);
+            $query->execute(array(':id' => $id_consultorio));
+            return $query->fetchAll();
+        } catch(PDOException $e) {
+            return array();
+        }
+    }
+     // Listar todos los médicos para asignar
+  function listarMedicos() {
+        try {
+            $sql = "SELECT id_medico, nombre_medico, apellido_medico, cedula_medico FROM registro_medico WHERE medico_tipo = 2 ORDER BY nombre_medico";
+            $query = $this->acceso->prepare($sql);
+            $query->execute();
+            return $query->fetchAll();
+        } catch(PDOException $e) {
+            return array();
+        }
+    }
+      // Asignar médico a consultorio
+   function asignarMedico($id_consultorio, $id_medico) {
         try {
             // Verificar si ya existe
             $sql_check = "SELECT id FROM consultorio_medicos WHERE id_consultorio = :id_consultorio AND id_medico = :id_medico AND activo = 1";
@@ -290,9 +259,8 @@ function getNombreParroquia($id_parroquia) {
             echo 'error';
         }
     }
-    
-    // Eliminar asignación de médico
-    function removerMedico($id_asignacion) {
+     // Eliminar asignación de médico
+   function removerMedico($id_asignacion) {
         try {
             $sql = "UPDATE consultorio_medicos SET activo = 0 WHERE id = :id";
             $query = $this->acceso->prepare($sql);
@@ -302,9 +270,25 @@ function getNombreParroquia($id_parroquia) {
             echo 'error';
         }
     }
+    // ==================== HORARIOS ====================
     
-    // Guardar horario
-    function guardarHorario($id_consultorio, $dia, $turno, $hora_inicio, $hora_fin, $id_medico = null) {
+    function obtenerHorarios($id_consultorio) {
+        try {
+            $sql = "SELECT ch.*, 
+                    CONCAT(rm.nombre_medico, ' ', rm.apellido_medico) as nombre_medico
+                    FROM consultorio_horarios ch
+                    LEFT JOIN registro_medico rm ON ch.id_medico = rm.id_medico
+                    WHERE ch.id_consultorio = :id AND ch.activo = 1
+                    ORDER BY FIELD(ch.dia_semana, 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'), ch.turno";
+            $query = $this->acceso->prepare($sql);
+            $query->execute(array(':id' => $id_consultorio));
+            return $query->fetchAll();
+        } catch(PDOException $e) {
+            return array();
+        }
+    }
+     // Guardar horario
+   function guardarHorario($id_consultorio, $dia, $turno, $hora_inicio, $hora_fin, $id_medico = null) {
         try {
             // Verificar si ya existe horario para ese día/turno
             $sql_check = "SELECT id_horario FROM consultorio_horarios WHERE id_consultorio = :id_consultorio AND dia_semana = :dia AND turno = :turno AND activo = 1";
@@ -343,65 +327,8 @@ function getNombreParroquia($id_parroquia) {
             echo 'error';
         }
     }
-    
-    // Listar todos los médicos para asignar
-    function listarMedicos() {
-        try {
-            $sql = "SELECT id_medico, nombre_medico, apellido_medico, cedula_medico FROM registro_medico WHERE medico_tipo = 2 ORDER BY nombre_medico";
-            $query = $this->acceso->prepare($sql);
-            $query->execute();
-            return $query->fetchAll();
-        } catch(PDOException $e) {
-            return array();
-        }
-    }
-    
-    //  lista de especialidades predefinidas
-    function obtenerListaEspecialidades() {
-        return [
-            'Cardiología', 'Pediatría', 'Dermatología', 'Ginecología', 'Traumatología',
-            'Oftalmología', 'Medicina General', 'Neurología', 'Psiquiatría', 'Gastroenterología',
-            'Urología', 'Otorrinolaringología', 'Neumología', 'Endocrinología', 'Reumatología',
-            'Nefrología', 'Oncología', 'Hematología', 'Medicina Interna', 'Anestesiología', 'Radiología'
-        ];
-    }
-    // Listar estados
-function listarEstados() {
-    try {
-        $sql = "SELECT id_estado, estado FROM estados ORDER BY estado";
-        $query = $this->acceso->prepare($sql);
-        $query->execute();
-        return $query->fetchAll();
-    } catch(PDOException $e) {
-        return array();
-    }
-}
-
-// Listar ciudades por estado
-function listarCiudades($id_estado) {
-    try {
-        $sql = "SELECT id_ciudad, ciudad FROM ciudades WHERE id_estado = :id_estado ORDER BY ciudad";
-        $query = $this->acceso->prepare($sql);
-        $query->execute(array(':id_estado' => $id_estado));
-        return $query->fetchAll();
-    } catch(PDOException $e) {
-        return array();
-    }
-}
-
-// Listar municipios por estado (NO por ciudad, porque municipio está relacionado con estado)
-function listarMunicipios($id_estado) {
-    try {
-        $sql = "SELECT id_municipio, municipio FROM municipios WHERE id_estado = :id_estado ORDER BY municipio";
-        $query = $this->acceso->prepare($sql);
-        $query->execute(array(':id_estado' => $id_estado));
-        return $query->fetchAll();
-    } catch(PDOException $e) {
-        return array();
-    }
-}
-// Verificar si un médico ya tiene horario en el mismo día/turno
-function verificarHorarioMedico($id_medico, $dia, $turno, $id_consultorio = null) {
+    // Verificar si un médico ya tiene horario en el mismo día/turno
+ function verificarHorarioMedico($id_medico, $dia, $turno, $id_consultorio = null) {
     try {
         $sql = "SELECT ch.*, c.nombre as consultorio_nombre 
                 FROM consultorio_horarios ch
@@ -434,17 +361,81 @@ function verificarHorarioMedico($id_medico, $dia, $turno, $id_consultorio = null
         return array();
     }
 }
-
-// Listar parroquias por municipio
-function listarParroquias($id_municipio) {
-    try {
-        $sql = "SELECT id_parroquia, parroquia FROM parroquias WHERE id_municipio = :id_municipio ORDER BY parroquia";
-        $query = $this->acceso->prepare($sql);
-        $query->execute(array(':id_municipio' => $id_municipio));
-        return $query->fetchAll();
-    } catch(PDOException $e) {
-        return array();
+// ==================== UBICACIÓN ====================
+    
+    function listarEstados() {
+        try {
+            $sql = "SELECT id_estado, estado FROM estados ORDER BY estado";
+            $query = $this->acceso->prepare($sql);
+            $query->execute();
+            return $query->fetchAll();
+        } catch(PDOException $e) {
+            error_log("Error en listarEstados: " . $e->getMessage());
+            return array();
+        }
     }
-}
+    // Listar ciudades por estado
+ function listarCiudades($id_estado) {
+        try {
+            $sql = "SELECT id_ciudad, ciudad FROM ciudades WHERE id_estado = :id_estado ORDER BY ciudad";
+            $query = $this->acceso->prepare($sql);
+            $query->execute(array(':id_estado' => $id_estado));
+            return $query->fetchAll();
+        } catch(PDOException $e) {
+            error_log("Error en listarCiudades: " . $e->getMessage());
+            return array();
+        }
+    }
+    function listarMunicipios($id_estado) {
+        try {
+            $sql = "SELECT id_municipio, municipio FROM municipios WHERE id_estado = :id_estado ORDER BY municipio";
+            $query = $this->acceso->prepare($sql);
+            $query->execute(array(':id_estado' => $id_estado));
+            return $query->fetchAll();
+        } catch(PDOException $e) {
+            error_log("Error en listarMunicipios: " . $e->getMessage());
+            return array();
+        }
+    }
+    function listarParroquias($id_municipio) {
+        try {
+            $sql = "SELECT id_parroquia, parroquia FROM parroquias WHERE id_municipio = :id_municipio ORDER BY parroquia";
+            $query = $this->acceso->prepare($sql);
+            $query->execute(array(':id_municipio' => $id_municipio));
+            return $query->fetchAll();
+        } catch(PDOException $e) {
+            error_log("Error en listarParroquias: " . $e->getMessage());
+            return array();
+        }
+    }
+    // Funciones auxiliares para obtener nombres
+    function getNombreEstado($id_estado) {
+        $sql = "SELECT estado FROM estados WHERE id_estado = :id";
+        $query = $this->acceso->prepare($sql);
+        $query->execute(array(':id' => $id_estado));
+        $resultado = $query->fetch();
+        return $resultado ? $resultado->estado : '';
+    }
+    function getNombreCiudad($id_ciudad) {
+        $sql = "SELECT ciudad FROM ciudades WHERE id_ciudad = :id";
+        $query = $this->acceso->prepare($sql);
+        $query->execute(array(':id' => $id_ciudad));
+        $resultado = $query->fetch();
+        return $resultado ? $resultado->ciudad : '';
+    }
+    function getNombreMunicipio($id_municipio) {
+        $sql = "SELECT municipio FROM municipios WHERE id_municipio = :id";
+        $query = $this->acceso->prepare($sql);
+        $query->execute(array(':id' => $id_municipio));
+        $resultado = $query->fetch();
+        return $resultado ? $resultado->municipio : '';
+    }
+    function getNombreParroquia($id_parroquia) {
+        $sql = "SELECT parroquia FROM parroquias WHERE id_parroquia = :id";
+        $query = $this->acceso->prepare($sql);
+        $query->execute(array(':id' => $id_parroquia));
+        $resultado = $query->fetch();
+        return $resultado ? $resultado->parroquia : '';
+    }   
 }
 ?>

@@ -104,26 +104,34 @@ class MedicoController {
     }
     
     // API: Editar médico
-    public function editarUsuario() {
-        $id_medico = $_POST['id_medico'] ?? 0;
-        $id_sesion = $_SESSION['usuario'];
-        
-        if($id_medico != $id_sesion) {
-            jsonResponse(['success' => false, 'error' => 'No autorizado']);
-            return;
-        }
-        
-        $telefono = $_POST['telefono'] ?? '';
-        $direccion = $_POST['direccion'] ?? '';
-        $correo = $_POST['correo'] ?? '';
-        $sexo = $_POST['sexo'] ?? '';
-        $adicional = $_POST['adicional'] ?? '';
-        
-        $medico = new Medico();
-        $medico->editar($id_medico, $telefono, $direccion, $correo, $sexo, $adicional);
-        
-        jsonResponse(['success' => true, 'message' => 'editado']);
+   // En controlador/MedicoController.php
+public function editarUsuario() {
+    $id_medico = $_POST['id_medico'] ?? 0;
+    $id_sesion = $_SESSION['usuario'];
+    
+    if($id_medico != $id_sesion) {
+        jsonResponse(['success' => false, 'error' => 'No autorizado']);
+        return;
     }
+    
+    $telefono = $_POST['telefono'] ?? '';
+    $direccion = $_POST['direccion'] ?? '';  // ← Este es el campo que viene del formulario
+    $correo = $_POST['correo'] ?? '';
+    $sexo = $_POST['sexo'] ?? '';
+    $adicional = $_POST['adicional'] ?? '';
+    
+    // Agrega logs para depuración
+    error_log("=== EDITANDO MÉDICO ===");
+    error_log("ID Médico: " . $id_medico);
+    error_log("Dirección recibida: " . $direccion);
+    error_log("Teléfono: " . $telefono);
+    error_log("Correo: " . $correo);
+    
+    $medico = new Medico();
+    $medico->editar($id_medico, $telefono, $direccion, $correo, $sexo, $adicional);
+    
+    jsonResponse(['success' => true, 'message' => 'editado']);
+}
     
     // API: Cambiar foto
     public function cambiarFoto() {

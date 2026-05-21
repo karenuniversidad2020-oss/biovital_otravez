@@ -17,7 +17,6 @@ $nombre_usuario = $_SESSION['nombre_us'];
 
     <!-- ==================== VARIABLES GLOBALES ==================== -->
     <script>
-        // Definir APP_URL ANTES que cualquier otro script
         var APP_URL = '<?php echo APP_URL; ?>';
         console.log('APP_URL definida:', APP_URL);
     </script>
@@ -31,11 +30,13 @@ $nombre_usuario = $_SESSION['nombre_us'];
     <!-- CSRF Protection -->
     <script src="<?php echo APP_URL; ?>/js/csrf.js"></script>
     
+    <!-- SCRIPT DE UBICACIÓN (IMPORTANTE - el mismo que usa pac_editar_datos) -->
+    <script src="<?php echo APP_URL; ?>/js/ubicacion.js"></script>
+    
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="<?php echo APP_URL; ?>/css/css/all.min.css">
     <link rel="stylesheet" href="<?php echo APP_URL; ?>/css/adminlte.min.css">
-    <link rel="stylesheet" href="<?php echo APP_URL; ?>/css/dashboard.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
     
     <title>Médico | Editar datos</title>
     <style>
@@ -260,12 +261,57 @@ $nombre_usuario = $_SESSION['nombre_us'];
                                         </div>
                                     </div>
                                     
-                                    <div class="form-group row">
-                                        <label for="direccion" class="col-sm-2 col-form-label">Dirección</label>
-                                        <div class="col-sm-10">
-                                            <input type="text" id="direccion" class="form-control" placeholder="Dirección completa" disabled>
+                                    <!-- ==================== SISTEMA DE UBICACIÓN (IGUAL QUE pac_editar_datos) ==================== -->
+                                    <h4 class="mt-4"><i class="fas fa-map-marker-alt"></i> Ubicación</h4>
+                                    <hr>
+
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="estado">Estado</label>
+                                                <select class="form-control" id="estado" name="estado" disabled>
+                                                    <option value="">Seleccione un estado...</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="ciudad">Ciudad</label>
+                                                <select class="form-control" id="ciudad" name="ciudad" disabled>
+                                                    <option value="">Seleccione un estado primero...</option>
+                                                </select>
+                                            </div>
                                         </div>
                                     </div>
+
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="municipio">Municipio</label>
+                                                <select class="form-control" id="municipio" name="municipio" disabled>
+                                                    <option value="">Seleccione un estado primero...</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="parroquia">Parroquia</label>
+                                                <select class="form-control" id="parroquia" name="parroquia" disabled>
+                                                    <option value="">Seleccione un municipio primero...</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="direccion_detallada">Dirección Detallada</label>
+                                        <input type="text" class="form-control" id="direccion_detallada" name="direccion_detallada" placeholder="Av. Principal, Edificio, Número, etc." disabled>
+                                        <small class="form-text text-muted">Ej: Av. Principal, Edificio Central, Casa #123</small>
+                                    </div>
+
+                                    <!-- Campo oculto para almacenar la dirección completa -->
+                                    <input type="hidden" id="direccion" name="direccion">
+                                    <!-- ==================== FIN SISTEMA DE UBICACIÓN ==================== -->
                                     
                                     <div class="form-group row">
                                         <label for="correo" class="col-sm-2 col-form-label">Correo</label>
@@ -317,6 +363,256 @@ $nombre_usuario = $_SESSION['nombre_us'];
 <script src="<?php echo APP_URL; ?>/js/adminlte.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
 <script src="<?php echo APP_URL; ?>/js/medico.js"></script>
+
+<script>
+// ==================== FUNCIÓN PARA CARGAR DIRECCIÓN EXISTENTE (IGUAL QUE EN pac_editar_datos) ====================
+function cargarDireccionExistente(direccion_completa) {
+    console.log('Parseando dirección existente:', direccion_completa);
+    
+    if (!direccion_completa || direccion_completa === '-') {
+        console.log('No hay dirección guardada');
+        return;
+    }
+    
+    let direccion_detallada = '';
+    let ubicacion = direccion_completa;
+    
+    // Separar la dirección detallada de la ubicación
+    if (direccion_completa.includes(' - ')) {
+        let partes = direccion_completa.split(' - ');
+        ubicacion = partes[0];
+        direccion_detallada = partes.slice(1).join(' - ');
+    }
+    
+    // Dividir la ubicación por comas
+    let ubicacion_partes = ubicacion.split(', ').filter(p => p.trim() !== '');
+    console.log('Partes de ubicación:', ubicacion_partes);
+    
+    // Cargar la dirección detallada en el campo
+    $('#direccion_detallada').val(direccion_detallada);
+    
+    // Cargar los selects con los valores existentes
+    cargarEstadosConSeleccion(ubicacion_partes);
+}
+
+function cargarEstadosConSeleccion(ubicacion_partes) {
+    $.ajax({
+        url: APP_URL + '/api/ubicacion/estados',
+        type: 'POST',
+        dataType: 'json',
+        success: function(estados) {
+            let options = '<option value="">Seleccione un estado...</option>';
+            for (let estado of estados) {
+                options += `<option value="${estado.id_estado}">${estado.estado}</option>`;
+            }
+            $('#estado').html(options).prop('disabled', false);
+            
+            // Seleccionar el estado guardado
+            if (ubicacion_partes[0] && ubicacion_partes[0] !== '') {
+                let estado_nombre = ubicacion_partes[0].trim();
+                $('#estado option').each(function() {
+                    if ($(this).text() === estado_nombre) {
+                        $(this).prop('selected', true);
+                        let id_estado = $(this).val();
+                        if (id_estado) {
+                            cargarCiudadesConSeleccion(id_estado, ubicacion_partes);
+                            cargarMunicipiosConSeleccion(id_estado, ubicacion_partes);
+                        }
+                    }
+                });
+            }
+        },
+        error: function() {
+            cargarEstadosFallbackConSeleccion(ubicacion_partes);
+        }
+    });
+}
+
+function cargarEstadosFallbackConSeleccion(ubicacion_partes) {
+    const estados = [
+        {id_estado: 1, estado: 'Amazonas'}, {id_estado: 2, estado: 'Anzoátegui'},
+        {id_estado: 3, estado: 'Apure'}, {id_estado: 4, estado: 'Aragua'},
+        {id_estado: 5, estado: 'Barinas'}, {id_estado: 6, estado: 'Bolívar'},
+        {id_estado: 7, estado: 'Carabobo'}, {id_estado: 8, estado: 'Cojedes'},
+        {id_estado: 9, estado: 'Delta Amacuro'}, {id_estado: 10, estado: 'Falcón'},
+        {id_estado: 11, estado: 'Guárico'}, {id_estado: 12, estado: 'Lara'},
+        {id_estado: 13, estado: 'Mérida'}, {id_estado: 14, estado: 'Miranda'},
+        {id_estado: 15, estado: 'Monagas'}, {id_estado: 16, estado: 'Nueva Esparta'},
+        {id_estado: 17, estado: 'Portuguesa'}, {id_estado: 18, estado: 'Sucre'},
+        {id_estado: 19, estado: 'Táchira'}, {id_estado: 20, estado: 'Trujillo'},
+        {id_estado: 21, estado: 'La Guaira'}, {id_estado: 22, estado: 'Yaracuy'},
+        {id_estado: 23, estado: 'Zulia'}, {id_estado: 24, estado: 'Distrito Capital'}
+    ];
+    let options = '<option value="">Seleccione un estado...</option>';
+    for (let estado of estados) {
+        options += `<option value="${estado.id_estado}">${estado.estado}</option>`;
+    }
+    $('#estado').html(options).prop('disabled', false);
+    
+    if (ubicacion_partes[0] && ubicacion_partes[0] !== '') {
+        let estado_nombre = ubicacion_partes[0].trim();
+        $('#estado option').each(function() {
+            if ($(this).text() === estado_nombre) {
+                $(this).prop('selected', true);
+                let id_estado = $(this).val();
+                if (id_estado) {
+                    cargarCiudadesConSeleccion(id_estado, ubicacion_partes);
+                    cargarMunicipiosConSeleccion(id_estado, ubicacion_partes);
+                }
+            }
+        });
+    }
+}
+
+function cargarCiudadesConSeleccion(id_estado, ubicacion_partes) {
+    if (!id_estado) return;
+    
+    $.ajax({
+        url: APP_URL + '/api/ubicacion/ciudades',
+        type: 'POST',
+        data: { id_estado: id_estado },
+        dataType: 'json',
+        success: function(ciudades) {
+            let options = '<option value="">Seleccione una ciudad...</option>';
+            for (let ciudad of ciudades) {
+                options += `<option value="${ciudad.id_ciudad}">${ciudad.ciudad}</option>`;
+            }
+            $('#ciudad').html(options).prop('disabled', false);
+            
+            if (ubicacion_partes[1] && ubicacion_partes[1] !== '') {
+                let ciudad_nombre = ubicacion_partes[1].trim();
+                $('#ciudad option').each(function() {
+                    if ($(this).text() === ciudad_nombre) {
+                        $(this).prop('selected', true);
+                    }
+                });
+            }
+        },
+        error: function() {
+            $('#ciudad').html('<option value="">Error al cargar ciudades</option>').prop('disabled', false);
+        }
+    });
+}
+
+function cargarMunicipiosConSeleccion(id_estado, ubicacion_partes) {
+    if (!id_estado) return;
+    
+    $.ajax({
+        url: APP_URL + '/api/ubicacion/municipios',
+        type: 'POST',
+        data: { id_estado: id_estado },
+        dataType: 'json',
+        success: function(municipios) {
+            let options = '<option value="">Seleccione un municipio...</option>';
+            for (let municipio of municipios) {
+                options += `<option value="${municipio.id_municipio}">${municipio.municipio}</option>`;
+            }
+            $('#municipio').html(options).prop('disabled', false);
+            
+            if (ubicacion_partes[2] && ubicacion_partes[2] !== '') {
+                let municipio_nombre = ubicacion_partes[2].trim();
+                $('#municipio option').each(function() {
+                    if ($(this).text() === municipio_nombre) {
+                        $(this).prop('selected', true);
+                        let id_municipio = $(this).val();
+                        if (id_municipio) {
+                            cargarParroquiasConSeleccion(id_municipio, ubicacion_partes);
+                        }
+                    }
+                });
+            }
+        },
+        error: function() {
+            $('#municipio').html('<option value="">Error al cargar municipios</option>').prop('disabled', false);
+        }
+    });
+}
+
+function cargarParroquiasConSeleccion(id_municipio, ubicacion_partes) {
+    if (!id_municipio) return;
+    
+    $.ajax({
+        url: APP_URL + '/api/ubicacion/parroquias',
+        type: 'POST',
+        data: { id_municipio: id_municipio },
+        dataType: 'json',
+        success: function(parroquias) {
+            let options = '<option value="">Seleccione una parroquia...</option>';
+            for (let parroquia of parroquias) {
+                options += `<option value="${parroquia.id_parroquia}">${parroquia.parroquia}</option>`;
+            }
+            $('#parroquia').html(options).prop('disabled', false);
+            
+            if (ubicacion_partes[3] && ubicacion_partes[3] !== '') {
+                let parroquia_nombre = ubicacion_partes[3].trim();
+                $('#parroquia option').each(function() {
+                    if ($(this).text() === parroquia_nombre) {
+                        $(this).prop('selected', true);
+                    }
+                });
+            }
+        },
+        error: function() {
+            $('#parroquia').html('<option value="">Error al cargar parroquias</option>').prop('disabled', false);
+        }
+    });
+}
+
+// ==================== MODIFICAR medico.js PARA INCLUIR CARGA DE DIRECCIÓN ====================
+// Esperar a que medico.js se cargue y luego agregar la funcionalidad de dirección
+$(document).ready(function() {
+    // Modificar la función buscar_medico para que después de cargar los datos, procese la dirección
+    var originalBuscarMedico = window.buscar_medico;
+    if (typeof window.buscar_medico === 'function') {
+        window.buscar_medico = function(dato) {
+            originalBuscarMedico(dato);
+            // Después de cargar los datos, procesar dirección
+            setTimeout(function() {
+                var direccion = $('#direccion_us').text();
+                if (direccion && direccion !== '-' && direccion !== 'No disponible') {
+                    cargarDireccionExistente(direccion);
+                }
+            }, 500);
+        };
+    }
+    
+    // También modificar el evento de edición para habilitar los selects de ubicación
+    $(document).on('click', '.edit', function() {
+        setTimeout(function() {
+            $('#estado, #ciudad, #municipio, #parroquia, #direccion_detallada').prop('disabled', false);
+        }, 100);
+    });
+    
+    // Al guardar, construir la dirección completa
+    $('#form-usuario').on('submit', function(e) {
+        var estado_nombre = $('#estado option:selected').text();
+        var ciudad_nombre = $('#ciudad option:selected').text();
+        var municipio_nombre = $('#municipio option:selected').text();
+        var parroquia_nombre = $('#parroquia option:selected').text();
+        var direccion_detallada = $('#direccion_detallada').val();
+        
+        var direccion_completa = '';
+        if (estado_nombre && estado_nombre !== 'Seleccione un estado...') {
+            direccion_completa = estado_nombre;
+        }
+        if (ciudad_nombre && ciudad_nombre !== 'Seleccione una ciudad...' && ciudad_nombre !== 'Seleccione un estado primero...') {
+            direccion_completa += (direccion_completa ? ', ' : '') + ciudad_nombre;
+        }
+        if (municipio_nombre && municipio_nombre !== 'Seleccione un municipio...' && municipio_nombre !== 'Seleccione un estado primero...') {
+            direccion_completa += (direccion_completa ? ', ' : '') + municipio_nombre;
+        }
+        if (parroquia_nombre && parroquia_nombre !== 'Seleccione una parroquia...' && parroquia_nombre !== 'Seleccione un municipio primero...') {
+            direccion_completa += (direccion_completa ? ', ' : '') + parroquia_nombre;
+        }
+        if (direccion_detallada && direccion_detallada !== '') {
+            direccion_completa += (direccion_completa ? ' - ' : '') + direccion_detallada;
+        }
+        
+        $('#direccion').val(direccion_completa);
+        console.log('Dirección completa a guardar:', direccion_completa);
+    });
+});
+</script>
 
 </body>
 </html>

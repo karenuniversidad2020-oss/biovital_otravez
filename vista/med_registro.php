@@ -246,8 +246,8 @@ include_once $securityPath;
                 </div>
                 
                 <div class="login-link">
-                    <a href="login_medico.php"><i class="fas fa-sign-in-alt"></i> ¿Ya tienes cuenta? Inicia sesión aquí</a>
-                </div>
+    <a href="<?php echo APP_URL; ?>/login/medico"><i class="fas fa-sign-in-alt"></i> ¿Ya tienes cuenta? Inicia sesión aquí</a>
+</div>
             </div>
         </div>
     </div>

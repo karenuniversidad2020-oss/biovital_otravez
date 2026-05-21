@@ -73,9 +73,9 @@ $nombre_usuario = $_SESSION['nombre_us'] ?? 'Administrador';
     </a>
     <div class="sidebar">
         <div class="user-panel mt-3 pb-3 mb-3 d-flex">
-            <div class="image">
-                <img id="avatar4" src="<?php echo APP_URL; ?>/img/avatar.png" class="img-circle elevation-2" alt="User Image">
-            </div>
+           <div class="image">
+    <img id="avatar_nav" src="<?php echo APP_URL; ?>/img/avatar.png" class="img-circle elevation-2" alt="User Image">
+</div>
             <div class="info">
                 <a href="#" class="d-block"><?php echo htmlspecialchars($nombre_usuario); ?></a>
             </div>
@@ -104,7 +104,7 @@ $nombre_usuario = $_SESSION['nombre_us'] ?? 'Administrador';
                     <i class="fas fa-hospital-user"></i> Clínica
                 </li>
                 <li class="nav-item">
-                    <a href="<?php echo APP_URL; ?>/consultorios" class="nav-link active">
+                    <a href="<?php echo APP_URL; ?>/consultorios" class="nav-link">
                         <i class="nav-icon fas fa-building"></i>
                         <p>Consultorios</p>
                     </a>
@@ -128,6 +128,7 @@ $nombre_usuario = $_SESSION['nombre_us'] ?? 'Administrador';
         </nav>
     </div>
 </aside>
+
 
 <!-- Content Wrapper -->
 <div class="content-wrapper">

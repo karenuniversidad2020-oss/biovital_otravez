@@ -245,9 +245,9 @@ include_once $securityPath;
                     </button>
                 </div>
                 
-                <div class="login-link">
-                    <a href="login_administrador.php"><i class="fas fa-sign-in-alt"></i> ¿Ya tienes cuenta? Inicia sesión aquí</a>
-                </div>
+               <div class="login-link">
+    <a href="<?php echo APP_URL; ?>/login/administrador"><i class="fas fa-sign-in-alt"></i> ¿Ya tienes cuenta? Inicia sesión aquí</a>
+</div>
             </div>
         </div>
     </div>

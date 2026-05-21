@@ -51,13 +51,15 @@ class AuthController {
                 $login->actualizarUltimoAcceso($objeto->{$map['idField']});
             }
             
-            // Redirigir a la URL correcta (sin /login/)
-            $redirectUrl = "panel/$rol";
+            // CORREGIDO: Construir la URL de redirección correctamente
+            // Eliminar cualquier referencia a /login/ de la ruta
+            $redirectUrl = APP_URL . '/panel/' . $rol;
             
             if ($isAjax) {
                 jsonResponse(['success' => true, 'redirect' => $redirectUrl]);
             } else {
-                redirect($redirectUrl);
+                header('Location: ' . $redirectUrl);
+                exit();
             }
         } else {
             if ($isAjax) {

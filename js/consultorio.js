@@ -1,20 +1,25 @@
-// Usar configuración global
-var BASE_URL = window.CONFIG ? window.CONFIG.BASE_URL : '';
+/**
+ * consultorio.js - Gestión de consultorios
+ 
+ */
 
-function getConsultorioUrl(action) {
-    if (window.CONFIG) {
-        return window.CONFIG.getControllerUrl('ConsultorioController');
-    }
-    return BASE_URL + '/controlador/ConsultorioController.php';
+// Esperar a que APP_URL esté definida
+if (typeof APP_URL === 'undefined') {
+    console.error('ERROR: APP_URL no está definida');
+    var APP_URL = '';
 }
+
 $(document).ready(function() {
+    console.log('APP_URL en consultorio.js:', APP_URL);
+    
     // ==================== LISTADO DE CONSULTORIOS ====================
     if ($('#contenedor_consultorios').length) {
         cargarEstadisticas();
         cargarConsultorios();
         
         $('#btnBuscar').click(function() {
-            cargarConsultorios($('#buscar_consultorio').val());
+            var busqueda = $('#buscar_consultorio').val();
+            cargarConsultorios(busqueda);
         });
         
         $('#buscar_consultorio').keypress(function(e) {
@@ -24,7 +29,7 @@ $(document).ready(function() {
         });
         
         $('#btnNuevoConsultorio').click(function() {
-            window.location.href = 'adm_consultorio_crear.php';
+            window.location.href = APP_URL + '/consultorios/crear';
         });
         
         $(document).on('click', '.btn-eliminar', function() {
@@ -34,6 +39,16 @@ $(document).ready(function() {
         
         $('#confirmarEliminar').click(function() {
             eliminarConsultorio($('#eliminar_id').val());
+        });
+        
+        // Limpiar resultados
+        $(document).on('click', '#limpiarResultados', function(e) {
+            e.preventDefault();
+            $('#buscar_consultorio').val('');
+            $('#resultado_busqueda').hide();
+            $('#btnLimpiarBusqueda').hide();
+            cargarConsultorios('');
+            cargarEstadisticas();
         });
     }
     
@@ -57,7 +72,6 @@ $(document).ready(function() {
         cargarEstados();
         cargarListaEspecialidades();
         
-        // Vista previa en tiempo real
         $('#nombre, #ciudad, #descripcion, #telefono, #email').on('input', function() {
             actualizarPreview();
         });
@@ -77,10 +91,9 @@ $(document).ready(function() {
         $('#volver_detalle').click(function(e) {
             e.preventDefault();
             let id = $('#id_consultorio').val();
-            window.location.href = 'adm_consultorio_detalle.php?id=' + id;
+            window.location.href = APP_URL + '/consultorios/detalle?id=' + id;
         });
         
-        // Vista previa en tiempo real
         $('#nombre, #ciudad, #descripcion, #telefono, #email').on('input', function() {
             actualizarPreview();
         });
@@ -99,7 +112,7 @@ $(document).ready(function() {
         $('#volver_detalle').click(function(e) {
             e.preventDefault();
             let id = $('#id_consultorio').val();
-            window.location.href = 'adm_consultorio_detalle.php?id=' + id;
+            window.location.href = APP_URL + '/consultorios/detalle?id=' + id;
         });
         
         $('#btnRefresh').click(function() {
@@ -139,14 +152,21 @@ $(document).ready(function() {
 // ==================== FUNCIONES DE CONSULTORIOS ====================
 
 function cargarEstadisticas() {
+    console.log('Cargando estadísticas desde:', APP_URL + '/api/consultorios/estadisticas');
+    
     $.ajax({
-        url: '../../controlador/ConsultorioController.php',
+        url: APP_URL + '/api/consultorios/estadisticas',
         type: 'POST',
-        data: { funcion: 'obtener_estadisticas' },
         dataType: 'json',
         success: function(data) {
+            console.log('Estadísticas recibidas:', data);
             $('#total_consultorios').text(data.total_consultorios || 0);
             $('#total_activos').text(data.activos || 0);
+        },
+        error: function(xhr, status, error) {
+            console.error('Error al cargar estadísticas:', error);
+            $('#total_consultorios').text('0');
+            $('#total_activos').text('0');
         }
     });
 }
@@ -155,9 +175,9 @@ function cargarConsultorios(busqueda = '') {
     $('#contenedor_consultorios').html('<div class="col-12 text-center"><div class="spinner-border text-primary"></div><p>Cargando consultorios...</p></div>');
     
     $.ajax({
-        url: '../../controlador/ConsultorioController.php',
+        url: APP_URL + '/api/consultorios/listar',
         type: 'POST',
-        data: { funcion: 'listar_consultorios', busqueda: busqueda },
+        data: { busqueda: busqueda, funcion: 'listar_consultorios' },
         dataType: 'json',
         success: function(consultorios) {
             let html = '';
@@ -174,13 +194,14 @@ function cargarConsultorios(busqueda = '') {
                                 </div>
                                 <div class="card-body">
                                     <p><i class="fas fa-map-marker-alt text-danger"></i> <strong>${escapeHtml(c.ciudad || 'No especificada')}</strong></p>
-                                    <p class="text-muted small">${escapeHtml(c.direccion || '')}</p>
+                                    <p class="text-muted small">${escapeHtml(c.direccion_detallada || '')}</p>
                                     <p><i class="fas fa-phone"></i> ${c.telefono || 'No disponible'}</p>
                                     <p><i class="fas fa-user-md"></i> <span class="badge-medicos">${c.total_medicos || 0} Médicos asignados</span></p>
-                                    <p><i class="fas fa-clock"></i> ${c.apertura || '08:00'} - ${c.cierre || '17:00'}</p>
+                                    <p><i class="fas fa-clock"></i> ${c.apertura_habitual || '08:00'} - ${c.cierre_habitual || '17:00'}</p>
                                 </div>
                                 <div class="card-footer text-right">
-                                    <a href="adm_consultorio_detalle.php?id=${c.id_consultorio}" class="btn btn-info btn-sm">
+                                    <!-- CORREGIDO: usar APP_URL y la ruta amigable -->
+                                    <a href="${APP_URL}/consultorios/detalle?id=${c.id_consultorio}" class="btn btn-info btn-sm">
                                         <i class="fas fa-eye"></i> Ver
                                     </a>
                                     <button class="btn btn-danger btn-sm btn-eliminar" data-id="${c.id_consultorio}">
@@ -202,11 +223,12 @@ function cargarConsultorios(busqueda = '') {
 
 function eliminarConsultorio(id) {
     $.ajax({
-        url: '../../controlador/ConsultorioController.php',
+        url: APP_URL + '/api/consultorios/eliminar',
         type: 'POST',
-        data: { funcion: 'eliminar_consultorio', id_consultorio: id },
+        data: { id_consultorio: id },
         dataType: 'json',
         success: function(response) {
+            console.log('Respuesta eliminar:', response);
             if (response.resultado === 'eliminado') {
                 $('#modalEliminar').modal('hide');
                 cargarConsultorios();
@@ -215,6 +237,10 @@ function eliminarConsultorio(id) {
             } else {
                 mostrarAlerta('Error al eliminar el consultorio', 'error');
             }
+        },
+        error: function(xhr, status, error) {
+            console.error('Error al eliminar:', error);
+            mostrarAlerta('Error de conexión al eliminar', 'error');
         }
     });
 }
@@ -223,18 +249,20 @@ function cargarDetalleConsultorio() {
     let id = $('#id_consultorio').val();
     
     $.ajax({
-        url: '../../controlador/ConsultorioController.php',
+        url: APP_URL + '/api/consultorios/obtener-detalle',
         type: 'POST',
-        data: { funcion: 'obtener_detalle', id_consultorio: id },
+        data: { id_consultorio: id },
         dataType: 'json',
         success: function(data) {
+            console.log('Detalle consultorio:', data);
+            
             $('#consultorio_nombre').text(data.nombre);
             $('#detalle_nombre').text(data.nombre);
             $('#detalle_ciudad').text(data.ciudad);
             $('#detalle_horario').text(data.apertura + ' - ' + data.cierre);
             $('#detalle_telefono').text(data.telefono || '-');
             $('#detalle_email').text(data.email || '-');
-            $('#detalle_direccion').text(data.direccion || '-');
+            $('#detalle_direccion').text(data.direccion_detallada || '-');
             $('#detalle_descripcion').html(data.descripcion || '<p class="text-muted">Sin descripción</p>');
             $('#total_citas').text(Math.floor(Math.random() * 50) + 10);
             
@@ -272,24 +300,30 @@ function cargarDetalleConsultorio() {
             }
             $('#contenedor_medicos').html(medHtml);
             
-            // Cargar lista de médicos para el modal
             cargarListaMedicos();
+        },
+        error: function(xhr, status, error) {
+            console.error('Error al cargar detalle:', error);
+            $('#detalle_nombre').text('Error al cargar datos');
         }
     });
 }
 
 function cargarListaMedicos() {
     $.ajax({
-        url: '../../controlador/ConsultorioController.php',
+        url: APP_URL + '/api/consultorios/listar-medicos',
         type: 'POST',
-        data: { funcion: 'listar_medicos_disponibles' },
         dataType: 'json',
         success: function(medicos) {
+            console.log('Médicos disponibles:', medicos);
             let options = '<option value="">Seleccione un médico...</option>';
             for (let med of medicos) {
                 options += `<option value="${med.id_medico}">${escapeHtml(med.nombre_medico)} ${escapeHtml(med.apellido_medico)} (${med.cedula_medico})</option>`;
             }
             $('#medico_seleccionado').html(options);
+        },
+        error: function(xhr, status, error) {
+            console.error('Error al cargar médicos:', error);
         }
     });
 }
@@ -304,11 +338,12 @@ function asignarMedico() {
     }
     
     $.ajax({
-        url: '../../controlador/ConsultorioController.php',
+        url: APP_URL + '/api/consultorios/asignar-medico',
         type: 'POST',
-        data: { funcion: 'asignar_medico', id_consultorio: id_consultorio, id_medico: id_medico },
+        data: { id_consultorio: id_consultorio, id_medico: id_medico },
         dataType: 'json',
         success: function(response) {
+            console.log('Respuesta asignar médico:', response);
             if (response.resultado === 'asignado') {
                 mostrarMensaje('Médico asignado correctamente', 'success');
                 setTimeout(function() {
@@ -320,36 +355,42 @@ function asignarMedico() {
             } else {
                 mostrarMensaje('Error al asignar el médico', 'error');
             }
+        },
+        error: function(xhr, status, error) {
+            console.error('Error al asignar médico:', error);
+            mostrarMensaje('Error de conexión', 'error');
         }
     });
 }
 
 function removerMedico(id_asignacion) {
     $.ajax({
-        url: '../../controlador/ConsultorioController.php',
+        url: APP_URL + '/api/consultorios/remover-medico',
         type: 'POST',
-        data: { funcion: 'remover_medico', id_asignacion: id_asignacion },
+        data: { id_asignacion: id_asignacion },
         dataType: 'json',
         success: function(response) {
+            console.log('Respuesta remover médico:', response);
             if (response.resultado === 'removido') {
                 mostrarAlerta('Médico removido del consultorio', 'success');
                 cargarDetalleConsultorio();
             } else {
                 mostrarAlerta('Error al remover el médico', 'error');
             }
+        },
+        error: function(xhr, status, error) {
+            console.error('Error al remover médico:', error);
+            mostrarAlerta('Error de conexión', 'error');
         }
     });
 }
 
-// ==================== FUNCIONES DE CREAR/EDITAR ====================
-
-// ==================== SISTEMA DE UBICACIÓN ====================
+// ==================== FUNCIONES DE UBICACIÓN ====================
 
 function cargarEstados() {
     $.ajax({
-        url: '../../controlador/ConsultorioController.php',
+        url: APP_URL + '/api/ubicacion/estados',
         type: 'POST',
-        data: { funcion: 'listar_estados' },
         dataType: 'json',
         success: function(estados) {
             let options = '<option value="">Seleccione un estado...</option>';
@@ -360,181 +401,37 @@ function cargarEstados() {
         },
         error: function(xhr) {
             console.error('Error cargando estados:', xhr.responseText);
+            cargarEstadosFallback();
         }
     });
 }
 
-function cargarCiudades(id_estado) {
-    if (!id_estado) {
-        $('#ciudad').html('<option value="">Seleccione un estado primero...</option>').prop('disabled', true);
-        $('#municipio').html('<option value="">Seleccione una ciudad primero...</option>').prop('disabled', true);
-        $('#parroquia').html('<option value="">Seleccione un municipio primero...</option>').prop('disabled', true);
-        return;
+function cargarEstadosFallback() {
+    const estados = [
+        {id_estado: 1, estado: 'Amazonas'}, {id_estado: 2, estado: 'Anzoátegui'},
+        {id_estado: 3, estado: 'Apure'}, {id_estado: 4, estado: 'Aragua'},
+        {id_estado: 5, estado: 'Barinas'}, {id_estado: 6, estado: 'Bolívar'},
+        {id_estado: 7, estado: 'Carabobo'}, {id_estado: 8, estado: 'Cojedes'},
+        {id_estado: 9, estado: 'Delta Amacuro'}, {id_estado: 10, estado: 'Falcón'},
+        {id_estado: 11, estado: 'Guárico'}, {id_estado: 12, estado: 'Lara'},
+        {id_estado: 13, estado: 'Mérida'}, {id_estado: 14, estado: 'Miranda'},
+        {id_estado: 15, estado: 'Monagas'}, {id_estado: 16, estado: 'Nueva Esparta'},
+        {id_estado: 17, estado: 'Portuguesa'}, {id_estado: 18, estado: 'Sucre'},
+        {id_estado: 19, estado: 'Táchira'}, {id_estado: 20, estado: 'Trujillo'},
+        {id_estado: 21, estado: 'La Guaira'}, {id_estado: 22, estado: 'Yaracuy'},
+        {id_estado: 23, estado: 'Zulia'}, {id_estado: 24, estado: 'Distrito Capital'}
+    ];
+    let options = '<option value="">Seleccione un estado...</option>';
+    for (let estado of estados) {
+        options += `<option value="${estado.id_estado}">${estado.estado}</option>`;
     }
-    
-    $('#ciudad').html('<option value="">Cargando ciudades...</option>').prop('disabled', true);
-    
-    $.ajax({
-        url: '../../controlador/ConsultorioController.php',
-        type: 'POST',
-        data: { funcion: 'listar_ciudades', id_estado: id_estado },
-        dataType: 'json',
-        success: function(ciudades) {
-            let options = '<option value="">Seleccione una ciudad...</option>';
-            for (let ciudad of ciudades) {
-                options += `<option value="${ciudad.id_ciudad}">${ciudad.ciudad}</option>`;
-            }
-            $('#ciudad').html(options).prop('disabled', false);
-            $('#municipio').html('<option value="">Seleccione una ciudad primero...</option>').prop('disabled', true);
-            $('#parroquia').html('<option value="">Seleccione un municipio primero...</option>').prop('disabled', true);
-        },
-        error: function(xhr) {
-            console.error('Error cargando ciudades:', xhr.responseText);
-            $('#ciudad').html('<option value="">Error al cargar ciudades</option>').prop('disabled', false);
-        }
-    });
+    $('#estado').html(options);
 }
 
-function cargarMunicipios(id_estado) {
-    if (!id_estado) {
-        $('#municipio').html('<option value="">Seleccione un estado primero...</option>').prop('disabled', true);
-        $('#parroquia').html('<option value="">Seleccione un municipio primero...</option>').prop('disabled', true);
-        return;
-    }
-    
-    $('#municipio').html('<option value="">Cargando municipios...</option>').prop('disabled', true);
-    
-    $.ajax({
-        url: '../../controlador/ConsultorioController.php',
-        type: 'POST',
-        data: { funcion: 'listar_municipios', id_estado: id_estado },
-        dataType: 'json',
-        success: function(municipios) {
-            let options = '<option value="">Seleccione un municipio...</option>';
-            for (let municipio of municipios) {
-                options += `<option value="${municipio.id_municipio}">${municipio.municipio}</option>`;
-            }
-            $('#municipio').html(options).prop('disabled', false);
-            $('#parroquia').html('<option value="">Seleccione un municipio primero...</option>').prop('disabled', true);
-        },
-        error: function(xhr) {
-            console.error('Error cargando municipios:', xhr.responseText);
-            $('#municipio').html('<option value="">Error al cargar municipios</option>').prop('disabled', false);
-        }
-    });
-}
-
-function cargarParroquias(id_municipio) {
-    if (!id_municipio) {
-        $('#parroquia').html('<option value="">Seleccione un municipio primero...</option>').prop('disabled', true);
-        return;
-    }
-    
-    $('#parroquia').html('<option value="">Cargando parroquias...</option>').prop('disabled', true);
-    
-    $.ajax({
-        url: '../../controlador/ConsultorioController.php',
-        type: 'POST',
-        data: { funcion: 'listar_parroquias', id_municipio: id_municipio },
-        dataType: 'json',
-        success: function(parroquias) {
-            let options = '<option value="">Seleccione una parroquia...</option>';
-            for (let parroquia of parroquias) {
-                options += `<option value="${parroquia.id_parroquia}">${parroquia.parroquia}</option>`;
-            }
-            $('#parroquia').html(options).prop('disabled', false);
-        },
-        error: function(xhr) {
-            console.error('Error cargando parroquias:', xhr.responseText);
-            $('#parroquia').html('<option value="">Error al cargar parroquias</option>').prop('disabled', false);
-        }
-    });
-}
-
-// Eventos
-$(document).on('change', '#estado', function() {
-    let id_estado = $(this).val();
-    if (id_estado) {
-        cargarCiudades(id_estado);
-        cargarMunicipios(id_estado);
-    } else {
-        $('#ciudad').html('<option value="">Seleccione un estado primero...</option>').prop('disabled', true);
-        $('#municipio').html('<option value="">Seleccione un estado primero...</option>').prop('disabled', true);
-        $('#parroquia').html('<option value="">Seleccione un municipio primero...</option>').prop('disabled', true);
-    }
-});
-
-$(document).on('change', '#ciudad', function() {
-    let ciudad_nombre = $('#ciudad option:selected').text();
-    if ($('#preview_ciudad').length) {
-        $('#preview_ciudad').text(ciudad_nombre || 'Ciudad');
-    }
-});
-
-$(document).on('change', '#municipio', function() {
-    let id_municipio = $(this).val();
-    if (id_municipio) {
-        cargarParroquias(id_municipio);
-    } else {
-        $('#parroquia').html('<option value="">Seleccione un municipio primero...</option>').prop('disabled', true);
-    }
-});
-
-// Función para cargar datos de ubicación al editar (para mostrar los nombres en lugar de IDs)
-function cargarUbicacionParaEdicion(estado_id, ciudad_id, municipio_id, parroquia_id) {
-    // Primero cargar estados y luego seleccionar
-    $.ajax({
-        url: '../../controlador/ConsultorioController.php',
-        type: 'POST',
-        data: { funcion: 'listar_estados' },
-        dataType: 'json',
-        success: function(estados) {
-            $('#estado').html('<option value="">Seleccione un estado...</option>');
-            for (let estado of estados) {
-                let selected = (estado.id_estado == estado_id) ? 'selected' : '';
-                $('#estado').append(`<option value="${estado.id_estado}" ${selected}>${estado.estado}</option>`);
-            }
-            
-            if (estado_id) {
-                cargarCiudades(estado_id, ciudad_id);
-            }
-        }
-    });
-}
-
-// Modificar cargarCiudades para aceptar selección opcional
-function cargarCiudades(id_estado, ciudad_seleccionada = null) {
-    if (!id_estado) {
-        $('#ciudad').html('<option value="">Primero seleccione un estado...</option>').prop('disabled', true);
-        return;
-    }
-    
-    $('#ciudad').html('<option value="">Cargando ciudades...</option>').prop('disabled', true);
-    
-    $.ajax({
-        url: '../../controlador/ConsultorioController.php',
-        type: 'POST',
-        data: { funcion: 'listar_ciudades', id_estado: id_estado },
-        dataType: 'json',
-        success: function(ciudades) {
-            let options = '<option value="">Seleccione una ciudad...</option>';
-            for (let ciudad of ciudades) {
-                let selected = (ciudad.id_ciudad == ciudad_seleccionada) ? 'selected' : '';
-                options += `<option value="${ciudad.id_ciudad}" data-nombre="${ciudad.ciudad}" ${selected}>${ciudad.ciudad}</option>`;
-            }
-            $('#ciudad').html(options).prop('disabled', false);
-            
-            if (ciudad_seleccionada) {
-                $('#ciudad').trigger('change');
-            }
-        }
-    });
-}
 function cargarListaEspecialidades() {
     $.ajax({
-        url: '../../controlador/ConsultorioController.php',
+        url: APP_URL + '/api/ubicacion/especialidades',
         type: 'POST',
-        data: { funcion: 'lista_especialidades' },
         dataType: 'json',
         success: function(especialidades) {
             let html = '';
@@ -547,6 +444,10 @@ function cargarListaEspecialidades() {
                 `;
             }
             $('#especialidades_container').html(html);
+        },
+        error: function(xhr) {
+            console.error('Error cargando especialidades:', xhr.responseText);
+            $('#especialidades_container').html('<div class="text-danger">Error al cargar especialidades</div>');
         }
     });
 }
@@ -568,10 +469,9 @@ function actualizarPreview() {
 }
 
 function crearConsultorio() {
-    let especialidades = obtenerEspecialidadesSeleccionadas();
+    var especialidades = obtenerEspecialidadesSeleccionadas();
     
-    let datos = {
-        funcion: 'crear_consultorio',
+    var datos = {
         nombre: $('#nombre').val(),
         descripcion: $('#descripcion').val(),
         apertura: $('#apertura').val(),
@@ -583,10 +483,12 @@ function crearConsultorio() {
         id_municipio: $('#municipio').val(),
         id_parroquia: $('#parroquia').val(),
         direccion: $('#direccion').val(),
-        especialidades: especialidades
+        especialidades: especialidades,
+        csrf_token: CSRF.getToken()
     };
     
-    // Validar campos requeridos
+    console.log('Datos a enviar:', datos); // Para depuración
+    
     if (!datos.nombre || !datos.id_estado || !datos.id_ciudad || !datos.direccion) {
         $('#errorMensaje').text('Complete los campos requeridos (*)');
         $('#alertError').show();
@@ -595,15 +497,16 @@ function crearConsultorio() {
     }
     
     $.ajax({
-        url: '../../controlador/ConsultorioController.php',
+        url: APP_URL + '/api/consultorios/crear',
         type: 'POST',
         data: datos,
         dataType: 'json',
         success: function(response) {
+            console.log('Respuesta crear consultorio:', response);
             if (response.resultado === 'creado') {
                 $('#alertExito').show();
                 setTimeout(function() {
-                    window.location.href = 'adm_consultorios.php';
+                    window.location.href = APP_URL + '/consultorios';
                 }, 2000);
             } else {
                 $('#errorMensaje').text('Error al crear el consultorio: ' + response.resultado);
@@ -612,7 +515,7 @@ function crearConsultorio() {
             }
         },
         error: function(xhr) {
-            console.error(xhr.responseText);
+            console.error('Error crear consultorio:', xhr.responseText);
             $('#errorMensaje').text('Error de conexión: ' + xhr.status);
             $('#alertError').show();
             setTimeout(function() { $('#alertError').hide(); }, 3000);
@@ -624,58 +527,22 @@ function cargarDatosConsultorio() {
     let id = $('#id_consultorio').val();
     
     $.ajax({
-        url: '../../controlador/ConsultorioController.php',
+        url: APP_URL + '/api/consultorios/obtener-detalle',
         type: 'POST',
-        data: { funcion: 'obtener_detalle', id_consultorio: id },
+        data: { id_consultorio: id },
         dataType: 'json',
         success: function(data) {
+            console.log('Datos consultorio para editar:', data);
+            
             $('#nombre').val(data.nombre);
-            $('#descripcion').val(data.descripcion);
+            $('#descripcion').val(data.descripcion || '');
             $('#apertura').val(data.apertura);
             $('#cierre').val(data.cierre);
-            $('#telefono').val(data.telefono);
-            $('#email').val(data.email);
-            $('#direccion').val(data.direccion);
-            
-            // Guardar nombres actuales para el preview
-            let estado_actual = data.estado;
-            let ciudad_actual = data.ciudad;
-            let municipio_actual = data.municipio;
-            let parroquia_actual = data.parroquia;
+            $('#telefono').val(data.telefono || '');
+            $('#email').val(data.email || '');
+            $('#direccion').val(data.direccion_detallada || '');
             
             actualizarPreview();
-            
-            // Cargar estados y luego seleccionar el correspondiente
-            $.ajax({
-                url: '../../controlador/ConsultorioController.php',
-                type: 'POST',
-                data: { funcion: 'listar_estados' },
-                dataType: 'json',
-                success: function(estados) {
-                    $('#estado').html('<option value="">Seleccione un estado...</option>');
-                    for (let estado of estados) {
-                        let selected = (estado.estado === estado_actual) ? 'selected' : '';
-                        $('#estado').append(`<option value="${estado.id_estado}" ${selected}>${estado.estado}</option>`);
-                    }
-                    
-                    if (estado_actual) {
-                        // Después de cargar estados, cargar ciudades
-                        let estado_id = $('#estado').val();
-                        if (estado_id) {
-                            cargarCiudades(estado_id);
-                            // Esperar a que se carguen las ciudades para seleccionar la correcta
-                            setTimeout(function() {
-                                $('#ciudad option').each(function() {
-                                    if ($(this).text() === ciudad_actual) {
-                                        $(this).prop('selected', true);
-                                        $('#ciudad').trigger('change');
-                                    }
-                                });
-                            }, 500);
-                        }
-                    }
-                }
-            });
             
             // Marcar especialidades seleccionadas
             if (data.especialidades && data.especialidades.length > 0) {
@@ -684,8 +551,11 @@ function cargarDatosConsultorio() {
                         let idCheck = `#esp_${esp.replace(/\s/g, '_')}`;
                         $(idCheck).prop('checked', true);
                     }
-                }, 1000);
+                }, 500);
             }
+        },
+        error: function(xhr) {
+            console.error('Error cargando datos para editar:', xhr.responseText);
         }
     });
 }
@@ -695,7 +565,6 @@ function editarConsultorio() {
     let id = $('#id_consultorio').val();
     
     let datos = {
-        funcion: 'editar_consultorio',
         id_consultorio: id,
         nombre: $('#nombre').val(),
         descripcion: $('#descripcion').val(),
@@ -708,25 +577,33 @@ function editarConsultorio() {
         municipio: $('#municipio').val(),
         parroquia: $('#parroquia').val(),
         direccion: $('#direccion').val(),
-        especialidades: especialidades
+        especialidades: especialidades,
+        csrf_token: CSRF.getToken()
     };
     
     $.ajax({
-        url: '../../controlador/ConsultorioController.php',
+        url: APP_URL + '/api/consultorios/editar',
         type: 'POST',
         data: datos,
         dataType: 'json',
         success: function(response) {
+            console.log('Respuesta editar consultorio:', response);
             if (response.resultado === 'editado') {
                 $('#alertExito').show();
                 setTimeout(function() {
-                    window.location.href = 'adm_consultorio_detalle.php?id=' + id;
+                    window.location.href = APP_URL + '/consultorios/detalle?id=' + id;
                 }, 2000);
             } else {
                 $('#errorMensaje').text('Error al actualizar el consultorio');
                 $('#alertError').show();
                 setTimeout(function() { $('#alertError').hide(); }, 3000);
             }
+        },
+        error: function(xhr) {
+            console.error('Error editar consultorio:', xhr.responseText);
+            $('#errorMensaje').text('Error de conexión: ' + xhr.status);
+            $('#alertError').show();
+            setTimeout(function() { $('#alertError').hide(); }, 3000);
         }
     });
 }
@@ -737,12 +614,15 @@ function cargarNombreConsultorio() {
     let id = $('#id_consultorio').val();
     
     $.ajax({
-        url: '../../controlador/ConsultorioController.php',
+        url: APP_URL + '/api/consultorios/obtener-detalle',
         type: 'POST',
-        data: { funcion: 'obtener_detalle', id_consultorio: id },
+        data: { id_consultorio: id },
         dataType: 'json',
         success: function(data) {
             $('#consultorio_nombre').text(data.nombre);
+        },
+        error: function(xhr) {
+            console.error('Error cargando nombre consultorio:', xhr.responseText);
         }
     });
 }
@@ -751,15 +631,16 @@ function cargarHorarios() {
     let id = $('#id_consultorio').val();
     
     $.ajax({
-        url: '../../controlador/ConsultorioController.php',
+        url: APP_URL + '/api/consultorios/obtener-horarios',
         type: 'POST',
-        data: { funcion: 'obtener_horarios', id_consultorio: id },
+        data: { id_consultorio: id },
         dataType: 'json',
         success: function(response) {
+            console.log('Horarios recibidos:', response);
+            
             let horarios = response.horarios;
             let medicos = response.medicos;
             
-            // Llenar select de médicos en el modal
             let options = '<option value="">Sin asignar</option>';
             for (let med of medicos) {
                 options += `<option value="${med.id}">${escapeHtml(med.nombre)}</option>`;
@@ -776,7 +657,6 @@ function cargarHorarios() {
                             <h4 class="text-center">${dia}</h4>
                 `;
                 
-                // Turno Mañana
                 let manana = horarios[dia]['Mañana'];
                 html += `
                     <div class="horario-slot ${manana ? 'ocupado' : 'disponible'}">
@@ -804,7 +684,6 @@ function cargarHorarios() {
                     </div>
                 `;
                 
-                // Turno Tarde
                 let tarde = horarios[dia]['Tarde'];
                 html += `
                     <div class="horario-slot ${tarde ? 'ocupado' : 'disponible'} mt-2">
@@ -837,21 +716,13 @@ function cargarHorarios() {
             
             $('#contenedor_horarios').html(html);
         },
-        error: function() {
+        error: function(xhr, status, error) {
+            console.error('Error al cargar horarios:', error);
             $('#contenedor_horarios').html('<div class="col-12 text-center"><div class="alert alert-danger">Error al cargar horarios</div></div>');
         }
     });
 }
-// *****************Botón limpiar resultados desde el enlace********************* */
-$(document).on('click', '#limpiarResultados', function(e) {
-    e.preventDefault();
-    $('#buscar_consultorio').val('');
-    $('#resultado_busqueda').hide();
-    $('#btnLimpiarBusqueda').hide();
-    cargarConsultorios('');
-    cargarEstadisticas();
-});
-//**              GUARDAR HORARIO************************************************ */
+
 function guardarHorario() {
     let id_consultorio = $('#id_consultorio').val();
     let dia = $('#horario_dia').val();
@@ -860,52 +731,34 @@ function guardarHorario() {
     let hora_fin = $('#hora_fin').val();
     let id_medico = $('#medico_asignado').val();
     
-    // VALIDACIÓN 1: Horarios completos
     if (!hora_inicio || !hora_fin) {
         mostrarErrorHorario('Complete los horarios de inicio y fin');
         return;
     }
     
-    // VALIDACIÓN 2: Hora fin mayor que hora inicio
     if (hora_inicio >= hora_fin) {
         mostrarErrorHorario('La hora de fin debe ser mayor que la hora de inicio');
         return;
     }
     
-    // VALIDACIÓN 3: Validar formato de hora (opcional)
-    const horaRegex = /^([0-1][0-9]|2[0-3]):[0-5][0-9]$/;
-    if (!horaRegex.test(hora_inicio) || !horaRegex.test(hora_fin)) {
-        mostrarErrorHorario('Formato de hora inválido. Use HH:MM (ej: 08:00, 14:30)');
-        return;
-    }
-    
-    // Confirmación si se va a sobrescribir un horario existente
-    let slotExistente = $('.btn-editar-horario[data-dia="' + dia + '"][data-turno="' + turno + '"]');
-    if (slotExistente.length && slotExistente.data('hora-inicio') !== hora_inicio) {
-        if (!confirm('¿Está seguro de modificar este horario? Los cambios afectarán la programación actual.')) {
-            return;
-        }
-    }
-    
-    // Mostrar loading
     let btn = $('#btnGuardarHorario');
     let originalText = btn.html();
     btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Guardando...');
     
     $.ajax({
-        url: '../../controlador/ConsultorioController.php',
+        url: APP_URL + '/api/consultorios/guardar-horario',
         type: 'POST',
         data: {
-            funcion: 'guardar_horario',
             id_consultorio: id_consultorio,
             dia: dia,
             turno: turno,
             hora_inicio: hora_inicio,
             hora_fin: hora_fin,
-            id_medico: id_medico
+            id_medico: id_medico || ''
         },
         dataType: 'json',
         success: function(response) {
+            console.log('Respuesta guardar horario:', response);
             if (response.resultado === 'guardado') {
                 $('#modalHorario').modal('hide');
                 mostrarExitoHorario('Horario guardado correctamente');
@@ -919,7 +772,7 @@ function guardarHorario() {
             }
         },
         error: function(xhr) {
-            console.error(xhr.responseText);
+            console.error('Error al guardar horario:', xhr.responseText);
             mostrarErrorHorario('Error de conexión al guardar el horario');
         },
         complete: function() {
@@ -971,4 +824,262 @@ function mostrarMensaje(mensaje, tipo) {
         .addClass(tipo === 'success' ? 'alert-success' : 'alert-danger')
         .text(mensaje).show();
     setTimeout(function() { $('#mensaje_asignacion').fadeOut(); }, 2000);
+}
+// ==================== FUNCIONES DE UBICACIÓN PARA CONSULTORIO ====================
+// Estas funciones faltan en consultorio.js pero son llamadas desde el formulario
+
+function cargarCiudades(id_estado) {
+    if (!id_estado) {
+        $('#ciudad').html('<option value="">Seleccione un estado primero...</option>').prop('disabled', true);
+        return;
+    }
+    
+    $('#ciudad').html('<option value="">Cargando ciudades...</option>').prop('disabled', false);
+    
+    $.ajax({
+        url: APP_URL + '/api/ubicacion/ciudades',
+        type: 'POST',
+        data: { id_estado: id_estado },
+        dataType: 'json',
+        success: function(response) {
+            let ciudades = Array.isArray(response) ? response : (response.data || response.ciudades || []);
+            let options = '<option value="">Seleccione una ciudad...</option>';
+            for (let i = 0; i < ciudades.length; i++) {
+                let ciudad = ciudades[i];
+                let id = ciudad.id_ciudad || ciudad.id;
+                let nombre = ciudad.ciudad || ciudad.nombre;
+                options += `<option value="${id}">${escapeHtml(nombre)}</option>`;
+            }
+            $('#ciudad').html(options).prop('disabled', false);
+        },
+        error: function(xhr) {
+            console.error('Error cargando ciudades:', xhr.responseText);
+            $('#ciudad').html('<option value="">Error al cargar ciudades</option>').prop('disabled', false);
+        }
+    });
+}
+
+function cargarMunicipios(id_estado) {
+    if (!id_estado) {
+        $('#municipio').html('<option value="">Seleccione un estado primero...</option>').prop('disabled', true);
+        $('#parroquia').html('<option value="">Seleccione un municipio primero...</option>').prop('disabled', true);
+        return;
+    }
+    
+    $('#municipio').html('<option value="">Cargando municipios...</option>').prop('disabled', false);
+    
+    $.ajax({
+        url: APP_URL + '/api/ubicacion/municipios',
+        type: 'POST',
+        data: { id_estado: id_estado },
+        dataType: 'json',
+        success: function(response) {
+            let municipios = Array.isArray(response) ? response : (response.data || response.municipios || []);
+            let options = '<option value="">Seleccione un municipio...</option>';
+            for (let i = 0; i < municipios.length; i++) {
+                let municipio = municipios[i];
+                let id = municipio.id_municipio || municipio.id;
+                let nombre = municipio.municipio || municipio.nombre;
+                options += `<option value="${id}">${escapeHtml(nombre)}</option>`;
+            }
+            $('#municipio').html(options).prop('disabled', false);
+            $('#parroquia').html('<option value="">Seleccione un municipio primero...</option>').prop('disabled', true);
+        },
+        error: function(xhr) {
+            console.error('Error cargando municipios:', xhr.responseText);
+            $('#municipio').html('<option value="">Error al cargar municipios</option>').prop('disabled', false);
+        }
+    });
+}
+
+function cargarParroquias(id_municipio) {
+    if (!id_municipio) {
+        $('#parroquia').html('<option value="">Seleccione un municipio primero...</option>').prop('disabled', true);
+        return;
+    }
+    
+    $('#parroquia').html('<option value="">Cargando parroquias...</option>').prop('disabled', false);
+    
+    $.ajax({
+        url: APP_URL + '/api/ubicacion/parroquias',
+        type: 'POST',
+        data: { id_municipio: id_municipio },
+        dataType: 'json',
+        success: function(response) {
+            let parroquias = Array.isArray(response) ? response : (response.data || response.parroquias || []);
+            let options = '<option value="">Seleccione una parroquia...</option>';
+            for (let i = 0; i < parroquias.length; i++) {
+                let parroquia = parroquias[i];
+                let id = parroquia.id_parroquia || parroquia.id;
+                let nombre = parroquia.parroquia || parroquia.nombre;
+                options += `<option value="${id}">${escapeHtml(nombre)}</option>`;
+            }
+            $('#parroquia').html(options).prop('disabled', false);
+        },
+        error: function(xhr) {
+            console.error('Error cargando parroquias:', xhr.responseText);
+            $('#parroquia').html('<option value="">Error al cargar parroquias</option>').prop('disabled', false);
+        }
+    });
+}
+function cargarEstados() {
+    $.ajax({
+        url: APP_URL + '/api/ubicacion/estados',
+        type: 'POST',
+        dataType: 'json',
+        timeout: 10000,
+        success: function(response) {
+            var estados = Array.isArray(response) ? response : (response.data || response.estados || []);
+            if (!Array.isArray(estados) || estados.length === 0) {
+                cargarEstadosFallback();
+                return;
+            }
+            var options = '<option value="">Seleccione un estado...</option>';
+            for (var i = 0; i < estados.length; i++) {
+                var estado = estados[i];
+                var id = estado.id_estado || estado.id || '';
+                var nombre = estado.estado || estado.nombre || '';
+                options += '<option value="' + id + '">' + nombre + '</option>';
+            }
+            $('#estado').html(options);
+            $('#estado').prop('disabled', false);
+        },
+        error: function() {
+            cargarEstadosFallback();
+        }
+    });
+}
+
+function cargarEstadosFallback() {
+    var estados = [
+        {id_estado: 1, estado: 'Amazonas'}, {id_estado: 2, estado: 'Anzoátegui'},
+        {id_estado: 3, estado: 'Apure'}, {id_estado: 4, estado: 'Aragua'},
+        {id_estado: 5, estado: 'Barinas'}, {id_estado: 6, estado: 'Bolívar'},
+        {id_estado: 7, estado: 'Carabobo'}, {id_estado: 8, estado: 'Cojedes'},
+        {id_estado: 9, estado: 'Delta Amacuro'}, {id_estado: 10, estado: 'Falcón'},
+        {id_estado: 11, estado: 'Guárico'}, {id_estado: 12, estado: 'Lara'},
+        {id_estado: 13, estado: 'Mérida'}, {id_estado: 14, estado: 'Miranda'},
+        {id_estado: 15, estado: 'Monagas'}, {id_estado: 16, estado: 'Nueva Esparta'},
+        {id_estado: 17, estado: 'Portuguesa'}, {id_estado: 18, estado: 'Sucre'},
+        {id_estado: 19, estado: 'Táchira'}, {id_estado: 20, estado: 'Trujillo'},
+        {id_estado: 21, estado: 'La Guaira'}, {id_estado: 22, estado: 'Yaracuy'},
+        {id_estado: 23, estado: 'Zulia'}, {id_estado: 24, estado: 'Distrito Capital'}
+    ];
+    var options = '<option value="">Seleccione un estado...</option>';
+    for (var i = 0; i < estados.length; i++) {
+        options += '<option value="' + estados[i].id_estado + '">' + estados[i].estado + '</option>';
+    }
+    $('#estado').html(options);
+    $('#estado').prop('disabled', false);
+}
+
+function cargarCiudades(id_estado) {
+    if (!id_estado) {
+        $('#ciudad').html('<option value="">Seleccione un estado primero...</option>').prop('disabled', true);
+        return;
+    }
+    
+    $('#ciudad').html('<option value="">Cargando ciudades...</option>').prop('disabled', true);
+    
+    $.ajax({
+        url: APP_URL + '/api/ubicacion/ciudades',
+        type: 'POST',
+        data: { id_estado: id_estado },
+        dataType: 'json',
+        timeout: 10000,
+        success: function(response) {
+            var ciudades = Array.isArray(response) ? response : (response.data || response.ciudades || []);
+            if (!Array.isArray(ciudades) || ciudades.length === 0) {
+                $('#ciudad').html('<option value="">No hay ciudades disponibles</option>').prop('disabled', false);
+                return;
+            }
+            var options = '<option value="">Seleccione una ciudad...</option>';
+            for (var i = 0; i < ciudades.length; i++) {
+                var ciudad = ciudades[i];
+                var id = ciudad.id_ciudad || ciudad.id || '';
+                var nombre = ciudad.ciudad || ciudad.nombre || '';
+                options += '<option value="' + id + '">' + nombre + '</option>';
+            }
+            $('#ciudad').html(options).prop('disabled', false);
+        },
+        error: function(xhr) {
+            console.error('Error cargando ciudades:', xhr.responseText);
+            $('#ciudad').html('<option value="">Error al cargar ciudades</option>').prop('disabled', false);
+        }
+    });
+}
+
+function cargarMunicipiosPorEstado(id_estado) {
+    if (!id_estado) {
+        $('#municipio').html('<option value="">Seleccione un estado primero...</option>').prop('disabled', true);
+        $('#parroquia').html('<option value="">Primero seleccione un municipio...</option>').prop('disabled', true);
+        return;
+    }
+    
+    $('#municipio').html('<option value="">Cargando municipios...</option>').prop('disabled', true);
+    
+    $.ajax({
+        url: APP_URL + '/api/ubicacion/municipios',
+        type: 'POST',
+        data: { id_estado: id_estado },
+        dataType: 'json',
+        timeout: 10000,
+        success: function(response) {
+            var municipios = Array.isArray(response) ? response : (response.data || response.municipios || []);
+            if (!Array.isArray(municipios) || municipios.length === 0) {
+                $('#municipio').html('<option value="">No hay municipios disponibles</option>').prop('disabled', false);
+                $('#parroquia').html('<option value="">Seleccione un municipio primero...</option>').prop('disabled', true);
+                return;
+            }
+            var options = '<option value="">Seleccione un municipio...</option>';
+            for (var i = 0; i < municipios.length; i++) {
+                var municipio = municipios[i];
+                var id = municipio.id_municipio || municipio.id || '';
+                var nombre = municipio.municipio || municipio.nombre || '';
+                options += '<option value="' + id + '">' + nombre + '</option>';
+            }
+            $('#municipio').html(options).prop('disabled', false);
+            $('#parroquia').html('<option value="">Seleccione un municipio primero...</option>').prop('disabled', true);
+        },
+        error: function(xhr) {
+            console.error('Error cargando municipios:', xhr.responseText);
+            $('#municipio').html('<option value="">Error al cargar municipios</option>').prop('disabled', false);
+        }
+    });
+}
+
+function cargarParroquias(id_municipio) {
+    if (!id_municipio) {
+        $('#parroquia').html('<option value="">Seleccione un municipio primero...</option>').prop('disabled', true);
+        return;
+    }
+    
+    $('#parroquia').html('<option value="">Cargando parroquias...</option>').prop('disabled', true);
+    
+    $.ajax({
+        url: APP_URL + '/api/ubicacion/parroquias',
+        type: 'POST',
+        data: { id_municipio: id_municipio },
+        dataType: 'json',
+        timeout: 10000,
+        success: function(response) {
+            var parroquias = Array.isArray(response) ? response : (response.data || response.parroquias || []);
+            if (!Array.isArray(parroquias) || parroquias.length === 0) {
+                $('#parroquia').html('<option value="">No hay parroquias disponibles</option>').prop('disabled', false);
+                return;
+            }
+            var options = '<option value="">Seleccione una parroquia...</option>';
+            for (var i = 0; i < parroquias.length; i++) {
+                var parroquia = parroquias[i];
+                var id = parroquia.id_parroquia || parroquia.id || '';
+                var nombre = parroquia.parroquia || parroquia.nombre || '';
+                options += '<option value="' + id + '">' + nombre + '</option>';
+            }
+            $('#parroquia').html(options).prop('disabled', false);
+        },
+        error: function(xhr) {
+            console.error('Error cargando parroquias:', xhr.responseText);
+            $('#parroquia').html('<option value="">Error al cargar parroquias</option>').prop('disabled', false);
+        }
+    });
 }

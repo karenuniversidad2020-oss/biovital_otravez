@@ -86,9 +86,9 @@ $id_consultorio = isset($_GET['id']) ? intval($_GET['id']) : 0;
     </a>
     <div class="sidebar">
         <div class="user-panel mt-3 pb-3 mb-3 d-flex">
-            <div class="image">
-                <img id="avatar4" src="<?php echo APP_URL; ?>/img/avatar.png" class="img-circle elevation-2" alt="User Image">
-            </div>
+           <div class="image">
+    <img id="avatar_nav" src="<?php echo APP_URL; ?>/img/avatar.png" class="img-circle elevation-2" alt="User Image">
+</div>
             <div class="info">
                 <a href="#" class="d-block"><?php echo htmlspecialchars($nombre_usuario); ?></a>
             </div>
@@ -141,6 +141,7 @@ $id_consultorio = isset($_GET['id']) ? intval($_GET['id']) : 0;
         </nav>
     </div>
 </aside>
+
 
 <!-- Content Wrapper -->
 <div class="content-wrapper">

@@ -27,8 +27,7 @@ $nombre_usuario = $_SESSION['nombre_us'];
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="<?php echo APP_URL; ?>/css/css/all.min.css">
     <link rel="stylesheet" href="<?php echo APP_URL; ?>/css/adminlte.min.css">
-    <link rel="stylesheet" href="<?php echo APP_URL; ?>/css/dashboard.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
     
     <title>Paciente | Editar datos</title>
     <style>

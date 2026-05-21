@@ -82,6 +82,7 @@ return [
     'api/administradores/cambiar-password' => ['controller' => 'AdministradorController', 'action' => 'cambiarPassword', 'method' => 'POST', 'rol' => 'administrador'],
     'administrador/usuarios' => ['controller' => 'AdministradorController', 'action' => 'listarUsuarios', 'rol' => 'administrador'],
 
+
     
     // ==================== CONSULTORIOS ====================
     'consultorios' => ['controller' => 'ConsultorioController', 'action' => 'index', 'rol' => 'administrador'],
@@ -98,6 +99,10 @@ return [
     'api/consultorios/guardar-horario' => ['controller' => 'ConsultorioController', 'action' => 'guardarHorario', 'method' => 'POST', 'rol' => 'administrador'],
     'api/consultorios/obtener-detalle' => ['controller' => 'ConsultorioController', 'action' => 'obtenerDetalle', 'method' => 'POST', 'auth' => true],
     'api/consultorios/obtener-horarios' => ['controller' => 'ConsultorioController', 'action' => 'obtenerHorarios', 'method' => 'POST', 'auth' => true],
+    'api/consultorios/estadisticas' => ['controller' => 'ConsultorioController', 'action' => 'obtenerEstadisticas', 'method' => 'POST', 'rol' => 'administrador'],
+    'api/consultorios/listar-medicos' => ['controller' => 'ConsultorioController', 'action' => 'listarMedicosDisponibles', 'method' => 'POST', 'rol' => 'administrador'],
+
+
     
     // ==================== RECETAS ====================
     'recetas' => ['controller' => 'RecetaController', 'action' => 'index', 'rol' => ['medico', 'asistente']],

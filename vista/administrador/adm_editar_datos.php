@@ -52,7 +52,6 @@ $nombre_usuario = $_SESSION['nombre_us'];
         <a href="<?php echo APP_URL; ?>/logout" class="btn btn-danger btn-sm">Cerrar sesión</a>
     </ul>
 </nav>
-
 <!-- Main Sidebar Container -->
 <aside class="main-sidebar sidebar-dark-primary elevation-4">
     <a href="<?php echo APP_URL; ?>/panel/administrador" class="brand-link">
@@ -61,23 +60,36 @@ $nombre_usuario = $_SESSION['nombre_us'];
     </a>
     <div class="sidebar">
         <div class="user-panel mt-3 pb-3 mb-3 d-flex">
-            <div class="image">
-                <img id="avatar4" src="<?php echo APP_URL; ?>/img/avatar.png" class="img-circle elevation-2" alt="User Image">
-            </div>
+           <div class="image">
+    <img id="avatar_nav" src="<?php echo APP_URL; ?>/img/avatar.png" class="img-circle elevation-2" alt="User Image">
+</div>
             <div class="info">
                 <a href="#" class="d-block"><?php echo htmlspecialchars($nombre_usuario); ?></a>
             </div>
         </div>
         <nav class="mt-2">
             <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu">
-                <li class="nav-header">Usuario</li>
+                <li class="nav-header">
+                    <i class="fas fa-user-shield"></i> Usuario
+                </li>
                 <li class="nav-item">
-                    <a href="<?php echo APP_URL; ?>/perfil" class="nav-link active">
+                    <a href="<?php echo APP_URL; ?>/perfil" class="nav-link">
                         <i class="nav-icon fas fa-user-cog"></i>
                         <p>Datos personales</p>
                     </a>
                 </li>
-                <li class="nav-header">Clínica</li>
+                <li class="nav-header">
+                    <i class="fas fa-chart-line"></i> Gestión
+                </li>
+                <li class="nav-item">
+                    <a href="<?php echo APP_URL; ?>/administrador/usuarios" class="nav-link">
+                        <i class="nav-icon fas fa-users"></i>
+                        <p>Usuarios</p>
+                    </a>
+                </li>
+                <li class="nav-header">
+                    <i class="fas fa-hospital-user"></i> Clínica
+                </li>
                 <li class="nav-item">
                     <a href="<?php echo APP_URL; ?>/consultorios" class="nav-link">
                         <i class="nav-icon fas fa-building"></i>
@@ -90,10 +102,20 @@ $nombre_usuario = $_SESSION['nombre_us'];
                         <p>Recetas</p>
                     </a>
                 </li>
+                <li class="nav-header">
+                    <i class="fas fa-chart-bar"></i> Reportes
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="nav-icon fas fa-chart-bar"></i>
+                        <p>Estadísticas</p>
+                    </a>
+                </li>
             </ul>
         </nav>
     </div>
 </aside>
+
 
 <!-- Modal Cambiar Contraseña -->
 <div class="modal fade" id="cambiocontra" tabindex="-1" role="dialog">
@@ -330,7 +352,7 @@ $nombre_usuario = $_SESSION['nombre_us'];
                                     
                                     <div class="form-group row">
                                         <div class="offset-sm-2 col-sm-10 float-right">
-                                            <button type="submit" class="btn btn-block btn-outline-success" disabled>Guardar Cambios</button>
+                                           <button type="submit" class="btn btn-block btn-outline-success" disabled>Guardar Cambios</button>
                                         </div>
                                     </div>
                                 </form>

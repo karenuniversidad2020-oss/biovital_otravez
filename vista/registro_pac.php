@@ -256,8 +256,8 @@
                 </div>
                 
                 <div class="login-link">
-                    <a href="<?php echo APP_URL; ?>/login/paciente"><i class="fas fa-sign-in-alt"></i> ¿Ya tienes cuenta? Inicia sesión aquí</a>
-                </div>
+    <a href="<?php echo APP_URL; ?>/login/paciente"><i class="fas fa-sign-in-alt"></i> ¿Ya tienes cuenta? Inicia sesión aquí</a>
+</div>
             </div>
         </div>
     </div>

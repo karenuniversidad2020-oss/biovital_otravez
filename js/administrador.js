@@ -1,12 +1,12 @@
 /**
  * administrador.js - Funcionalidades para el panel del administrador
- * Usa la API del sistema a través del Front Controller
+ * CORREGIDO - Soluciona problemas de edición y guardado de datos
  */
 
 $(document).ready(function() {
-    // Verificar que APP_URL esté definida
+    // ==================== VERIFICACIÓN INICIAL ====================
     if (typeof APP_URL === 'undefined') {
-        console.error('APP_URL no está definida');
+        console.error('ERROR: APP_URL no está definida');
         $('#nombre_us').html('Error de configuración');
         return;
     }
@@ -14,7 +14,6 @@ $(document).ready(function() {
     console.log('APP_URL:', APP_URL);
     
     var id_usuario = $('#id_usuario').val();
-    var funcion = '';
     var edit = false;
 
     console.log('ID Administrador desde PHP:', id_usuario);
@@ -25,89 +24,128 @@ $(document).ready(function() {
         return;
     }
     
-    buscar_administrador(id_usuario);
-
-    function buscar_administrador(dato) {
-        console.log('Buscando administrador con dato:', dato);
-        console.log('URL de petición:', APP_URL + '/api/administradores/buscar');
-        
-        $.ajax({
-            url: APP_URL + '/api/administradores/buscar',
-            type: 'POST',
-            data: { dato: dato },
-            dataType: 'json',
-            timeout: 10000,
-            success: function(administrador) {
-                console.log('Administrador recibido:', administrador);
+    // ==================== FUNCIÓN PRINCIPAL: BUSCAR ADMINISTRADOR ====================
+   function buscar_administrador(dato) {
+    console.log('Buscando administrador con dato:', dato);
+    console.log('URL de petición:', APP_URL + '/api/administradores/buscar');
+    
+    $.ajax({
+        url: APP_URL + '/api/administradores/buscar',
+        type: 'POST',
+        data: { dato: dato },
+        dataType: 'json',
+        timeout: 10000,
+        success: function(administrador) {
+            console.log('Administrador recibido:', administrador);
+            
+            if(administrador.error) {
+                console.error('Error:', administrador.error);
+                $('#nombre_us').html('Error: ' + administrador.error);
+                return;
+            }
+            
+            // Actualizar UI con los datos
+            $('#nombre_us').html(administrador.nombre || '');
+            $('#apellidos_us').html(administrador.apellidos || '');
+            $('#edad').html(administrador.fecha_nacimiento || '');
+            $('#cedula_us').html(administrador.cedula || '');
+            $('#us_tipo').html(administrador.tipo || 'Administrador');
+            $('#telefono_us').html(administrador.telefono || '');
+            $('#correo_us').html(administrador.correo || '');
+            $('#sexo_us').html(administrador.sexo || '');
+            $('#adicional_us').html(administrador.adicional || '');
+            
+            // Mostrar dirección
+            if(administrador.direccion) {
+                $('#direccion_us').html(administrador.direccion);
+            } else {
+                $('#direccion_us').html('-');
+            }
+            
+            // ==================== ACTUALIZAR TODOS LOS AVATARES ====================
+            if(administrador.avatar) {
+                var avatarUrl = administrador.avatar;
+                // Agregar timestamp para evitar caché
+                var timestamp = new Date().getTime();
+                avatarUrl = avatarUrl + '?t=' + timestamp;
                 
-                if(administrador.error) {
-                    console.error('Error:', administrador.error);
-                    $('#nombre_us').html('Error: ' + administrador.error);
-                    return;
-                }
+                // Actualizar avatar en el perfil (vista de edición)
+                $('#avatar1, #avatar2, #avatar3, #avatar4').attr('src', avatarUrl);
+                // Actualizar avatar en el NAV (sidebar)
+                $('#avatar_nav').attr('src', avatarUrl);
                 
-                // Actualizar UI con los datos
-                $('#nombre_us').html(administrador.nombre || '');
-                $('#apellidos_us').html(administrador.apellidos || '');
-                $('#edad').html(administrador.fecha_nacimiento || '');
-                $('#cedula_us').html(administrador.cedula || '');
-                $('#us_tipo').html(administrador.tipo || 'Administrador');
-                $('#telefono_us').html(administrador.telefono || '');
-                $('#correo_us').html(administrador.correo || '');
-                $('#sexo_us').html(administrador.sexo || '');
-                $('#adicional_us').html(administrador.adicional || '');
-                
-                // Mostrar dirección
-                if(administrador.direccion) {
-                    $('#direccion_us').html(administrador.direccion);
-                } else {
-                    $('#direccion_us').html('-');
-                }
-                
-                // Cargar avatar
-                if(administrador.avatar) {
-                    $('#avatar1, #avatar2, #avatar3, #avatar4').attr('src', administrador.avatar);
-                }
-                
-                // Cargar dirección en los campos de edición si existe la función
-                if (administrador.direccion && administrador.direccion !== '-') {
-                    cargarDireccionEnCampos(administrador.direccion);
-                } else {
-                    cargarEstados();
-                }
-                
-                console.log('Datos actualizados correctamente');
-            },
-            error: function(xhr, status, error) {
-                console.error('Error en la petición AJAX:', error);
-                console.error('Respuesta del servidor:', xhr.responseText);
-                $('#nombre_us').html('Error de conexión: ' + status);
-                
-                // Cargar estados por defecto
+                console.log('Avatar actualizado en todas partes:', avatarUrl);
+            } else {
+                var defaultAvatar = APP_URL + '/img/avatarDES.jpg?t=' + new Date().getTime();
+                $('#avatar1, #avatar2, #avatar3, #avatar4, #avatar_nav').attr('src', defaultAvatar);
+            }
+            // ==================== FIN ACTUALIZAR AVATARES ====================
+            
+            // Cargar dirección en los campos de edición si existe
+            if (administrador.direccion && administrador.direccion !== '-') {
+                cargarDireccionEnCampos(administrador.direccion);
+            } else {
                 cargarEstados();
             }
-        });
+            
+            console.log('Datos actualizados correctamente');
+        },
+        error: function(xhr, status, error) {
+            console.error('Error en la petición AJAX:', error);
+            console.error('Respuesta del servidor:', xhr.responseText);
+            $('#nombre_us').html('Error de conexión: ' + status);
+            cargarEstados();
+        }
+    });
+}
+    
+    // ==================== ACTUALIZAR INTERFAZ ====================
+    function actualizarUI(admin) {
+        $('#nombre_us').html(admin.nombre || '');
+        $('#apellidos_us').html(admin.apellidos || '');
+        $('#edad').html(admin.fecha_nacimiento || '');
+        $('#cedula_us').html(admin.cedula || '');
+        $('#us_tipo').html(admin.tipo || 'Administrador');
+        $('#telefono_us').html(admin.telefono || '');
+        $('#correo_us').html(admin.correo || '');
+        $('#sexo_us').html(admin.sexo || '');
+        $('#adicional_us').html(admin.adicional || '');
+        
+        if(admin.direccion) {
+            $('#direccion_us').html(admin.direccion);
+        } else {
+            $('#direccion_us').html('-');
+        }
+        
+        if(admin.avatar) {
+            $('#avatar1, #avatar2, #avatar3, #avatar4').attr('src', admin.avatar);
+        }
+        
+        // Cargar datos en los campos del formulario de edición
+        $('#telefono').val(admin.telefono || '');
+        $('#correo').val(admin.correo || '');
+        $('#sexo').val(admin.sexo || '');
+        $('#adicional').val(admin.adicional || '');
+        $('#direccion_detallada').val('');
     }
-
-    // Función para parsear la dirección y cargarla en los campos
+    
+    // ==================== FUNCIONES DE UBICACIÓN ====================
     function cargarDireccionEnCampos(direccion_completa) {
         console.log('Parseando dirección:', direccion_completa);
         
-        // Separar la dirección detallada del resto
-        let partes = direccion_completa.split(' - ');
-        let ubicacion = partes[0];
-        let direccion_detallada = partes.length > 1 ? partes[1] : '';
+        let direccion_detallada = '';
+        let ubicacion = direccion_completa;
         
-        // Separar los componentes de ubicación
-        let ubicacion_partes = ubicacion.split(', ');
+        if (direccion_completa.includes(' - ')) {
+            let partes = direccion_completa.split(' - ');
+            ubicacion = partes[0];
+            direccion_detallada = partes.slice(1).join(' - ');
+        }
         
-        // Asignar dirección detallada
+        let ubicacion_partes = ubicacion.split(', ').filter(p => p.trim() !== '');
+        
         $('#direccion_detallada').val(direccion_detallada);
         
-        // Guardar la dirección original
-        $('#direccion').val(direccion_completa);
-        
-        // Cargar estados y luego seleccionar el correcto
         cargarEstadosConSeleccion(ubicacion_partes);
     }
 
@@ -121,10 +159,8 @@ $(document).ready(function() {
                 for (let estado of estados) {
                     options += `<option value="${estado.id_estado}">${estado.estado}</option>`;
                 }
-                $('#estado').html(options);
-                $('#estado').prop('disabled', false);
+                $('#estado').html(options).prop('disabled', false);
                 
-                // Si tenemos un estado en la dirección, seleccionarlo
                 if (ubicacion_partes[0] && ubicacion_partes[0] !== '') {
                     let estado_nombre = ubicacion_partes[0].trim();
                     $('#estado option').each(function() {
@@ -133,6 +169,7 @@ $(document).ready(function() {
                             let id_estado = $(this).val();
                             if (id_estado) {
                                 cargarCiudadesConSeleccion(id_estado, ubicacion_partes);
+                                cargarMunicipiosConSeleccion(id_estado, ubicacion_partes);
                             }
                         }
                     });
@@ -146,8 +183,6 @@ $(document).ready(function() {
 
     function cargarCiudadesConSeleccion(id_estado, ubicacion_partes) {
         if (!id_estado) return;
-        
-        $('#ciudad').html('<option value="">Cargando ciudades...</option>').prop('disabled', false);
         
         $.ajax({
             url: APP_URL + '/api/ubicacion/ciudades',
@@ -166,11 +201,8 @@ $(document).ready(function() {
                     $('#ciudad option').each(function() {
                         if ($(this).text() === ciudad_nombre) {
                             $(this).prop('selected', true);
-                            cargarMunicipiosConSeleccion(id_estado, ubicacion_partes);
                         }
                     });
-                } else {
-                    cargarMunicipios(id_estado);
                 }
             },
             error: function() {
@@ -181,8 +213,6 @@ $(document).ready(function() {
 
     function cargarMunicipiosConSeleccion(id_estado, ubicacion_partes) {
         if (!id_estado) return;
-        
-        $('#municipio').html('<option value="">Cargando municipios...</option>').prop('disabled', false);
         
         $.ajax({
             url: APP_URL + '/api/ubicacion/municipios',
@@ -218,8 +248,6 @@ $(document).ready(function() {
     function cargarParroquiasConSeleccion(id_municipio, ubicacion_partes) {
         if (!id_municipio) return;
         
-        $('#parroquia').html('<option value="">Cargando parroquias...</option>').prop('disabled', false);
-        
         $.ajax({
             url: APP_URL + '/api/ubicacion/parroquias',
             type: 'POST',
@@ -247,7 +275,6 @@ $(document).ready(function() {
         });
     }
 
-    // Funciones de ubicación
     function cargarEstados() {
         $.ajax({
             url: APP_URL + '/api/ubicacion/estados',
@@ -258,8 +285,7 @@ $(document).ready(function() {
                 for (let estado of estados) {
                     options += `<option value="${estado.id_estado}">${estado.estado}</option>`;
                 }
-                $('#estado').html(options);
-                $('#estado').prop('disabled', false);
+                $('#estado').html(options).prop('disabled', false);
             },
             error: function() {
                 cargarEstadosFallback();
@@ -286,8 +312,7 @@ $(document).ready(function() {
         for (let estado of estados) {
             options += `<option value="${estado.id_estado}">${estado.estado}</option>`;
         }
-        $('#estado').html(options);
-        $('#estado').prop('disabled', false);
+        $('#estado').html(options).prop('disabled', false);
     }
 
     function cargarCiudades(id_estado) {
@@ -296,7 +321,7 @@ $(document).ready(function() {
             return;
         }
         
-        $('#ciudad').html('<option value="">Cargando ciudades...</option>').prop('disabled', true);
+        $('#ciudad').html('<option value="">Cargando ciudades...</option>').prop('disabled', false);
         
         $.ajax({
             url: APP_URL + '/api/ubicacion/ciudades',
@@ -323,7 +348,7 @@ $(document).ready(function() {
             return;
         }
         
-        $('#municipio').html('<option value="">Cargando municipios...</option>').prop('disabled', true);
+        $('#municipio').html('<option value="">Cargando municipios...</option>').prop('disabled', false);
         
         $.ajax({
             url: APP_URL + '/api/ubicacion/municipios',
@@ -350,7 +375,7 @@ $(document).ready(function() {
             return;
         }
         
-        $('#parroquia').html('<option value="">Cargando parroquias...</option>').prop('disabled', true);
+        $('#parroquia').html('<option value="">Cargando parroquias...</option>').prop('disabled', false);
         
         $.ajax({
             url: APP_URL + '/api/ubicacion/parroquias',
@@ -370,7 +395,7 @@ $(document).ready(function() {
         });
     }
 
-    // Eventos de cambio para carga de ubicación
+    // ==================== EVENTOS DE UBICACIÓN ====================
     $(document).on('change', '#estado', function() {
         let id_estado = $(this).val();
         if (id_estado) {
@@ -392,13 +417,16 @@ $(document).ready(function() {
         }
     });
 
-    // Evento para el botón editar
+    // ==================== BOTÓN EDITAR ====================
     $(document).on('click', '.edit', function(e) {
         e.preventDefault();
-        funcion = 'capturar_datos';
         edit = true;
         
         console.log('Editando administrador ID:', id_usuario);
+        
+        var $btn = $(this);
+        var originalText = $btn.html();
+        $btn.html('<i class="fas fa-spinner fa-spin"></i> Cargando...');
         
         $.ajax({
             url: APP_URL + '/api/administradores/capturar-datos',
@@ -409,114 +437,182 @@ $(document).ready(function() {
                 console.log('Datos a editar:', administrador);
                 
                 if(administrador.error) {
-                    console.error('Error:', administrador.error);
+                    alert('Error: ' + administrador.error);
                     return;
                 }
                 
-                $('#telefono').val(administrador.telefono);
-                $('#correo').val(administrador.correo);
-                $('#sexo').val(administrador.sexo);
-                $('#adicional').val(administrador.adicional);
+                // Cargar datos en los campos
+                $('#telefono').val(administrador.telefono || '');
+                $('#correo').val(administrador.correo || '');
+                $('#sexo').val(administrador.sexo || '');
+                $('#adicional').val(administrador.adicional || '');
                 
-                // Habilitar todos los campos de edición
+                // Habilitar campos de edición
                 $('#telefono, #correo, #sexo, #adicional, #estado, #ciudad, #municipio, #parroquia, #direccion_detallada').prop('disabled', false);
-                $('.btn-outline-success').removeClass('btn-outline-success').addClass('btn-success');
+                
+                // Cambiar estilo del botón guardar
+                $('.btn-outline-success')
+                    .removeClass('btn-outline-success')
+                    .addClass('btn-success')
+                    .prop('disabled', false);
+                
+                $('#editado').show(1000);
+                setTimeout(function() { $('#editado').hide(2000); }, 2000);
             },
             error: function(xhr, status, error) {
                 console.error('Error al capturar datos:', error);
                 alert('Error al cargar datos para edición: ' + status);
+            },
+            complete: function() {
+                $btn.html(originalText);
             }
         });
     });
     
-    $('#form-usuario').submit(function(e) {
+    // ==================== FORMULARIO DE EDICIÓN - GUARDAR CAMBIOS ====================
+    console.log('Registrando evento submit del formulario...');
+    
+    $('#form-usuario').off('submit').on('submit', function(e) {
+        console.log('=== EVENTO SUBMIT DISPARADO ===');
         e.preventDefault();
         
-        if (edit == true) {
-            // Construir dirección completa
-            var estado_nombre = $('#estado option:selected').text();
-            var ciudad_nombre = $('#ciudad option:selected').text();
-            var municipio_nombre = $('#municipio option:selected').text();
-            var parroquia_nombre = $('#parroquia option:selected').text();
-            var direccion_detallada = $('#direccion_detallada').val();
-            
-            var direccion_completa = '';
-            
-            if (estado_nombre && estado_nombre !== 'Seleccione un estado...' && estado_nombre !== '') {
-                direccion_completa += estado_nombre;
-            }
-            if (ciudad_nombre && ciudad_nombre !== 'Seleccione una ciudad...' && ciudad_nombre !== '' && ciudad_nombre !== 'Cargando ciudades...') {
-                direccion_completa += (direccion_completa ? ', ' : '') + ciudad_nombre;
-            }
-            if (municipio_nombre && municipio_nombre !== 'Seleccione un municipio...' && municipio_nombre !== '' && municipio_nombre !== 'Cargando municipios...') {
-                direccion_completa += (direccion_completa ? ', ' : '') + municipio_nombre;
-            }
-            if (parroquia_nombre && parroquia_nombre !== 'Seleccione una parroquia...' && parroquia_nombre !== '' && parroquia_nombre !== 'Cargando parroquias...') {
-                direccion_completa += (direccion_completa ? ', ' : '') + parroquia_nombre;
-            }
-            if (direccion_detallada && direccion_detallada !== '') {
-                direccion_completa += (direccion_completa ? ' - ' : '') + direccion_detallada;
-            }
-            
-            let telefono = $('#telefono').val();
-            let direccion = direccion_completa;
-            let correo = $('#correo').val();
-            let sexo = $('#sexo').val();
-            let adicional = $('#adicional').val();
-            
-            console.log('Guardando dirección:', direccion);
-            
-            $.ajax({
-                url: APP_URL + '/api/administradores/editar',
-                type: 'POST',
-                data: {
-                    id_administrador: id_usuario,
-                    telefono: telefono,
-                    direccion: direccion,
-                    correo: correo,
-                    sexo: sexo,
-                    adicional: adicional
-                },
-                dataType: 'json',
-                success: function(response) {
-                    console.log('Respuesta editar:', response);
-                    
-                    if (response.success) {
-                        $('#editado').show(1000);
-                        setTimeout(function() { $('#editado').hide(2000); }, 1000);
-                        $('#form-usuario').trigger('reset');
-                        edit = false;
-                        // Deshabilitar campos después de guardar
-                        $('#estado, #ciudad, #municipio, #parroquia, #direccion_detallada').prop('disabled', true);
-                        buscar_administrador(id_usuario);
-                    } else {
-                        $('#noeditado').show(1000);
-                        setTimeout(function() { $('#noeditado').hide(2000); }, 1000);
-                    }
-                },
-                error: function(xhr, status, error) {
-                    console.error('Error al editar:', error);
-                    $('#noeditado').show(1000);
-                    setTimeout(function() { $('#noeditado').hide(2000); }, 1000);
-                }
-            });
-        } else {
-            $('#noeditado').show(1000);
-            setTimeout(function() { $('#noeditado').hide(2000); }, 1000);
-            $('#form-usuario').trigger('reset');
+        console.log('Variable edit:', edit);
+        
+        if (!edit) {
+            alert('Primero haga clic en "Editar"');
+            return false;
         }
+        
+        console.log('Continuando con el guardado...');
+        
+        // Construir dirección completa
+        var estado_nombre = $('#estado option:selected').text();
+        var ciudad_nombre = $('#ciudad option:selected').text();
+        var municipio_nombre = $('#municipio option:selected').text();
+        var parroquia_nombre = $('#parroquia option:selected').text();
+        var direccion_detallada = $('#direccion_detallada').val();
+        
+        console.log('Estado seleccionado:', estado_nombre);
+        console.log('Ciudad seleccionada:', ciudad_nombre);
+        console.log('Municipio seleccionado:', municipio_nombre);
+        console.log('Parroquia seleccionada:', parroquia_nombre);
+        console.log('Dirección detallada:', direccion_detallada);
+        
+        var direccion_completa = '';
+        
+        if (estado_nombre && estado_nombre !== 'Seleccione un estado...' && estado_nombre !== '') {
+            direccion_completa = estado_nombre;
+        }
+        if (ciudad_nombre && ciudad_nombre !== 'Seleccione una ciudad...' && ciudad_nombre !== '' && ciudad_nombre !== 'Cargando ciudades...') {
+            direccion_completa += (direccion_completa ? ', ' : '') + ciudad_nombre;
+        }
+        if (municipio_nombre && municipio_nombre !== 'Seleccione un municipio...' && municipio_nombre !== '' && municipio_nombre !== 'Cargando municipios...') {
+            direccion_completa += (direccion_completa ? ', ' : '') + municipio_nombre;
+        }
+        if (parroquia_nombre && parroquia_nombre !== 'Seleccione una parroquia...' && parroquia_nombre !== '' && parroquia_nombre !== 'Cargando parroquias...') {
+            direccion_completa += (direccion_completa ? ', ' : '') + parroquia_nombre;
+        }
+        if (direccion_detallada && direccion_detallada !== '') {
+            direccion_completa += (direccion_completa ? ' - ' : '') + direccion_detallada;
+        }
+        
+        var telefono = $('#telefono').val();
+        var correo = $('#correo').val();
+        var sexo = $('#sexo').val();
+        var adicional = $('#adicional').val();
+        
+        console.log('=== ENVIANDO DATOS ===');
+        console.log('ID:', id_usuario);
+        console.log('Dirección completa:', direccion_completa);
+        console.log('Teléfono:', telefono);
+        console.log('Correo:', correo);
+        console.log('Sexo:', sexo);
+        console.log('Adicional:', adicional);
+        
+        // Deshabilitar botón para evitar doble envío
+        var $btn = $(this).find('button[type="submit"]');
+        var originalText = $btn.html();
+        $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Guardando...');
+        
+        $.ajax({
+            url: APP_URL + '/api/administradores/editar',
+            type: 'POST',
+            data: {
+                id_administrador: id_usuario,
+                telefono: telefono,
+                direccion: direccion_completa,
+                correo: correo,
+                sexo: sexo,
+                adicional: adicional
+            },
+            dataType: 'json',
+            success: function(response) {
+                console.log('Respuesta del servidor:', response);
+                
+                if (response.success) {
+                    $('#editado').show(1000);
+                    setTimeout(function() { 
+                        $('#editado').hide(2000); 
+                    }, 3000);
+                    
+                    // Resetear estado de edición
+                    edit = false;
+                    
+                    // Deshabilitar campos después de guardar
+                    $('#telefono, #correo, #sexo, #adicional, #estado, #ciudad, #municipio, #parroquia, #direccion_detallada').prop('disabled', true);
+                    
+                    // Restaurar estilo del botón guardar
+                    $('.btn-success')
+                        .removeClass('btn-success')
+                        .addClass('btn-outline-success')
+                        .prop('disabled', true);
+                    
+                    // Recargar datos del administrador
+                    buscar_administrador(id_usuario);
+                    
+                    alert('¡Datos actualizados correctamente!');
+                } else {
+                    $('#noeditado').show(1000);
+                    setTimeout(function() { 
+                        $('#noeditado').hide(2000); 
+                    }, 3000);
+                    alert(response.error || 'Error al guardar los cambios');
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('Error en AJAX:', error);
+                console.error('Respuesta del servidor:', xhr.responseText);
+                $('#noeditado').show(1000);
+                setTimeout(function() { 
+                    $('#noeditado').hide(2000); 
+                }, 3000);
+                alert('Error de conexión: ' + status + ' - ' + error);
+            },
+            complete: function() {
+                $btn.prop('disabled', false).html(originalText);
+            }
+        });
+        
+        return false;
     });
     
+    console.log('Evento submit registrado correctamente');
+    
+    // ==================== CAMBIAR CONTRASEÑA ====================
     $('#form-pass').submit(function(e) {
         e.preventDefault();
         
-        let oldpass = $('#oldpass').val();
-        let newpass = $('#newpass').val();
+        var oldpass = $('#oldpass').val();
+        var newpass = $('#newpass').val();
         
         if (newpass.length < 6) {
             alert('La nueva contraseña debe tener al menos 6 caracteres');
             return false;
         }
+        
+        var $btn = $(this).find('button[type="submit"]');
+        var originalText = $btn.html();
+        $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i>');
         
         $.ajax({
             url: APP_URL + '/api/administradores/cambiar-password',
@@ -532,52 +628,103 @@ $(document).ready(function() {
                 
                 if (response.resultado == 'update') {
                     $('#update').show(1000);
-                    setTimeout(function() { $('#update').hide(2000); }, 1000);
+                    setTimeout(function() { 
+                        $('#update').hide(2000); 
+                        $('#cambiocontra').modal('hide');
+                    }, 2000);
                     $('#form-pass').trigger('reset');
                 } else {
                     $('#noupdate').show(1000);
-                    setTimeout(function() { $('#noupdate').hide(2000); }, 1000);
-                    $('#form-pass').trigger('reset');
+                    setTimeout(function() { 
+                        $('#noupdate').hide(2000); 
+                    }, 2000);
                 }
             },
             error: function(xhr, status, error) {
                 console.error('Error al cambiar contraseña:', error);
+                alert('Error de conexión: ' + status);
+            },
+            complete: function() {
+                $btn.prop('disabled', false).html(originalText);
             }
         });
     });
     
-    $('#form-photo').submit(function(e) {
-        e.preventDefault();
-        
-        let formData = new FormData($('#form-photo')[0]);
-        formData.append('id_administrador', id_usuario);
-        
-        $.ajax({
-            url: APP_URL + '/api/administradores/cambiar-foto',
-            type: 'POST',
-            data: formData,
-            cache: false,
-            processData: false,
-            contentType: false,
-            dataType: 'json',
-            success: function(response) {
-                console.log('Respuesta cambio foto:', response);
+    // ==================== CAMBIAR FOTO ====================
+  
+$('#form-photo').submit(function(e) {
+    e.preventDefault();
+    
+    var fileInput = $(this).find('input[type="file"]')[0];
+    if (!fileInput.files || fileInput.files.length === 0) {
+        alert('Por favor seleccione una imagen');
+        return;
+    }
+    
+    var formData = new FormData(this);
+    formData.append('id_administrador', id_usuario);
+    
+    var $btn = $(this).find('button[type="submit"]');
+    var originalText = $btn.html();
+    $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Subiendo...');
+    
+    $.ajax({
+        url: APP_URL + '/api/administradores/cambiar-foto',
+        type: 'POST',
+        data: formData,
+        cache: false,
+        processData: false,
+        contentType: false,
+        dataType: 'json',
+        success: function(response) {
+            console.log('Respuesta cambio foto:', response);
+            
+            if (response.alert === 'edit') {
+                var timestamp = new Date().getTime();
+                var nuevaRuta = response.ruta + '?t=' + timestamp;
                 
-                if (response.alert == 'edit') {
-                    $('#avatar1, #avatar2, #avatar3, #avatar4').attr('src', response.ruta + '?t=' + new Date().getTime());
-                    $('#edit').show(1000);
-                    setTimeout(function() { $('#edit').hide(2000); }, 1000);
-                    $('#form-photo').trigger('reset');
-                    buscar_administrador(id_usuario);
-                } else {
-                    $('#noedit').show(1000);
-                    setTimeout(function() { $('#noedit').hide(2000); }, 1000);
-                    $('#form-photo').trigger('reset');
-                }
-            },
-            error: function(xhr, status, error) {
-                console.error('Error al cambiar foto:', error);
+                console.log('Nueva ruta de avatar:', nuevaRuta);
+                
+                // ==================== ACTUALIZAR TODOS LOS AVATARES ====================
+                // Actualizar imágenes en el formulario de edición
+                $('#avatar1, #avatar2, #avatar3, #avatar4').attr('src', nuevaRuta);
+                // Actualizar imagen en el NAV (sidebar)
+                $('#avatar_nav').attr('src', nuevaRuta);
+                // ==================== FIN ACTUALIZAR AVATARES ====================
+                
+                $('#edit').show(1000);
+                setTimeout(function() { 
+                    $('#edit').hide(2000); 
+                }, 3000);
+                
+                $('#form-photo').trigger('reset');
+                
+                setTimeout(function() { 
+                    $('#cambiophoto').modal('hide'); 
+                }, 1500);
+                
+            } else {
+                $('#noedit').show(1000);
+                setTimeout(function() { 
+                    $('#noedit').hide(2000); 
+                }, 3000);
+                alert(response.error || 'Error al cambiar la foto');
             }
-        });
+        },
+        error: function(xhr, status, error) {
+            console.error('Error al cambiar foto:', error);
+            $('#noedit').show(1000);
+            setTimeout(function() { 
+                $('#noedit').hide(2000); 
+            }, 3000);
+            alert('Error al cambiar la foto. Verifique el tipo de archivo (JPG, PNG, GIF)');
+        },
+        complete: function() {
+            $btn.prop('disabled', false).html(originalText);
+        }
     });
+});
+    
+    // ==================== INICIALIZAR ====================
+    buscar_administrador(id_usuario);
 });
