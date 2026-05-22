@@ -1,6 +1,5 @@
 // Usar la configuración global
 var BASE_URL = window.CONFIG ? window.CONFIG.BASE_URL : '';
-
 function getUrl(controller, action) {
     if (window.CONFIG) {
         return window.CONFIG.getControllerUrl(controller);
@@ -61,7 +60,7 @@ function listar_recetas() {
     $('#tabla_recetas').html('<tr><td colspan="8" class="text-center">Cargando recetas...<div class="spinner-border spinner-border-sm ml-2" role="status"></div></td></tr>');
     
     $.ajax({
-        url: getUrl('RecetaController', 'listar_recetas'),
+       url: APP_URL + '/api/recetas/listar',
         type: 'POST',
         data: { funcion: 'listar_recetas' },
         dataType: 'json',

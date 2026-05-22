@@ -1,15 +1,18 @@
 <?php
 return [
+
     // ==================== PÁGINAS PÚBLICAS ====================
     '' => ['controller' => 'PageController', 'action' => 'home', 'auth' => false],
     'home' => ['controller' => 'PageController', 'action' => 'home', 'auth' => false],
+     'login/:rol' => ['controller' => 'PageController', 'action' => 'loginRedirect', 'auth' => false],
+
     
     // ==================== LOGIN ====================
     'login' => ['controller' => 'AuthController', 'action' => 'login', 'method' => 'POST', 'auth' => false],
-    'login/paciente' => ['controller' => 'AuthController', 'action' => 'showLoginPaciente', 'auth' => false],
-    'login/medico' => ['controller' => 'AuthController', 'action' => 'showLoginMedico', 'auth' => false],
-    'login/asistente' => ['controller' => 'AuthController', 'action' => 'showLoginAsistente', 'auth' => false],
-    'login/administrador' => ['controller' => 'AuthController', 'action' => 'showLoginAdministrador', 'auth' => false],
+    'login/paciente' => ['controller' => 'PageController', 'action' => 'home', 'auth' => false],
+    'login/medico' => ['controller' => 'PageController', 'action' => 'home', 'auth' => false],
+    'login/asistente' => ['controller' => 'PageController', 'action' => 'home', 'auth' => false],
+    'login/administrador' => ['controller' => 'PageController', 'action' => 'home', 'auth' => false],
     'logout' => ['controller' => 'AuthController', 'action' => 'logout', 'auth' => true],
     
     // ==================== REGISTRO - VISTAS ====================
@@ -88,7 +91,7 @@ return [
     'consultorios' => ['controller' => 'ConsultorioController', 'action' => 'index', 'rol' => 'administrador'],
     'consultorios/crear' => ['controller' => 'ConsultorioController', 'action' => 'crear', 'rol' => 'administrador'],
     'consultorios/editar' => ['controller' => 'ConsultorioController', 'action' => 'editar', 'rol' => 'administrador'],
-    'consultorios/detalle' => ['controller' => 'ConsultorioController', 'action' => 'detalle', 'rol' => 'administrador'],
+    'consultorios/detalle/:id' => ['controller' => 'ConsultorioController', 'action' => 'detalle', 'rol' => 'administrador'],
     'consultorios/horarios' => ['controller' => 'ConsultorioController', 'action' => 'horarios', 'rol' => 'administrador'],
     'api/consultorios/listar' => ['controller' => 'ConsultorioController', 'action' => 'listar', 'method' => 'POST', 'rol' => 'administrador'],
     'api/consultorios/crear' => ['controller' => 'ConsultorioController', 'action' => 'crearConsultorio', 'method' => 'POST', 'rol' => 'administrador'],
@@ -102,18 +105,19 @@ return [
     'api/consultorios/estadisticas' => ['controller' => 'ConsultorioController', 'action' => 'obtenerEstadisticas', 'method' => 'POST', 'rol' => 'administrador'],
     'api/consultorios/listar-medicos' => ['controller' => 'ConsultorioController', 'action' => 'listarMedicosDisponibles', 'method' => 'POST', 'rol' => 'administrador'],
 
-
     
     // ==================== RECETAS ====================
-    'recetas' => ['controller' => 'RecetaController', 'action' => 'index', 'rol' => ['medico', 'asistente']],
-    'api/recetas/listar' => ['controller' => 'RecetaController', 'action' => 'listar', 'method' => 'POST', 'rol' => ['medico', 'asistente']],
-    'api/recetas/crear' => ['controller' => 'RecetaController', 'action' => 'crear', 'method' => 'POST', 'rol' => 'medico'],
-    'api/recetas/editar' => ['controller' => 'RecetaController', 'action' => 'editar', 'method' => 'POST', 'rol' => 'medico'],
-    'api/recetas/borrar' => ['controller' => 'RecetaController', 'action' => 'borrar', 'method' => 'POST', 'rol' => 'medico'],
-    'api/recetas/obtener' => ['controller' => 'RecetaController', 'action' => 'obtener', 'method' => 'POST', 'auth' => true],
-    'api/recetas/buscar-pacientes' => ['controller' => 'RecetaController', 'action' => 'buscarPacientes', 'method' => 'POST', 'rol' => ['medico', 'asistente']],
-    'api/recetas/mis-recetas' => ['controller' => 'RecetaController', 'action' => 'misRecetas', 'method' => 'POST', 'rol' => 'paciente'],
-    
+     'recetas' => ['controller' => 'RecetaController', 'action' => 'index', 'rol' => ['medico', 'asistente', 'administrador']],
+     'api/recetas/listar' => ['controller' => 'RecetaController', 'action' => 'listar', 'method' => 'POST', 'rol' => ['medico', 'asistente', 'administrador']],
+     'api/recetas/crear' => ['controller' => 'RecetaController', 'action' => 'crear', 'method' => 'POST', 'rol' => 'medico'],
+     'api/recetas/editar' => ['controller' => 'RecetaController', 'action' => 'editar', 'method' => 'POST', 'rol' => 'medico'],
+     'api/recetas/borrar' => ['controller' => 'RecetaController', 'action' => 'borrar', 'method' => 'POST', 'rol' => 'medico'],
+     'api/recetas/obtener' => ['controller' => 'RecetaController', 'action' => 'obtener', 'method' => 'POST', 'rol' => ['medico', 'asistente', 'administrador']],
+     'api/recetas/buscar-pacientes' => ['controller' => 'RecetaController', 'action' => 'buscarPacientes', 'method' => 'POST', 'rol' => ['medico', 'asistente']],
+     'api/recetas/mis-recetas' => ['controller' => 'RecetaController', 'action' => 'misRecetas', 'method' => 'POST', 'rol' => 'paciente'],
+     'api/recetas/estadisticas' => ['controller' => 'RecetaController', 'action' => 'estadisticas', 'method' => 'POST', 'rol' => 'administrador'],
+
+
     // ==================== CSRF ====================
     'api/csrf/token' => ['controller' => 'CSRFController', 'action' => 'getToken', 'method' => 'POST', 'auth' => false],
 ];

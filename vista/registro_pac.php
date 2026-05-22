@@ -6,9 +6,8 @@
     <title>Registro de Usuario - BioVital</title>
     
     <!-- ==================== VARIABLE GLOBAL APP_URL ==================== -->
-   <script>
-    var APP_URL = '<?php echo rtrim(dirname($_SERVER['SCRIPT_NAME']), '/'); ?>';
-    console.log('APP_URL desde PHP:', APP_URL);
+  <script>
+    var APP_URL = '<?php echo APP_URL; ?>';
 </script>
     
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
@@ -255,9 +254,10 @@
                     </button>
                 </div>
                 
-                <div class="login-link">
-    <a href="<?php echo APP_URL; ?>/login/paciente"><i class="fas fa-sign-in-alt"></i> ¿Ya tienes cuenta? Inicia sesión aquí</a>
-</div>
+               <div class="login-link">
+                 <a href="<?php echo APP_URL; ?>/login/paciente" class="login-link">
+                 <i class="fas fa-sign-in-alt"></i> ¿Ya tienes cuenta? Inicia sesión aquí</a>
+               </div>
             </div>
         </div>
     </div>
