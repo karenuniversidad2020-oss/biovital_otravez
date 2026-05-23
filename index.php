@@ -78,7 +78,7 @@ function renderView($view, $data = []) {
     }
 }
 
-// ==================== ROUTER CON PARÁMETROS DINÁMICOS ====================
+// ==================== ROUTER ====================
 $requestUri = $_SERVER['REQUEST_URI'];
 $scriptName = dirname($_SERVER['SCRIPT_NAME']);
 $path = str_replace($scriptName, '', $requestUri);
@@ -104,49 +104,14 @@ function verificarRol($rolRequerido, $rolUsuario) {
 }
 
 $routeFound = false;
-$routeParams = [];
-
-// Dividir la URL solicitada en partes
-$pathParts = explode('/', $path);
-
 foreach ($routes as $route => $config) {
-    // Dividir la ruta definida en partes
-    $routeParts = explode('/', $route);
-    
-    // Verificar que tengan la misma cantidad de partes
-    if (count($routeParts) !== count($pathParts)) {
-        continue;
-    }
-    
-    $match = true;
-    $params = [];
-    
-    // Comparar cada parte
-    for ($i = 0; $i < count($routeParts); $i++) {
-        // Si la parte de la ruta comienza con ":", es un parámetro dinámico
-        if (strpos($routeParts[$i], ':') === 0) {
-            $paramName = substr($routeParts[$i], 1);
-            $params[$paramName] = $pathParts[$i];
-            // Guardar en $_GET para que esté disponible en los controladores
-            $_GET[$paramName] = $pathParts[$i];
-        } 
-        // Si no es parámetro, debe coincidir exactamente
-        elseif ($routeParts[$i] !== $pathParts[$i]) {
-            $match = false;
-            break;
-        }
-    }
-    
-    if ($match) {
+    if ($path === $route) {
         $routeFound = true;
-        $routeParams = $params;
         
-        // Verificar método HTTP
         if (isset($config['method']) && $config['method'] !== $method) {
             jsonResponse(['error' => 'Método no permitido'], 405);
         }
         
-        // Verificar autenticación
         if (isset($config['auth']) && $config['auth'] === true) {
             if (!isset($_SESSION['usuario']) || !isset($_SESSION['rol'])) {
                 if ($isAjax) {
@@ -157,7 +122,6 @@ foreach ($routes as $route => $config) {
             }
         }
         
-        // Verificar rol
         if (isset($config['rol'])) {
             if (!isset($_SESSION['rol'])) {
                 if ($isAjax) {
@@ -195,7 +159,6 @@ foreach ($routes as $route => $config) {
             jsonResponse(['error' => "Acción '{$actionName}' no encontrada en {$controllerName}"], 500);
         }
         
-        // Ejecutar el controlador
         $controller->$actionName();
         break;
     }
@@ -214,4 +177,3 @@ if (!$routeFound) {
         }
     }
 }
-?>

@@ -15,17 +15,5 @@ class PageController {
             }
         }
         renderView('home');
-        
-    } public function loginRedirect() {
-        // Obtener el rol de los parámetros de la ruta
-        // (disponible gracias a la captura que hicimos en routes.php)
-        $rol = $_GET['rol'] ?? 'paciente';
-
-        // Establecer una variable de sesión para que home.php sepa qué modal abrir
-        $_SESSION['open_login'] = $rol;
-
-        // Finalmente, cargar la vista home, que al iniciarse leerá esta variable
-        $this->home();
     }
 }
-?>

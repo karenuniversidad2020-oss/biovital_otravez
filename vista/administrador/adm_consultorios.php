@@ -16,7 +16,6 @@ $nombre_usuario = $_SESSION['nombre_us'] ?? 'Administrador';
 
     <script>
         var APP_URL = '<?php echo APP_URL; ?>';
-        console.log('APP_URL:', APP_URL);
     </script>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -26,85 +25,28 @@ $nombre_usuario = $_SESSION['nombre_us'] ?? 'Administrador';
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="<?php echo APP_URL; ?>/css/css/all.min.css">
     <link rel="stylesheet" href="<?php echo APP_URL; ?>/css/adminlte.min.css">
-    <link rel="stylesheet" href="<?php echo APP_URL; ?>/css/dashboard.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
     
     <title>Administrador | Consultorios</title>
     
     <style>
         .consultorio-card {
-            transition: transform 0.3s, box-shadow 0.3s;
+            transition: transform 0.2s;
             margin-bottom: 20px;
-            border-radius: 16px;
-            overflow: hidden;
-            border: none;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
         }
         .consultorio-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 12px 28px rgba(0,0,0,0.12);
-        }
-        .consultorio-card .card-header {
-            background: linear-gradient(135deg, var(--bv-primary), var(--bv-accent));
-            color: white;
-            border: none;
-            padding: 1rem 1.25rem;
-        }
-        .consultorio-card .card-header h5 {
-            font-weight: 600;
-            margin: 0;
-        }
-        .consultorio-card .card-body {
-            padding: 1.25rem;
-        }
-        .consultorio-card .card-footer {
-            background: #f8f9fa;
-            border-top: 1px solid #eef2f6;
-            padding: 0.75rem 1.25rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
         .badge-medicos {
-            background-color: #e8f4f8;
-            color: #0d9488;
-            padding: 5px 12px;
+            background-color: #17a2b8;
+            color: white;
+            padding: 5px 10px;
             border-radius: 20px;
             font-size: 12px;
-            font-weight: 600;
-        }
-        .badge-estado {
-            background-color: #d4edda;
-            color: #155724;
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 11px;
-            font-weight: 600;
         }
         .search-box {
-            max-width: 350px;
-        }
-        .info-box-icon {
-            transition: transform 0.3s;
-        }
-        .info-box:hover .info-box-icon {
-            transform: scale(1.1);
-        }
-        .btn-accion {
-            transition: all 0.2s;
-        }
-        .btn-accion:hover {
-            transform: translateY(-2px);
-        }
-        .ubicacion-text {
-            font-size: 0.85rem;
-            color: #6c757d;
-            line-height: 1.4;
-        }
-        .horario-text {
-            font-family: monospace;
-            font-size: 0.85rem;
-            background: #f0f0f0;
-            padding: 3px 8px;
-            border-radius: 12px;
-            display: inline-block;
+            max-width: 300px;
         }
     </style>
 </head>
@@ -119,9 +61,7 @@ $nombre_usuario = $_SESSION['nombre_us'] ?? 'Administrador';
         </li>
     </ul>
     <ul class="navbar-nav ml-auto">
-        <a href="<?php echo APP_URL; ?>/logout" class="btn btn-danger btn-sm">
-            <i class="fas fa-sign-out-alt"></i> Cerrar sesión
-        </a>
+        <a href="<?php echo APP_URL; ?>/logout" class="btn btn-danger btn-sm">Cerrar sesión</a>
     </ul>
 </nav>
 
@@ -133,9 +73,9 @@ $nombre_usuario = $_SESSION['nombre_us'] ?? 'Administrador';
     </a>
     <div class="sidebar">
         <div class="user-panel mt-3 pb-3 mb-3 d-flex">
-            <div class="image">
-                <img id="avatar_nav" src="<?php echo APP_URL; ?>/img/avatar.png" class="img-circle elevation-2" alt="User Image">
-            </div>
+           <div class="image">
+    <img id="avatar_nav" src="<?php echo APP_URL; ?>/img/avatar.png" class="img-circle elevation-2" alt="User Image">
+</div>
             <div class="info">
                 <a href="#" class="d-block"><?php echo htmlspecialchars($nombre_usuario); ?></a>
             </div>
@@ -164,7 +104,7 @@ $nombre_usuario = $_SESSION['nombre_us'] ?? 'Administrador';
                     <i class="fas fa-hospital-user"></i> Clínica
                 </li>
                 <li class="nav-item">
-                    <a href="<?php echo APP_URL; ?>/consultorios" class="nav-link active">
+                    <a href="<?php echo APP_URL; ?>/consultorios" class="nav-link">
                         <i class="nav-icon fas fa-building"></i>
                         <p>Consultorios</p>
                     </a>
@@ -189,6 +129,7 @@ $nombre_usuario = $_SESSION['nombre_us'] ?? 'Administrador';
     </div>
 </aside>
 
+
 <!-- Content Wrapper -->
 <div class="content-wrapper">
     <section class="content-header">
@@ -209,19 +150,11 @@ $nombre_usuario = $_SESSION['nombre_us'] ?? 'Administrador';
 
     <section class="content">
         <div class="container-fluid">
-            
-            <!-- Welcome Banner (estilo dashboard) -->
-            <div class="bv-welcome-banner admin bv-animate">
-                <h2><i class="fas fa-building"></i> Consultorios Médicos</h2>
-                <p>Gestiona las sedes, horarios y asignación de médicos a cada consultorio.</p>
-                <div class="bv-role-tag"><i class="fas fa-hospital-user"></i> Infraestructura</div>
-            </div>
-
-            <!-- Stats Cards -->
+            <!-- Estadísticas -->
             <div class="row">
                 <div class="col-md-3 col-sm-6 col-12">
-                    <div class="info-box bv-animate bv-animate-delay-1">
-                        <span class="info-box-icon bg-info elevation-1"><i class="fas fa-building"></i></span>
+                    <div class="info-box">
+                        <span class="info-box-icon bg-info"><i class="fas fa-building"></i></span>
                         <div class="info-box-content">
                             <span class="info-box-text">Total Consultorios</span>
                             <span class="info-box-number" id="total_consultorios">0</span>
@@ -229,8 +162,8 @@ $nombre_usuario = $_SESSION['nombre_us'] ?? 'Administrador';
                     </div>
                 </div>
                 <div class="col-md-3 col-sm-6 col-12">
-                    <div class="info-box bv-animate bv-animate-delay-1">
-                        <span class="info-box-icon bg-success elevation-1"><i class="fas fa-check-circle"></i></span>
+                    <div class="info-box">
+                        <span class="info-box-icon bg-success"><i class="fas fa-check-circle"></i></span>
                         <div class="info-box-content">
                             <span class="info-box-text">Activos</span>
                             <span class="info-box-number" id="total_activos">0</span>
@@ -238,17 +171,17 @@ $nombre_usuario = $_SESSION['nombre_us'] ?? 'Administrador';
                     </div>
                 </div>
                 <div class="col-md-3 col-sm-6 col-12">
-                    <div class="info-box bv-animate bv-animate-delay-2">
-                        <span class="info-box-icon bg-warning elevation-1"><i class="fas fa-user-md"></i></span>
+                    <div class="info-box">
+                        <span class="info-box-icon bg-warning"><i class="fas fa-chart-line"></i></span>
                         <div class="info-box-content">
-                            <span class="info-box-text">Médicos Asignados</span>
-                            <span class="info-box-number" id="total_medicos_asignados">0</span>
+                            <span class="info-box-text">Ocupación</span>
+                            <span class="info-box-number" id="tasa_ocupacion">0%</span>
                         </div>
                     </div>
                 </div>
                 <div class="col-md-3 col-sm-6 col-12">
-                    <div class="info-box bv-animate bv-animate-delay-2">
-                        <span class="info-box-icon bg-primary elevation-1"><i class="fas fa-plus-circle"></i></span>
+                    <div class="info-box">
+                        <span class="info-box-icon bg-primary"><i class="fas fa-plus-circle"></i></span>
                         <div class="info-box-content">
                             <button class="btn btn-primary btn-sm btn-block" id="btnNuevoConsultorio">
                                 <i class="fas fa-plus"></i> Nuevo Consultorio
@@ -258,7 +191,7 @@ $nombre_usuario = $_SESSION['nombre_us'] ?? 'Administrador';
                 </div>
             </div>
 
-            <!-- Search Bar -->
+            <!-- Barra de búsqueda -->
             <div class="row mt-3">
                 <div class="col-12">
                     <div class="card">
@@ -291,13 +224,13 @@ $nombre_usuario = $_SESSION['nombre_us'] ?? 'Administrador';
                 </div>
             </div>
 
-            <!-- Tarjetas de consultorios (Grid estilo dashboard) -->
+            <!-- Tarjetas de consultorios -->
             <div class="row" id="contenedor_consultorios">
                 <div class="col-12 text-center">
                     <div class="spinner-border text-primary" role="status">
                         <span class="sr-only">Cargando...</span>
                     </div>
-                    <p class="mt-2">Cargando consultorios...</p>
+                    <p>Cargando consultorios...</p>
                 </div>
             </div>
         </div>
@@ -319,7 +252,7 @@ $nombre_usuario = $_SESSION['nombre_us'] ?? 'Administrador';
         <div class="modal-content">
             <div class="modal-header bg-danger text-white">
                 <h5 class="modal-title"><i class="fas fa-exclamation-triangle"></i> Confirmar Eliminación</h5>
-                <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
             </div>
             <div class="modal-body">
                 <p>¿Está seguro que desea eliminar este consultorio?</p>
@@ -337,61 +270,6 @@ $nombre_usuario = $_SESSION['nombre_us'] ?? 'Administrador';
 <script src="<?php echo APP_URL; ?>/js/adminlte.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
 <script src="<?php echo APP_URL; ?>/js/consultorio.js"></script>
-
-<script>
-// Funciones adicionales para mejorar la búsqueda y el estilo
-$(document).ready(function() {
-    // Manejo de la búsqueda con resultados
-    $('#btnBuscar').click(function() {
-        let busqueda = $('#buscar_consultorio').val();
-        if (busqueda.length > 0) {
-            $('#termino_busqueda').text(busqueda);
-            $('#resultado_busqueda').show();
-            $('#btnLimpiarBusqueda').show();
-            if (typeof cargarConsultorios === 'function') {
-                cargarConsultorios(busqueda);
-            }
-        } else {
-            $('#resultado_busqueda').hide();
-            $('#btnLimpiarBusqueda').hide();
-            if (typeof cargarConsultorios === 'function') {
-                cargarConsultorios('');
-            }
-        }
-    });
-
-    $('#buscar_consultorio').keypress(function(e) {
-        if (e.which == 13) {
-            $('#btnBuscar').click();
-        }
-    });
-
-    $('#btnLimpiarBusqueda').click(function() {
-        $('#buscar_consultorio').val('');
-        $('#resultado_busqueda').hide();
-        $(this).hide();
-        if (typeof cargarConsultorios === 'function') {
-            cargarConsultorios('');
-        }
-        if (typeof cargarEstadisticas === 'function') {
-            cargarEstadisticas();
-        }
-    });
-
-    $('#limpiarResultados').click(function(e) {
-        e.preventDefault();
-        $('#buscar_consultorio').val('');
-        $('#resultado_busqueda').hide();
-        $('#btnLimpiarBusqueda').hide();
-        if (typeof cargarConsultorios === 'function') {
-            cargarConsultorios('');
-        }
-        if (typeof cargarEstadisticas === 'function') {
-            cargarEstadisticas();
-        }
-    });
-});
-</script>
 
 </body>
 </html>

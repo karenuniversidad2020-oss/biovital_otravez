@@ -24,14 +24,6 @@ if(isset($_SESSION['usuario']) && isset($_SESSION['rol'])){
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="<?php echo APP_URL; ?>/css/home.css">
-    
-    <!-- ==================== VARIABLES GLOBALES PARA JAVASCRIPT ==================== -->
-    <script>
-        const APP_URL = '<?php echo APP_URL; ?>';
-        // Pasar la variable de sesión de PHP a JavaScript (para el login redirect)
-        const openLoginRol = '<?php echo $_SESSION['open_login'] ?? ''; ?>';
-        <?php if(isset($_SESSION['open_login'])) unset($_SESSION['open_login']); ?>
-    </script>
 </head>
 <body>
 
@@ -332,44 +324,7 @@ if(isset($_SESSION['usuario']) && isset($_SESSION['rol'])){
 </div>
 
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script>const APP_URL = '<?php echo APP_URL; ?>';</script>
 <script src="<?php echo APP_URL; ?>/js/home.js"></script>
-<script>
-    // ==================== INICIALIZACIÓN DEL LOGIN ====================
-    document.addEventListener('DOMContentLoaded', function() {
-        // 1. Verificar si hay un parámetro en la URL (método antiguo, por compatibilidad)
-        const urlParams = new URLSearchParams(window.location.search);
-        const openLogin = urlParams.get('openLogin');
-        
-        if (openLogin && (openLogin === 'paciente' || openLogin === 'medico' || openLogin === 'asistente' || openLogin === 'administrador')) {
-            let iconClass = '';
-            switch(openLogin) {
-                case 'paciente': iconClass = 'fa-user-injured'; break;
-                case 'medico': iconClass = 'fa-user-md'; break;
-                case 'asistente': iconClass = 'fa-clipboard-list'; break;
-                case 'administrador': iconClass = 'fa-sliders'; break;
-                default: iconClass = 'fa-user';
-            }
-            openLogin(openLogin, iconClass);
-            // Limpiar la URL para que no se vea feo
-            window.history.replaceState({}, document.title, window.location.pathname);
-        }
-        
-        // 2. Verificar si hay una variable de sesión (método nuevo con ruta amigable)
-        if (typeof openLoginRol !== 'undefined' && openLoginRol && openLoginRol !== '') {
-            let iconClass = '';
-            switch(openLoginRol) {
-                case 'paciente': iconClass = 'fa-user-injured'; break;
-                case 'medico': iconClass = 'fa-user-md'; break;
-                case 'asistente': iconClass = 'fa-clipboard-list'; break;
-                case 'administrador': iconClass = 'fa-sliders'; break;
-                default: iconClass = 'fa-user';
-            }
-            // Pequeño retraso para asegurar que el DOM está listo
-            setTimeout(function() {
-                openLogin(openLoginRol, iconClass);
-            }, 100);
-        }
-    });
-</script>
 </body>
 </html>

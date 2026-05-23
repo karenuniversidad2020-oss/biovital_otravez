@@ -44,28 +44,21 @@ class ConsultorioController {
      * Vista: Detalle del consultorio
      * GET /consultorios/detalle?id=XXX
      */
-   public function detalle() {
-    // Obtener el ID desde la URL amigable (GET) o desde el parámetro tradicional
-    $id = isset($_GET['id']) ? intval($_GET['id']) : 0;
-    
-    // Si no se encuentra en GET, buscar en el parámetro de la ruta
-    if ($id <= 0 && isset($_GET['id_param'])) {
-        $id = intval($_GET['id_param']);
+    public function detalle() {
+        $id = isset($_GET['id']) ? intval($_GET['id']) : 0;
+        if ($id <= 0) {
+            redirect('consultorios');
+        }
+        
+        // Verificar que exista la vista
+        $viewFile = VIEW_PATH . '/administrador/adm_consultorio_detalle.php';
+        if (file_exists($viewFile)) {
+            renderView('administrador/adm_consultorio_detalle');
+        } else {
+            error_log("Vista no encontrada: " . $viewFile);
+            die("Error: Vista de detalle no encontrada");
+        }
     }
-    
-    if ($id <= 0) {
-        redirect('consultorios');
-    }
-    
-    // Verificar que exista la vista
-    $viewFile = VIEW_PATH . '/administrador/adm_consultorio_detalle.php';
-    if (file_exists($viewFile)) {
-        renderView('administrador/adm_consultorio_detalle');
-    } else {
-        error_log("Vista no encontrada: " . $viewFile);
-        die("Error: Vista de detalle no encontrada");
-    }
-}
     
     /**
      * Vista: Crear consultorio

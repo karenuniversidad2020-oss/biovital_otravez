@@ -172,12 +172,12 @@ function cargarEstadisticas() {
 }
 
 function cargarConsultorios(busqueda = '') {
-    $('#contenedor_consultorios').html('<div class="col-12 text-center"><div class="spinner-border text-primary"></div><p class="mt-2">Cargando consultorios...</p></div>');
+    $('#contenedor_consultorios').html('<div class="col-12 text-center"><div class="spinner-border text-primary"></div><p>Cargando consultorios...</p></div>');
     
     $.ajax({
         url: APP_URL + '/api/consultorios/listar',
         type: 'POST',
-        data: { busqueda: busqueda },
+        data: { busqueda: busqueda, funcion: 'listar_consultorios' },
         dataType: 'json',
         success: function(consultorios) {
             let html = '';
@@ -189,46 +189,24 @@ function cargarConsultorios(busqueda = '') {
                     html += `
                         <div class="col-md-4 col-sm-6">
                             <div class="card consultorio-card h-100">
-                                <div class="card-header">
-                                    <h5 class="card-title mb-0">
-                                        <i class="fas fa-building"></i> ${escapeHtml(c.nombre)}
-                                    </h5>
+                                <div class="card-header bg-primary text-white">
+                                    <h5 class="card-title mb-0"><i class="fas fa-building"></i> ${escapeHtml(c.nombre)}</h5>
                                 </div>
                                 <div class="card-body">
-                                    <div class="mb-2">
-                                        <i class="fas fa-map-marker-alt text-danger"></i>
-                                        <strong>${escapeHtml(c.ciudad || 'No especificada')}</strong>
-                                    </div>
-                                    <div class="ubicacion-text mb-2">
-                                        <i class="fas fa-location-dot text-muted"></i>
-                                        ${escapeHtml(c.direccion_detallada || 'Sin dirección registrada')}
-                                    </div>
-                                    <div class="mb-2">
-                                        <i class="fas fa-phone text-success"></i>
-                                        ${c.telefono || 'No disponible'}
-                                    </div>
-                                    <div class="mb-2">
-                                        <i class="fas fa-user-md text-info"></i>
-                                        <span class="badge-medicos">
-                                            <i class="fas fa-stethoscope"></i> ${c.total_medicos || 0} Médicos asignados
-                                        </span>
-                                    </div>
-                                    <div>
-                                        <i class="fas fa-clock text-warning"></i>
-                                        <span class="horario-text">
-                                            ${c.apertura_habitual || '08:00'} - ${c.cierre_habitual || '17:00'}
-                                        </span>
-                                    </div>
+                                    <p><i class="fas fa-map-marker-alt text-danger"></i> <strong>${escapeHtml(c.ciudad || 'No especificada')}</strong></p>
+                                    <p class="text-muted small">${escapeHtml(c.direccion_detallada || '')}</p>
+                                    <p><i class="fas fa-phone"></i> ${c.telefono || 'No disponible'}</p>
+                                    <p><i class="fas fa-user-md"></i> <span class="badge-medicos">${c.total_medicos || 0} Médicos asignados</span></p>
+                                    <p><i class="fas fa-clock"></i> ${c.apertura_habitual || '08:00'} - ${c.cierre_habitual || '17:00'}</p>
                                 </div>
-                                <div class="card-footer">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <a href="${APP_URL}/consultorios/detalle/${c.id_consultorio}" class="btn btn-info btn-sm btn-accion">
-                                            <i class="fas fa-eye"></i> Ver detalle
-                                        </a>
-                                        <button class="btn btn-danger btn-sm btn-accion btn-eliminar" data-id="${c.id_consultorio}">
-                                            <i class="fas fa-trash"></i> Eliminar
-                                        </button>
-                                    </div>
+                                <div class="card-footer text-right">
+                                    <!-- CORREGIDO: usar APP_URL y la ruta amigable -->
+                                    <a href="${APP_URL}/consultorios/detalle?id=${c.id_consultorio}" class="btn btn-info btn-sm">
+                                        <i class="fas fa-eye"></i> Ver
+                                    </a>
+                                    <button class="btn btn-danger btn-sm btn-eliminar" data-id="${c.id_consultorio}">
+                                        <i class="fas fa-trash"></i> Eliminar
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -236,10 +214,6 @@ function cargarConsultorios(busqueda = '') {
                 }
             }
             $('#contenedor_consultorios').html(html);
-            
-            // Actualizar el contador de médicos asignados en las estadísticas
-            let totalMedicosAsignados = consultorios.reduce((sum, c) => sum + (c.total_medicos || 0), 0);
-            $('#total_medicos_asignados').text(totalMedicosAsignados);
         },
         error: function() {
             $('#contenedor_consultorios').html('<div class="col-12 text-center"><div class="alert alert-danger">Error al cargar consultorios</div></div>');

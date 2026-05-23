@@ -237,69 +237,67 @@ function showView(viewId) {
 }
 
 function openLogin(role, iconClass) {
-    currentRole = role;
-    document.getElementById('login-rol').value = role;
-    document.getElementById('login-user').value = '';
-    document.getElementById('login-pass').value = '';
+  currentRole = role;
+  document.getElementById('login-rol').value = role;
+  document.getElementById('login-user').value = '';
+  document.getElementById('login-pass').value = '';
 
-    var badge = document.getElementById('login-badge');
-    badge.innerHTML = '<i class="fa-solid ' + iconClass + '"></i> Perfil: ' + role;
+  var badge = document.getElementById('login-badge');
+  badge.innerHTML = '<i class="fa-solid ' + iconClass + '"></i> Perfil: ' + role;
 
-    var footer = document.getElementById('signup-redirect');
-    if (role === 'administrador' || role === 'asistente') {
-        footer.innerHTML = '<i class="fa-solid fa-circle-info"></i> Cuentas administrativas protegidas. Solicita accesos con TI.';
-    } else {
-        footer.innerHTML = '¿Eres nuevo? <a href="' + APP_URL + '/registro/' + role + '">Regístrate aquí</a>';
-    }
+  var footer = document.getElementById('signup-redirect');
+  if (role === 'administrador' || role === 'asistente') {
+    footer.innerHTML = '<i class="fa-solid fa-circle-info"></i> Cuentas administrativas protegidas. Solicita accesos con TI.';
+  } else {
+    footer.innerHTML = '¿Eres nuevo? <a href="' + APP_URL + '/registro/' + role + '">Regístrate aquí</a>';
+  }
 
-    showView('login-view');
+  showView('login-view');
 
-    // Scroll al login
-    setTimeout(function () {
-        var el = document.getElementById('login-view');
-        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }, 100);
+  // Scroll to login
+  setTimeout(function () {
+    var el = document.getElementById('login-view');
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }, 100);
 }
 
 // AJAX Login
 $(document).ready(function () {
-    $('#form-login').submit(function (e) {
-        e.preventDefault();
-        var loginError = document.getElementById('login-error');
-        var loginErrorMsg = document.getElementById('login-error-msg');
-        var submitBtn = document.getElementById('login-submit-btn');
+  $('#form-login').submit(function (e) {
+    e.preventDefault();
+    var loginError = document.getElementById('login-error');
+    var loginErrorMsg = document.getElementById('login-error-msg');
+    var submitBtn = document.getElementById('login-submit-btn');
 
-        loginError.classList.remove('show');
-        submitBtn.disabled = true;
-        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verificando...';
+    loginError.classList.remove('show');
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verificando...';
 
-        $.ajax({
-            url: APP_URL + '/login',  // ✅ Verifica que APP_URL esté definida correctamente
-            type: 'POST',
-            data: $(this).serialize(),
-            dataType: 'json',
-           success: function (response) {
-    if (response.success) {
-        submitBtn.innerHTML = '<i class="fas fa-check-circle"></i> ¡Acceso concedido!';
-        // --- CÓDIGO CORREGIDO ---
-        // response.redirect ya tiene el formato "panel/paciente"
-        window.location.href = APP_URL + '/' + response.redirect;
-    } else {
-                    loginErrorMsg.textContent = response.error || 'Cédula o contraseña incorrecta';
-                    loginError.classList.add('show');
-                    submitBtn.disabled = false;
-                    submitBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Autenticar Entrada';
-                }
-            },
-            error: function () {
-                loginErrorMsg.textContent = 'Error de conexión con el servidor';
-                loginError.classList.add('show');
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Autenticar Entrada';
-            }
-        });
+    $.ajax({
+      url: APP_URL + '/login',
+      type: 'POST',
+      data: $(this).serialize(),
+      dataType: 'json',
+      success: function (response) {
+        if (response.success) {
+          submitBtn.innerHTML = '<i class="fas fa-check-circle"></i> ¡Acceso concedido!';
+          window.location.href = APP_URL + '/' + response.redirect;
+        } else {
+          loginErrorMsg.textContent = response.error || 'Cédula o contraseña incorrecta';
+          loginError.classList.add('show');
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Autenticar Entrada';
+        }
+      },
+      error: function () {
+        loginErrorMsg.textContent = 'Error de conexión con el servidor';
+        loginError.classList.add('show');
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Autenticar Entrada';
+      }
     });
-});;
+  });
+});
 
 // ========== MAP ==========
 function showMap(location) {
