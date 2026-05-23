@@ -2,19 +2,24 @@
 class AuthController {
     
     public function showLoginPaciente() {
-        renderView('login_paciente');
+        // Redirigir a la página principal con el parámetro para abrir el login
+        header('Location: ' . APP_URL . '?openLogin=paciente');
+        exit();
     }
     
     public function showLoginMedico() {
-        renderView('login_medico');
+        header('Location: ' . APP_URL . '?openLogin=medico');
+        exit();
     }
     
     public function showLoginAsistente() {
-        renderView('login_asistente');
+        header('Location: ' . APP_URL . '?openLogin=asistente');
+        exit();
     }
     
     public function showLoginAdministrador() {
-        renderView('login_administrador');
+        header('Location: ' . APP_URL . '?openLogin=administrador');
+        exit();
     }
     
     public function login() {
@@ -34,7 +39,7 @@ class AuthController {
         
         if (!isset($loginMap[$rol])) {
             if ($isAjax) jsonResponse(['success' => false, 'error' => 'Rol inválido']);
-            redirect('login');
+            redirect('?error=1');
             return;
         }
         
@@ -51,21 +56,20 @@ class AuthController {
                 $login->actualizarUltimoAcceso($objeto->{$map['idField']});
             }
             
-            // CORREGIDO: Construir la URL de redirección correctamente
-            // Eliminar cualquier referencia a /login/ de la ruta
-            $redirectUrl = APP_URL . '/panel/' . $rol;
+            // Redirigir al panel correspondiente
+            $redirectUrl = 'panel/' . $rol;
             
             if ($isAjax) {
                 jsonResponse(['success' => true, 'redirect' => $redirectUrl]);
             } else {
-                header('Location: ' . $redirectUrl);
+                header('Location: ' . APP_URL . '/' . $redirectUrl);
                 exit();
             }
         } else {
             if ($isAjax) {
                 jsonResponse(['success' => false, 'error' => 'Cédula o contraseña incorrecta']);
             } else {
-                redirect("login/$rol?error=1");
+                redirect('?error=1');
             }
         }
     }

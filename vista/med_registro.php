@@ -244,10 +244,15 @@ include_once $securityPath;
                         <span>&times;</span>
                     </button>
                 </div>
-                
+
+                 <!-- ==================== redirecciona a login ==================== -->
                 <div class="login-link">
-    <a href="<?php echo APP_URL; ?>/login/medico"><i class="fas fa-sign-in-alt"></i> ¿Ya tienes cuenta? Inicia sesión aquí</a>
-</div>
+                  <a href="<?php echo APP_URL; ?>/login/medico" class="login-link">
+                  <i class="fas fa-sign-in-alt"></i> ¿Ya tienes cuenta? Inicia sesión aquí </a>
+                </div>
+  <!-- ==================== FIN ==================== -->
+                
+             
             </div>
         </div>
     </div>
