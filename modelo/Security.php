@@ -29,17 +29,26 @@ class Security {
      * @param string $token Token a verificar
      * @return bool True si es válido
      */
-    public static function verificarTokenCSRF($token) {
-        if (!isset($_SESSION['csrf_token']) || !isset($_SESSION['csrf_token_expiry'])) {
-            return false;
-        }
-        
-        if (time() > $_SESSION['csrf_token_expiry']) {
-            return false;
-        }
-        
-        return hash_equals($_SESSION['csrf_token'], $token);
+   public static function verificarTokenCSRF($token) {
+    if (!isset($_SESSION['csrf_token']) || !isset($_SESSION['csrf_token_expiry'])) {
+        error_log("[CSRF] Verificación fallida: Token no existe en sesión");
+        return false;
     }
+    
+    if (time() > $_SESSION['csrf_token_expiry']) {
+        error_log("[CSRF] Verificación fallida: Token expirado");
+        return false;
+    }
+    
+    $valid = hash_equals($_SESSION['csrf_token'], $token);
+    if (!$valid) {
+        error_log("[CSRF] Verificación fallida: Tokens no coinciden");
+        error_log("[CSRF] Session token: " . substr($_SESSION['csrf_token'], 0, 20) . "...");
+        error_log("[CSRF] Received token: " . substr($token, 0, 20) . "...");
+    }
+    
+    return $valid;
+}
     
     /**
      * Obtiene el token CSRF actual (para usar en formularios)

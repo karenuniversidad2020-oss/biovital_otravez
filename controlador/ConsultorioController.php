@@ -29,16 +29,25 @@ class ConsultorioController {
      * Vista: Listado de consultorios
      * GET /consultorios
      */
-    public function index() {
-        // Verificar que exista la vista
-        $viewFile = VIEW_PATH . '/administrador/adm_consultorios.php';
-        if (file_exists($viewFile)) {
-            renderView('administrador/adm_consultorios');
-        } else {
-            error_log("Vista no encontrada: " . $viewFile);
-            die("Error: Vista de consultorios no encontrada");
-        }
-    }
+   public function index() {
+    AuthHelper::checkRole('administrador', true);
+    
+    $options = [
+        'title' => 'Consultorios Médicos - BioVital',
+        'breadcrumbs' => [
+            ['label' => 'Inicio', 'url' => APP_URL . '/panel/administrador'],
+            ['label' => 'Consultorios']
+        ],
+        'active_page' => 'consultorios',
+        'css' => '<link rel="stylesheet" href="' . APP_URL . '/css/dashboard-utils.css">'
+    ];
+    
+    $data = [
+        'nombre_usuario' => $_SESSION['nombre_us'] ?? 'Administrador'
+    ];
+    
+    ViewHelper::renderDashboard('administrador/adm_consultorios', $data, $options);
+}
     
     /**
      * Vista: Detalle del consultorio
@@ -71,53 +80,92 @@ class ConsultorioController {
      * Vista: Crear consultorio
      * GET /consultorios/crear
      */
-    public function crear() {
-        $viewFile = VIEW_PATH . '/administrador/adm_consultorio_crear.php';
-        if (file_exists($viewFile)) {
-            renderView('administrador/adm_consultorio_crear');
-        } else {
-            error_log("Vista no encontrada: " . $viewFile);
-            die("Error: Vista de crear consultorio no encontrada");
-        }
-    }
+   public function crear() {
+    AuthHelper::checkRole('administrador', true);
+    
+    $options = [
+        'title' => 'Crear Consultorio - BioVital',
+        'breadcrumbs' => [
+            ['label' => 'Inicio', 'url' => APP_URL . '/panel/administrador'],
+            ['label' => 'Consultorios', 'url' => APP_URL . '/consultorios'],
+            ['label' => 'Crear']
+        ],
+        'active_page' => 'consultorios',
+        'css' => '<link rel="stylesheet" href="' . APP_URL . '/css/dashboard-utils.css">'
+    ];
+    
+    $data = [
+        'nombre_usuario' => $_SESSION['nombre_us'] ?? 'Administrador'
+    ];
+    
+    ViewHelper::renderDashboard('administrador/adm_consultorio_crear', $data, $options);
+}
     
     /**
      * Vista: Editar consultorio
      * GET /consultorios/editar?id=XXX
      */
     public function editar() {
-        $id = isset($_GET['id']) ? intval($_GET['id']) : 0;
-        if ($id <= 0) {
-            redirect('consultorios');
-        }
-        
-        $viewFile = VIEW_PATH . '/administrador/adm_consultorio_editar.php';
-        if (file_exists($viewFile)) {
-            renderView('administrador/adm_consultorio_editar');
-        } else {
-            error_log("Vista no encontrada: " . $viewFile);
-            die("Error: Vista de editar consultorio no encontrada");
-        }
+    AuthHelper::checkRole('administrador', true);
+    
+    $id = isset($_GET['id']) ? intval($_GET['id']) : 0;
+    
+    if ($id <= 0) {
+        redirect('consultorios');
     }
+    
+    $options = [
+        'title' => 'Editar Consultorio - BioVital',
+        'breadcrumbs' => [
+            ['label' => 'Inicio', 'url' => APP_URL . '/panel/administrador'],
+            ['label' => 'Consultorios', 'url' => APP_URL . '/consultorios'],
+            ['label' => 'Detalle', 'url' => APP_URL . '/consultorios/detalle?id=' . $id],
+            ['label' => 'Editar']
+        ],
+        'active_page' => 'consultorios',
+        'css' => '<link rel="stylesheet" href="' . APP_URL . '/css/dashboard-utils.css">'
+    ];
+    
+    $data = [
+        'nombre_usuario' => $_SESSION['nombre_us'] ?? 'Administrador',
+        'id_consultorio' => $id
+    ];
+    
+    ViewHelper::renderDashboard('administrador/adm_consultorio_editar', $data, $options);
+}
     
     /**
      * Vista: Horarios del consultorio
      * GET /consultorios/horarios?id=XXX
      */
-    public function horarios() {
-        $id = isset($_GET['id']) ? intval($_GET['id']) : 0;
-        if ($id <= 0) {
-            redirect('consultorios');
-        }
-        
-        $viewFile = VIEW_PATH . '/administrador/adm_consultorio_horarios.php';
-        if (file_exists($viewFile)) {
-            renderView('administrador/adm_consultorio_horarios');
-        } else {
-            error_log("Vista no encontrada: " . $viewFile);
-            die("Error: Vista de horarios no encontrada");
-        }
+   public function horarios() {
+    AuthHelper::checkRole('administrador', true);
+    
+    $id = isset($_GET['id']) ? intval($_GET['id']) : 0;
+    
+    if ($id <= 0) {
+        redirect('consultorios');
     }
+    
+    $options = [
+        'title' => 'Horarios de Consultorio - BioVital',
+        'breadcrumbs' => [
+            ['label' => 'Inicio', 'url' => APP_URL . '/panel/administrador'],
+            ['label' => 'Consultorios', 'url' => APP_URL . '/consultorios'],
+            ['label' => 'Detalle', 'url' => APP_URL . '/consultorios/detalle?id=' . $id],
+            ['label' => 'Horarios']
+        ],
+        'active_page' => 'consultorios',
+        'css' => '<link rel="stylesheet" href="' . APP_URL . '/css/dashboard-utils.css">'
+    ];
+    
+    $data = [
+        'nombre_usuario' => $_SESSION['nombre_us'] ?? 'Administrador',
+        'id_consultorio' => $id
+    ];
+    
+    ViewHelper::renderDashboard('administrador/adm_consultorio_horarios', $data, $options);
+}
     
     // ==================== API - LISTAR ====================
     

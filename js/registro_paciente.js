@@ -1,5 +1,14 @@
-//***   crear_paciente */
+
+
 $(document).ready(function() {
+    // Verificar que APP_URL esté definida
+    if (typeof APP_URL === 'undefined') {
+        console.error('ERROR: APP_URL no está definida');
+        window.APP_URL = '';
+    }
+    
+    console.log('APP_URL:', APP_URL);
+    
     $('#form-registro').submit(function(e) {
         e.preventDefault();
         
@@ -42,18 +51,21 @@ $(document).ready(function() {
             direccion_completa += (direccion_completa ? ' - ' : '') + direccion_detallada;
         }
         
+        // Obtener el token CSRF
+        var csrf_token = $('input[name="csrf_token"]').val();
+        
         var datos = {
-            funcion: 'crear_paciente',
-            nombre: $('#nombre').val(),
-            apellidos: $('#apellidos').val(),
+            nombre: $('#nombre').val().trim(),
+            apellidos: $('#apellidos').val().trim(),
             fecha_nacimiento: $('#fecha_nacimiento').val(),
-            cedula: $('#cedula').val(),
-            telefono: $('#telefono').val(),
-            direccion: direccion_completa,  // Guardamos la dirección completa
-            correo: $('#correo').val(),
+            cedula: $('#cedula').val().trim(),
+            telefono: $('#telefono').val().trim(),
+            direccion: direccion_completa,
+            correo: $('#correo').val().trim(),
             sexo: $('#sexo').val(),
-            adicional: $('#adicional').val(),
-            pass: pass
+            adicional: $('#adicional').val().trim(),
+            pass: pass,
+            csrf_token: csrf_token
         };
         
         console.log('Enviando datos:', datos);
@@ -62,8 +74,9 @@ $(document).ready(function() {
         var originalText = $submitBtn.html();
         $submitBtn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Creando cuenta...');
         
+       
         $.ajax({
-            url: '../controlador/RegistroPacienteController.php',
+            url: APP_URL + '/api/registro/paciente',  // ← Ruta corregida
             type: 'POST',
             data: datos,
             dataType: 'json',
@@ -72,7 +85,8 @@ $(document).ready(function() {
                 if(response.success) {
                     mostrarExito(response.message);
                     setTimeout(function() {
-                        window.location.href = '../vista/login_paciente.php';
+                        // Redirigir al login del paciente con la ruta amigable
+                        window.location.href = APP_URL + '/login/paciente';
                     }, 2000);
                 } else {
                     mostrarError(response.message);
@@ -81,8 +95,16 @@ $(document).ready(function() {
             },
             error: function(xhr, status, error) {
                 console.error('Error:', error);
-                console.error('Respuesta:', xhr.responseText);
-                mostrarError('Error de conexión: ' + xhr.status);
+                console.error('Respuesta del servidor:', xhr.responseText);
+                
+                let errorMsg = 'Error de conexión: ' + xhr.status;
+                if (xhr.responseJSON && xhr.responseJSON.error) {
+                    errorMsg = xhr.responseJSON.error;
+                } else if (xhr.responseJSON && xhr.responseJSON.message) {
+                    errorMsg = xhr.responseJSON.message;
+                }
+                
+                mostrarError(errorMsg);
                 $submitBtn.prop('disabled', false).html(originalText);
             }
         });

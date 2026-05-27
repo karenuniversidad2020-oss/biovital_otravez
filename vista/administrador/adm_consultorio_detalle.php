@@ -1,5 +1,4 @@
 <?php
-// NO iniciar sesión aquí - el Front Controller ya lo hace
 if($_SESSION['us_tipo'] != 4 || $_SESSION['rol'] != 'administrador'){
     header('Location: ' . APP_URL . '/login/administrador');
     exit();
@@ -75,16 +74,16 @@ $id_consultorio = isset($_GET['id']) ? intval($_GET['id']) : 0;
 </nav>
 
 <!-- Main Sidebar Container -->
-<aside class="main-sidebar sidebar-dark-primary elevation-4">
+  <aside class="main-sidebar sidebar-dark-primary elevation-4">
     <a href="<?php echo APP_URL; ?>/panel/administrador" class="brand-link">
         <img src="<?php echo APP_URL; ?>/img/logo_azul.png" alt="Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
-        <span class="brand-text font-weight-light">BIOVITAL</span>
+        <span class="brand-text font-weight-light">BioVital</span>
     </a>
     <div class="sidebar">
         <div class="user-panel mt-3 pb-3 mb-3 d-flex">
-           <div class="image">
-    <img id="avatar_nav" src="<?php echo APP_URL; ?>/img/avatar.png" class="img-circle elevation-2" alt="User Image">
-</div>
+            <div class="image">
+                <img id="avatar_nav" src="<?php echo APP_URL; ?>/img/avatar.png" class="img-circle elevation-2" alt="User Image">
+            </div>
             <div class="info">
                 <a href="#" class="d-block"><?php echo htmlspecialchars($nombre_usuario); ?></a>
             </div>
@@ -109,11 +108,18 @@ $id_consultorio = isset($_GET['id']) ? intval($_GET['id']) : 0;
                         <p>Usuarios</p>
                     </a>
                 </li>
+               
                 <li class="nav-header">
                     <i class="fas fa-hospital-user"></i> Clínica
                 </li>
+                 <li class="nav-item">
+                    <a href="<?php echo APP_URL; ?>/especialidades" class="nav-link">
+                        <i class="nav-icon fas fa-stethoscope"></i>
+                        <p>Especialidades</p>
+                    </a>
+                </li>
                 <li class="nav-item">
-                    <a href="<?php echo APP_URL; ?>/consultorios" class="nav-link">
+                    <a href="<?php echo APP_URL; ?>/consultorios" class="nav-link active">
                         <i class="nav-icon fas fa-building"></i>
                         <p>Consultorios</p>
                     </a>
@@ -138,7 +144,6 @@ $id_consultorio = isset($_GET['id']) ? intval($_GET['id']) : 0;
     </div>
 </aside>
 
-
 <!-- Content Wrapper -->
 <div class="content-wrapper">
     <section class="content-header">
@@ -157,7 +162,6 @@ $id_consultorio = isset($_GET['id']) ? intval($_GET['id']) : 0;
             </div>
         </div>
     </section>
-
     <section class="content">
         <div class="container-fluid">
             <input type="hidden" id="id_consultorio" value="<?php echo $id_consultorio; ?>">
@@ -190,8 +194,7 @@ $id_consultorio = isset($_GET['id']) ? intval($_GET['id']) : 0;
                                     <b><i class="fas fa-map-marker-alt"></i> Dirección</b>
                                     <a class="float-right" id="detalle_direccion">-</a>
                                 </li>
-                            </ul>
-                            
+                            </ul>                            
                             <div class="text-center">
                                 <a href="<?php echo APP_URL; ?>/consultorios/horarios?id=<?php echo $id_consultorio; ?>" class="btn btn-info btn-sm">
                                     <i class="fas fa-calendar-alt"></i> Gestionar Horarios
@@ -202,7 +205,6 @@ $id_consultorio = isset($_GET['id']) ? intval($_GET['id']) : 0;
                             </div>
                         </div>
                     </div>
-
                     <div class="card card-success">
                         <div class="card-header">
                             <h3 class="card-title"><i class="fas fa-stethoscope"></i> Especialidades Admitidas</h3>
@@ -211,7 +213,6 @@ $id_consultorio = isset($_GET['id']) ? intval($_GET['id']) : 0;
                             <p class="text-muted text-center">Cargando...</p>
                         </div>
                     </div>
-
                     <div class="card card-info">
                         <div class="card-header">
                             <h3 class="card-title"><i class="fas fa-chart-line"></i> Estadísticas</h3>
@@ -222,7 +223,6 @@ $id_consultorio = isset($_GET['id']) ? intval($_GET['id']) : 0;
                         </div>
                     </div>
                 </div>
-
                 <div class="col-md-8">
                     <div class="card card-primary">
                         <div class="card-header">
@@ -259,14 +259,12 @@ $id_consultorio = isset($_GET['id']) ? intval($_GET['id']) : 0;
         </div>
     </section>
 </div>
-
 <footer class="main-footer">
     <div class="float-right d-none d-sm-block">
         <b>Version</b> 1.0.0
     </div>
     <strong>Copyright &copy; 2024 BioVital.</strong> Todos los derechos reservados.
 </footer>
-
 </div>
 
 <!-- Modal Asignar Médico -->
@@ -293,7 +291,6 @@ $id_consultorio = isset($_GET['id']) ? intval($_GET['id']) : 0;
         </div>
     </div>
 </div>
-
 <script src="<?php echo APP_URL; ?>/js/adminlte.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
 <script src="<?php echo APP_URL; ?>/js/consultorio.js"></script>

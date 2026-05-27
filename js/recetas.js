@@ -1,11 +1,11 @@
 // Usar la configuración global
 var BASE_URL = window.CONFIG ? window.CONFIG.BASE_URL : '';
-function getUrl(controller, action) {
+function getUrl(endpoint) {
     if (window.CONFIG) {
-        return window.CONFIG.getControllerUrl(controller);
+        return window.CONFIG.getApiUrl(endpoint);
     }
-    // Fallback para entornos sin config.js
-    return BASE_URL + '/controlador/' + controller + '.php';
+    // Fallback para compatibilidad
+    return BASE_URL + '/api/' + endpoint;
 }
 
 $(document).ready(function() {
@@ -55,52 +55,113 @@ $(document).ready(function() {
         });
     });
 });
+function cargarEstadisticas() {
+    $.ajax({
+        url: APP_URL + '/api/recetas/estadisticas',
+        type: 'POST',
+        dataType: 'json',
+        success: function(response) {
+            console.log('Estadísticas recibidas:', response);
+            
+            // Manejar formato ApiResponse
+            var data = {};
+            if (response.success && response.data) {
+                data = response.data;
+            } else {
+                data = response;
+            }
+            
+            $('#total_recetas').text(data.total_recetas || 0);
+            $('#total_medicos').text(data.total_medicos || 0);
+            $('#total_pacientes').text(data.total_pacientes || 0);
+            $('#recetas_mes').text(data.recetas_mes || 0);
+        },
+        error: function(xhr, status, error) {
+            console.error('Error al cargar estadísticas:', error);
+            $('#total_recetas').text('0');
+            $('#total_medicos').text('0');
+            $('#total_pacientes').text('0');
+            $('#recetas_mes').text('0');
+        }
+    });
+}
 
 function listar_recetas() {
-    $('#tabla_recetas').html('<tr><td colspan="8" class="text-center">Cargando recetas...<div class="spinner-border spinner-border-sm ml-2" role="status"></div></td></tr>');
+    $('#tabla_recetas').html('<tr><td colspan="9" class="text-center"><div class="spinner-border text-primary"></div><p>Cargando recetas...</p></td></tr>');
     
     $.ajax({
-       url: APP_URL + '/api/recetas/listar',
+        url: APP_URL + '/api/recetas/listar',
         type: 'POST',
-        data: { funcion: 'listar_recetas' },
         dataType: 'json',
-        success: function(recetas) {
-            console.log('Recetas cargadas:', recetas);
+        success: function(response) {
+            console.log('Respuesta recetas (raw):', response);
+            
+            // ==================== MANEJAR FORMATO ApiResponse ====================
+            var recetas = [];
+            
+            // Si la respuesta tiene el formato ApiResponse (success + data)
+            if (response.success && response.data) {
+                recetas = response.data;
+                console.log('Recetas extraídas de ApiResponse.data:', recetas);
+            } 
+            // Si es un array directo
+            else if (Array.isArray(response)) {
+                recetas = response;
+                console.log('Recetas es un array directo:', recetas);
+            }
+            // Si tiene propiedad recetas
+            else if (response.recetas && Array.isArray(response.recetas)) {
+                recetas = response.recetas;
+                console.log('Recetas extraídas de response.recetas:', recetas);
+            }
+            // Otro formato
+            else {
+                console.warn('Formato de respuesta no reconocido:', response);
+                recetas = [];
+            }
+            
+            // Asegurar que sea un array
+            if (!Array.isArray(recetas)) {
+                console.error('recetas no es un array:', recetas);
+                recetas = [];
+            }
+            
+            console.log('Recetas procesadas (cantidad):', recetas.length);
             
             let html = '';
             
-            if (!recetas || recetas.length === 0) {
-                html = '<tr><td colspan="8" class="text-center">No hay recetas registradas</td></tr>';
+            if (recetas.length === 0) {
+                html = '<tr><td colspan="9" class="text-center text-muted">No hay recetas registradas</td></tr>';
             } else {
-                for (let receta of recetas) {
+                for (let i = 0; i < recetas.length; i++) {
+                    let receta = recetas[i];
                     html += `
                         <tr>
-                            <td>${receta.id_receta || ''}</td>
+                            <td><span class="badge badge-secondary">${receta.id_receta || ''}</span></td>
                             <td><strong>${escapeHtml(receta.nombre_medicamento || '')}</strong></td>
                             <td>${escapeHtml(receta.marca || '')}</td>
                             <td>${escapeHtml(receta.cantidad || '')}</td>
                             <td>${escapeHtml(receta.dosis || '-')}</td>
-                            <td>${escapeHtml(receta.paciente || 'N/A')}</td>
-                            <td>${receta.fecha_receta || ''}</td>
+                            <td><i class="fas fa-user-injured text-info"></i> ${escapeHtml(receta.paciente || 'N/A')}</td>
+                            <td><i class="fas fa-user-md text-success"></i> ${escapeHtml(receta.medico || 'N/A')}</td>
+                            <td><i class="fas fa-calendar-alt"></i> ${receta.fecha_receta || ''}</td>
                             <td class="table-actions">
-                                <button class="btn btn-warning btn-sm btn-editar" data-id="${receta.id_receta}">
-                                    <i class="fas fa-edit"></i> Editar
+                                <button class="btn btn-info btn-sm btn-ver-detalle" data-id="${receta.id_receta}">
+                                    <i class="fas fa-eye"></i> Ver
                                 </button>
-                                <button class="btn btn-danger btn-sm btn-borrar" data-id="${receta.id_receta}">
-                                    <i class="fas fa-trash-alt"></i> Borrar
-                                </button>
-                            </td>
-                        </tr>
+                             </td>
+                         </tr>
                     `;
                 }
             }
             
             $('#tabla_recetas').html(html);
+            console.log('Tabla actualizada con', recetas.length, 'recetas');
         },
         error: function(xhr, status, error) {
             console.error('Error al listar recetas:', error);
-            $('#tabla_recetas').html('<tr><td colspan="8" class="text-center text-danger">Error al cargar las recetas</td></tr>');
-            mostrarAlerta('Error al cargar las recetas', 'error');
+            console.error('Respuesta del servidor:', xhr.responseText);
+            $('#tabla_recetas').html('<tr><td colspan="9" class="text-center text-danger">Error al cargar las recetas: ' + error + '</td></tr>');
         }
     });
 }

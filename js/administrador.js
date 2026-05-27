@@ -1,7 +1,3 @@
-/**
- * administrador.js - Funcionalidades para el panel del administrador
- * CORREGIDO - Soluciona problemas de edición y guardado de datos
- */
 
 $(document).ready(function() {
     // ==================== VERIFICACIÓN INICIAL ====================

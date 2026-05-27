@@ -31,26 +31,50 @@ class RecetaController {
     /**
      * Vista principal de recetas (según el rol del usuario)
      */
-    public function index() {
-        $rol = $_SESSION['rol'];
-        
-        switch($rol) {
-            case 'medico':
-                $vista = 'medico/adm_recetas';
-                break;
-            case 'asistente':
-                $vista = 'asistente/adm_recetas';
-                break;
-            case 'administrador':
-                $vista = 'administrador/adm_recetas';
-                break;
-            default:
-                redirect('login');
-                return;
-        }
-        
-        renderView($vista);
+  public function index() {
+    $rol = $_SESSION['rol'];
+    
+    // Verificar permisos
+    if (!in_array($rol, ['administrador', 'medico', 'asistente'])) {
+        redirect('login');
+        return;
     }
+    
+    // Determinar la vista según el rol
+    switch($rol) {
+        case 'administrador':
+            $vista = 'administrador/adm_recetas';
+            $titulo = 'Gestión de Recetas - BioVital';
+            break;
+        case 'medico':
+            $vista = 'medico/med_recetas';
+            $titulo = 'Mis Recetas - BioVital';
+            break;
+        case 'asistente':
+            $vista = 'administrador/adm_recetas';  // Asistente usa la misma vista que administrador
+            $titulo = 'Recetas - BioVital';
+            break;
+        default:
+            redirect('login');
+            return;
+    }
+    
+    $options = [
+        'title' => $titulo,
+        'breadcrumbs' => [
+            ['label' => 'Inicio', 'url' => APP_URL . '/panel/' . $rol],
+            ['label' => 'Recetas']
+        ],
+        'active_page' => 'recetas',
+        'css' => '<link rel="stylesheet" href="' . APP_URL . '/css/dashboard-utils.css">'
+    ];
+    
+    $data = [
+        'nombre_usuario' => $_SESSION['nombre_us'] ?? 'Usuario'
+    ];
+    
+    ViewHelper::renderDashboard($vista, $data, $options);
+}
     
     /**
      * Vista específica para administrador

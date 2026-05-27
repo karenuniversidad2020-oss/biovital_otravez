@@ -1,10 +1,13 @@
 <?php
+// controlador/PacienteController.php - CORREGIDO
+// Basado en el funcionamiento de AdministradorController.php
+
 class PacienteController {
     
     public function __construct() {
         if (!isset($_SESSION['usuario']) || !isset($_SESSION['rol']) || $_SESSION['rol'] !== 'paciente') {
             if ($this->isAjax()) {
-                jsonResponse(['error' => 'No autorizado'], 401);
+                ApiResponse::unauthorized('No autorizado');
             } else {
                 redirect('login/paciente');
             }
@@ -17,7 +20,7 @@ class PacienteController {
                strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest';
     }
     
-    // Buscar paciente (cargar datos)
+    // ==================== BUSCAR PACIENTE (cargar datos para el perfil) ====================
     public function buscar() {
         $id_paciente = $_POST['dato'] ?? $_POST['id_paciente'] ?? 0;
         $id_sesion = $_SESSION['usuario'];
@@ -25,7 +28,7 @@ class PacienteController {
         error_log("PacienteController::buscar - ID: $id_paciente, Sesión: $id_sesion");
         
         if($id_paciente != $id_sesion) {
-            jsonResponse(['error' => 'No autorizado']);
+            ApiResponse::error('No autorizado para ver este perfil', 'unauthorized', [], 403);
             return;
         }
         
@@ -34,7 +37,7 @@ class PacienteController {
         $paciente->obtener_datos($id_paciente);
         
         if(empty($paciente->objetos)) {
-            jsonResponse(['error' => 'No se encontró el paciente']);
+            ApiResponse::notFound('Paciente');
             return;
         }
         
@@ -62,10 +65,11 @@ class PacienteController {
                 'avatar' => $avatar_path
             );
         }
-        jsonResponse($json);
+        
+        ApiResponse::success($json, 'datos_cargados', 'Datos del paciente cargados correctamente');
     }
     
-    // Capturar datos para edición
+    // ==================== CAPTURAR DATOS PARA EDICIÓN ====================
     public function capturarDatos() {
         $id_paciente = $_POST['id_paciente'] ?? 0;
         $id_sesion = $_SESSION['usuario'];
@@ -73,7 +77,7 @@ class PacienteController {
         error_log("PacienteController::capturarDatos - ID: $id_paciente, Sesión: $id_sesion");
         
         if($id_paciente != $id_sesion) {
-            jsonResponse(['error' => 'No autorizado']);
+            ApiResponse::error('No autorizado', 'unauthorized', [], 403);
             return;
         }
         
@@ -81,7 +85,7 @@ class PacienteController {
         $paciente->obtener_datos($id_paciente);
         
         if(empty($paciente->objetos)) {
-            jsonResponse(['error' => 'No se encontró el paciente']);
+            ApiResponse::notFound('Paciente');
             return;
         }
         
@@ -95,23 +99,24 @@ class PacienteController {
                 'adicional' => $objeto->adicional_paciente ?? ''
             );
         }
-        jsonResponse($json);
+        
+        ApiResponse::success($json, 'datos_capturados', 'Datos cargados para edición');
     }
     
-    // Editar paciente
-    public function editarUsuario() {
-        $id_paciente = $_POST['id_paciente'] ?? 0;
-        $id_sesion = $_SESSION['usuario'];
+    // ==================== EDITAR PACIENTE ====================
+   public function editarUsuario() {
+    $id_paciente = $_POST['id_paciente'] ?? 0;
+    $id_sesion = $_SESSION['usuario'];
         
         error_log("PacienteController::editarUsuario - ID: $id_paciente, Sesión: $id_sesion");
         
         if($id_paciente != $id_sesion) {
-            jsonResponse(['success' => false, 'error' => 'No autorizado']);
+            ApiResponse::error('No autorizado', 'unauthorized', [], 403);
             return;
         }
         
         $telefono = $_POST['telefono'] ?? '';
-        $direccion = $_POST['direccion'] ?? '';
+        $direccion = $_POST['direccion'] ?? ''; 
         $correo = $_POST['correo'] ?? '';
         $sexo = $_POST['sexo'] ?? '';
         $adicional = $_POST['adicional'] ?? '';
@@ -119,20 +124,20 @@ class PacienteController {
         $paciente = new Paciente();
         $paciente->editar($id_paciente, $telefono, $direccion, $correo, $sexo, $adicional);
         
-        jsonResponse(['success' => true, 'message' => 'editado']);
+        ApiResponse::updated([], 'Datos actualizados correctamente');
     }
     
-    // Cambiar foto de perfil
+    // ==================== CAMBIAR FOTO DE PERFIL ====================
     public function cambiarFoto() {
         $id_paciente = $_SESSION['usuario'];
         
         if (empty($id_paciente)) {
-            jsonResponse(['alert' => 'noedit', 'error' => 'Sesión no válida']);
+            ApiResponse::error('Sesión no válida', 'auth_error', [], 401);
             return;
         }
         
         if (!isset($_FILES['photo']) || $_FILES['photo']['error'] !== UPLOAD_ERR_OK) {
-            jsonResponse(['alert' => 'noedit', 'error' => 'No se recibió el archivo']);
+            ApiResponse::error('No se recibió el archivo', 'upload_error', [], 400);
             return;
         }
         
@@ -142,39 +147,41 @@ class PacienteController {
         finfo_close($finfo);
         
         if (!in_array($mime_type, $allowed_types)) {
-            jsonResponse(['alert' => 'noedit', 'error' => 'Tipo de archivo no permitido']);
+            ApiResponse::error('Tipo de archivo no permitido. Use JPG, PNG o GIF', 'invalid_type', [], 400);
             return;
         }
         
         $extension = pathinfo($_FILES['photo']['name'], PATHINFO_EXTENSION);
         $nombre = uniqid() . '.' . $extension;
-        $ruta_destino = '../img/' . $nombre;
+        $ruta_destino = dirname(__DIR__) . '/img/' . $nombre;
         
         if (move_uploaded_file($_FILES['photo']['tmp_name'], $ruta_destino)) {
             $paciente = new Paciente();
             $avatar_anterior = $paciente->cambiar_photo($id_paciente, $nombre);
             
-            // Eliminar avatar anterior si no es el default
             if ($avatar_anterior && $avatar_anterior !== 'avatarDES.jpg') {
-                $ruta_anterior = '../img/' . $avatar_anterior;
+                $ruta_anterior = dirname(__DIR__) . '/img/' . $avatar_anterior;
                 if (file_exists($ruta_anterior)) {
                     @unlink($ruta_anterior);
                 }
             }
             
-            jsonResponse(['ruta' => APP_URL . '/img/' . $nombre, 'alert' => 'edit']);
+            ApiResponse::success([
+                'ruta' => APP_URL . '/img/' . $nombre,
+                'alert' => 'edit'
+            ], 'foto_actualizada', 'Foto de perfil actualizada correctamente');
         } else {
-            jsonResponse(['alert' => 'noedit', 'error' => 'Error al mover el archivo']);
+            ApiResponse::error('Error al mover el archivo', 'upload_error', [], 500);
         }
     }
     
-    // Cambiar contraseña
+    // ==================== CAMBIAR CONTRASEÑA ====================
     public function cambiarPassword() {
         $id_paciente = $_POST['id_paciente'] ?? 0;
         $id_sesion = $_SESSION['usuario'];
         
         if($id_paciente != $id_sesion) {
-            jsonResponse(['resultado' => 'noupdate']);
+            ApiResponse::error('No autorizado', 'unauthorized', [], 403);
             return;
         }
         
@@ -182,40 +189,61 @@ class PacienteController {
         $newpass = $_POST['newpass'] ?? '';
         
         if(strlen($newpass) < 6) {
-            jsonResponse(['resultado' => 'noupdate', 'error' => 'La contraseña debe tener al menos 6 caracteres']);
+            ApiResponse::error('La contraseña debe tener al menos 6 caracteres', 'validation_error', [], 400);
             return;
         }
         
         $loginPaciente = new LoginPaciente();
         ob_start();
         $loginPaciente->cambiar_contra($id_paciente, $oldpass, $newpass);
-        $resultado = ob_get_clean();
+        $resultado = trim(ob_get_clean());
         
-        jsonResponse(['resultado' => trim($resultado)]);
+        if ($resultado === 'update') {
+            ApiResponse::success([], 'password_updated', 'Contraseña actualizada correctamente');
+        } else {
+            ApiResponse::error('Contraseña actual incorrecta', 'auth_error', [], 401);
+        }
     }
     
-    // Mis estadísticas
+    // ==================== MIS ESTADÍSTICAS ====================
     public function misEstadisticas() {
         $id_paciente = $_POST['id_paciente'] ?? 0;
         $id_sesion = $_SESSION['usuario'];
         
         if($id_paciente != $id_sesion) {
-            jsonResponse(['error' => 'No autorizado']);
+            ApiResponse::error('No autorizado', 'unauthorized', [], 403);
             return;
         }
         
         $paciente = new Paciente();
         $total_recetas = $paciente->contarRecetas($id_paciente);
         
-        jsonResponse([
+        ApiResponse::success([
             'total_recetas' => $total_recetas,
             'proximas_citas' => 0
-        ]);
+        ], 'estadisticas', 'Estadísticas cargadas correctamente');
     }
     
-    // Vista: Mis recetas
-    public function recetas() {
-        renderView('paciente/pac_recetas');
-    }
+    // ==================== VISTA: MIS RECETAS ====================
+   public function recetas() {
+    AuthHelper::checkRole('paciente', true);
+    
+    $options = [
+        'title' => 'Mis Recetas - BioVital',
+        'breadcrumbs' => [
+            ['label' => 'Inicio', 'url' => APP_URL . '/panel/paciente'],
+            ['label' => 'Mis Recetas']
+        ],
+        'active_page' => 'recetas',
+        'css' => '<link rel="stylesheet" href="' . APP_URL . '/css/dashboard-utils.css">'
+    ];
+    
+    $data = [
+        'nombre_usuario' => $_SESSION['nombre_us'] ?? 'Usuario',
+        'id_paciente' => $_SESSION['usuario'] ?? 0
+    ];
+    
+    ViewHelper::renderDashboard('paciente/pac_recetas', $data, $options);
+}
 }
 ?>

@@ -99,7 +99,7 @@ $id_medico = $_SESSION['usuario'];
 <aside class="main-sidebar sidebar-dark-primary elevation-4">
     <a href="<?php echo APP_URL; ?>/panel/medico" class="brand-link">
         <img src="<?php echo APP_URL; ?>/img/logo_azul.png" alt="Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
-        <span class="brand-text font-weight-light">BIOVITAL</span>
+        <span class="brand-text font-weight-light">BioVital</span>
     </a>
     <div class="sidebar">
         <div class="user-panel mt-3 pb-3 mb-3 d-flex">
@@ -397,56 +397,67 @@ $(document).ready(function() {
     });
 
     // Buscar en la tabla
-    $('#btnBuscar').click(function() {
-        let busqueda = $('#buscar_receta').val().toLowerCase();
-        buscarEnTabla(busqueda);
-    });
-
-    $('#buscar_receta').keypress(function(e) {
-        if (e.which == 13) {
-            $('#btnBuscar').click();
-        }
-    });
-
-    $('#btnLimpiarBusqueda').click(function() {
-        $('#buscar_receta').val('');
-        $(this).hide();
-        listar_recetas();
-    });
-
-    function buscarEnTabla(busqueda) {
+    $('#buscar_receta').on('keyup', function() {
+        let value = $(this).val().toLowerCase();
         let hayResultados = false;
+        
         $('#tabla_recetas tr').each(function() {
             if ($(this).find('td').length > 0) {
                 let texto = $(this).text().toLowerCase();
-                let mostrar = texto.indexOf(busqueda) > -1;
+                let mostrar = texto.indexOf(value) > -1;
                 $(this).toggle(mostrar);
                 if (mostrar) hayResultados = true;
             }
         });
         
-        if (busqueda.length > 0) {
+        if (value.length > 0) {
+            $('#termino_busqueda').text(value);
+            $('#resultado_busqueda').show();
             $('#btnLimpiarBusqueda').show();
-            if (!hayResultados) {
-                $('#tabla_recetas').append('<tr class="sin-resultados"><td colspan="8" class="text-center text-muted">No se encontraron resultados para "' + escapeHtml(busqueda) + '"</td></tr>');
-            }
         } else {
+            $('#resultado_busqueda').hide();
             $('#btnLimpiarBusqueda').hide();
+        }
+        
+        if (!hayResultados && value.length > 0) {
+            $('#tabla_recetas').append('<tr class="sin-resultados"><td colspan="8" class="text-center text-muted">No se encontraron resultados para "' + escapeHtml(value) + '"</td></tr>');
+        } else {
             $('.sin-resultados').remove();
         }
-    }
+    });
+
+    $('#btnLimpiarBusqueda').click(function() {
+        $('#buscar_receta').val('');
+        $('#resultado_busqueda').hide();
+        $(this).hide();
+        listar_recetas();
+    });
+
+    $('#limpiarResultados').click(function(e) {
+        e.preventDefault();
+        $('#buscar_receta').val('');
+        $('#resultado_busqueda').hide();
+        $('#btnLimpiarBusqueda').hide();
+        listar_recetas();
+    });
 
     function cargarEstadisticas() {
         $.ajax({
             url: APP_URL + '/api/medicos/mis-estadisticas',
             type: 'POST',
-            data: { id_medico: ID_MEDICO },
+            data: { id_medico: <?php echo $_SESSION['usuario'] ?? 0; ?> },
             dataType: 'json',
-            success: function(data) {
+            success: function(response) {
+                console.log('Estadísticas recibidas:', response);
+                
+                // Manejar formato ApiResponse
+                var data = response.success && response.data ? response.data : response;
+                
                 $('#total_recetas').text(data.total_recetas || 0);
                 $('#total_pacientes').text(data.total_pacientes || 0);
             },
-            error: function() {
+            error: function(xhr, status, error) {
+                console.error('Error al cargar estadísticas:', error);
                 $('#total_recetas').text('0');
                 $('#total_pacientes').text('0');
             }
@@ -460,13 +471,32 @@ $(document).ready(function() {
             url: APP_URL + '/api/recetas/listar',
             type: 'POST',
             dataType: 'json',
-            success: function(recetas) {
+            success: function(response) {
+                console.log('Respuesta recetas:', response);
+                
+                // Manejar formato ApiResponse
+                var recetas = [];
+                if (response.success && response.data) {
+                    recetas = response.data;
+                } else if (Array.isArray(response)) {
+                    recetas = response;
+                } else if (response.recetas && Array.isArray(response.recetas)) {
+                    recetas = response.recetas;
+                }
+                
+                if (!Array.isArray(recetas)) {
+                    recetas = [];
+                }
+                
+                console.log('Recetas procesadas:', recetas.length);
+                
                 let html = '';
                 
-                if (!recetas || recetas.length === 0) {
+                if (recetas.length === 0) {
                     html = '<tr><td colspan="8" class="text-center text-muted">No hay recetas registradas</td></tr>';
                 } else {
-                    for (let receta of recetas) {
+                    for (let i = 0; i < recetas.length; i++) {
+                        let receta = recetas[i];
                         html += `
                             <tr>
                                 <td><span class="badge badge-secondary">${receta.id_receta || ''}</span></td>
@@ -486,8 +516,8 @@ $(document).ready(function() {
                                     <button class="btn btn-danger btn-sm btn-borrar" data-id="${receta.id_receta}">
                                         <i class="fas fa-trash-alt"></i> Borrar
                                     </button>
-                                 </td>
-                             </tr>
+                                </td>
+                            </tr>
                         `;
                     }
                 }
@@ -501,9 +531,9 @@ $(document).ready(function() {
         });
     }
 
-    // Ver detalle de receta
     $(document).on('click', '.btn-ver-detalle', function() {
         let id = $(this).data('id');
+        console.log('Ver detalle receta ID:', id);
         
         $('#detalle_receta_content').html('<div class="text-center"><div class="spinner-border text-primary"></div><p>Cargando detalles...</p></div>');
         $('#modalDetalleReceta').modal('show');
@@ -513,50 +543,60 @@ $(document).ready(function() {
             type: 'POST',
             data: { id_receta: id },
             dataType: 'json',
-            success: function(receta) {
-                let html = `
-                    <div class="receta-detalle">
-                        <div class="row mb-3">
-                            <div class="col-md-12 text-center">
-                                <h3 class="text-primary">RECETA MÉDICA</h3>
-                                <hr>
+            success: function(response) {
+                console.log('Detalle receta:', response);
+                
+                // Manejar formato ApiResponse
+                var receta = response.success && response.data ? response.data : response;
+                
+                if (receta && receta.id_receta) {
+                    let html = `
+                        <div class="receta-detalle">
+                            <div class="row mb-3">
+                                <div class="col-md-12 text-center">
+                                    <h3 class="text-primary">RECETA MÉDICA</h3>
+                                    <hr>
+                                </div>
                             </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <p><strong><i class="fas fa-id-badge"></i> ID Receta:</strong> ${receta.id_receta}</p>
-                                <p><strong><i class="fas fa-capsules"></i> Medicamento:</strong> ${escapeHtml(receta.nombre_medicamento)}</p>
-                                <p><strong><i class="fas fa-trademark"></i> Marca:</strong> ${escapeHtml(receta.marca)}</p>
-                                <p><strong><i class="fas fa-cubes"></i> Cantidad:</strong> ${escapeHtml(receta.cantidad)}</p>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p><strong><i class="fas fa-id-badge"></i> ID Receta:</strong> ${receta.id_receta}</p>
+                                    <p><strong><i class="fas fa-capsules"></i> Medicamento:</strong> ${escapeHtml(receta.nombre_medicamento)}</p>
+                                    <p><strong><i class="fas fa-trademark"></i> Marca:</strong> ${escapeHtml(receta.marca)}</p>
+                                    <p><strong><i class="fas fa-cubes"></i> Cantidad:</strong> ${escapeHtml(receta.cantidad)}</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p><strong><i class="fas fa-clock"></i> Dosis:</strong> ${escapeHtml(receta.dosis || 'No especificada')}</p>
+                                    <p><strong><i class="fas fa-calendar-day"></i> Fecha:</strong> ${receta.fecha_receta}</p>
+                                    <p><strong><i class="fas fa-user-injured"></i> Paciente ID:</strong> ${receta.id_paciente || 'N/A'}</p>
+                                </div>
                             </div>
-                            <div class="col-md-6">
-                                <p><strong><i class="fas fa-clock"></i> Dosis:</strong> ${escapeHtml(receta.dosis || 'No especificada')}</p>
-                                <p><strong><i class="fas fa-calendar-day"></i> Fecha:</strong> ${receta.fecha_receta}</p>
-                                <p><strong><i class="fas fa-user-injured"></i> Paciente ID:</strong> ${receta.id_paciente || 'N/A'}</p>
-                            </div>
-                        </div>
-                        <div class="row mt-3">
-                            <div class="col-md-12">
-                                <div class="card">
-                                    <div class="card-header bg-info text-white">
-                                        <strong><i class="fas fa-stethoscope"></i> Instrucciones</strong>
-                                    </div>
-                                    <div class="card-body">
-                                        ${escapeHtml(receta.instrucciones) || '<em class="text-muted">Sin instrucciones adicionales</em>'}
+                            <div class="row mt-3">
+                                <div class="col-md-12">
+                                    <div class="card">
+                                        <div class="card-header bg-info text-white">
+                                            <strong><i class="fas fa-stethoscope"></i> Instrucciones</strong>
+                                        </div>
+                                        <div class="card-body">
+                                            ${escapeHtml(receta.instrucciones) || '<em class="text-muted">Sin instrucciones adicionales</em>'}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="row mt-3">
-                            <div class="col-md-12 text-muted text-center">
-                                <small>Documento generado electrónicamente por BioVital - Sistema de Gestión Médica</small>
+                            <div class="row mt-3">
+                                <div class="col-md-12 text-muted text-center">
+                                    <small>Documento generado electrónicamente por BioVital - Sistema de Gestión Médica</small>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                `;
-                $('#detalle_receta_content').html(html);
+                    `;
+                    $('#detalle_receta_content').html(html);
+                } else {
+                    $('#detalle_receta_content').html('<div class="alert alert-danger">Error al cargar los detalles de la receta</div>');
+                }
             },
-            error: function() {
+            error: function(xhr, status, error) {
+                console.error('Error al obtener detalle:', error);
                 $('#detalle_receta_content').html('<div class="alert alert-danger">Error al cargar los detalles de la receta</div>');
             }
         });
@@ -565,12 +605,14 @@ $(document).ready(function() {
     // Editar receta
     $(document).on('click', '.btn-editar', function() {
         let id = $(this).data('id');
+        console.log('Editar receta ID:', id);
         editarReceta(id);
     });
 
     // Borrar receta
     $(document).on('click', '.btn-borrar', function() {
         let id = $(this).data('id');
+        console.log('Borrar receta ID:', id);
         if (confirm('¿Está seguro de que desea eliminar esta receta?')) {
             borrarReceta(id);
         }
@@ -623,13 +665,26 @@ $(document).ready(function() {
             type: 'POST',
             data: { dato: dato },
             dataType: 'json',
-            success: function(pacientes) {
+            success: function(response) {
+                console.log('Pacientes encontrados:', response);
+                
+                // Manejar formato ApiResponse
+                var pacientes = [];
+                if (response.success && response.data) {
+                    pacientes = response.data;
+                } else if (Array.isArray(response)) {
+                    pacientes = response;
+                } else {
+                    pacientes = response;
+                }
+                
                 let html = '';
                 
                 if (!pacientes || pacientes.length === 0) {
                     html = '<a href="#" class="list-group-item list-group-item-action disabled">No se encontraron pacientes</a>';
                 } else {
-                    for (let paciente of pacientes) {
+                    for (let i = 0; i < pacientes.length; i++) {
+                        let paciente = pacientes[i];
                         html += `<a href="#" class="list-group-item list-group-item-action paciente-item" 
                                     data-id="${paciente.id_usuario}" 
                                     data-nombre="${escapeHtml(paciente.nombre_completo)}" 
@@ -652,7 +707,8 @@ $(document).ready(function() {
                     $('#resultados_pacientes').hide();
                 });
             },
-            error: function() {
+            error: function(xhr, status, error) {
+                console.error('Error al buscar pacientes:', error);
                 $('#resultados_pacientes').html('<a href="#" class="list-group-item list-group-item-action disabled">Error al buscar pacientes</a>').show();
             }
         });
@@ -729,8 +785,8 @@ $(document).ready(function() {
                     mostrarAlerta(response.message || 'Error al guardar la receta', 'error');
                 }
             },
-            error: function(xhr) {
-                console.error('Error:', xhr);
+            error: function(xhr, status, error) {
+                console.error('Error:', error);
                 mostrarAlerta('Error de conexión al guardar la receta', 'error');
             },
             complete: function() {
@@ -745,7 +801,9 @@ $(document).ready(function() {
             type: 'POST',
             data: { id_receta: id },
             dataType: 'json',
-            success: function(receta) {
+            success: function(response) {
+                var receta = response.success && response.data ? response.data : response;
+                
                 if (receta && receta.id_receta) {
                     $('#id_receta').val(receta.id_receta);
                     $('#nombre_medicamento').val(receta.nombre_medicamento);
@@ -765,7 +823,8 @@ $(document).ready(function() {
                     mostrarAlerta('Error al cargar los datos de la receta', 'error');
                 }
             },
-            error: function() {
+            error: function(xhr, status, error) {
+                console.error('Error al editar:', error);
                 mostrarAlerta('Error al cargar los datos de la receta', 'error');
             }
         });
@@ -786,7 +845,8 @@ $(document).ready(function() {
                     mostrarAlerta(response.message || 'Error al borrar la receta', 'error');
                 }
             },
-            error: function() {
+            error: function(xhr, status, error) {
+                console.error('Error al borrar:', error);
                 mostrarAlerta('Error de conexión al borrar la receta', 'error');
             }
         });
@@ -798,7 +858,8 @@ $(document).ready(function() {
             type: 'POST',
             data: { dato: '' },
             dataType: 'json',
-            success: function(pacientes) {
+            success: function(response) {
+                var pacientes = response.success && response.data ? response.data : (Array.isArray(response) ? response : []);
                 if (pacientes && Array.isArray(pacientes)) {
                     let paciente = pacientes.find(p => p.id_usuario == id_paciente);
                     if (paciente) {
@@ -806,6 +867,9 @@ $(document).ready(function() {
                         $('#id_paciente').val(paciente.id_usuario);
                     }
                 }
+            },
+            error: function(xhr, status, error) {
+                console.error('Error al cargar datos del paciente:', error);
             }
         });
     }

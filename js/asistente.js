@@ -20,9 +20,9 @@ $(document).ready(function() {
         console.log('Buscando asistente con dato:', dato);
         
         $.ajax({
-            url: '../../controlador/AsistenteController.php',
-            type: 'POST',
-            data: {dato: dato, funcion: funcion},
+    url: APP_URL + '/api/asistentes/buscar',
+    type: 'POST',
+    data: { dato: dato, id_asistente: id_usuario },
             dataType: 'json',
             success: function(asistente) {
                 console.log('Asistente recibido:', asistente);

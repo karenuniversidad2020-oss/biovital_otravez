@@ -1,28 +1,48 @@
 <?php
+// controlador/PerfilController.php
+
 class PerfilController {
     
     private $rol;
     private $id;
     
     public function __construct() {
-        $this->rol = $_SESSION['rol'];
+        AuthHelper::checkRole(['paciente', 'medico', 'asistente', 'administrador'], true);
+        $this->rol = AuthHelper::getCurrentRole();
         $this->id = $_SESSION['usuario'];
     }
     
-    public function index() {
-        $vistas = [
-            'paciente' => 'paciente/pac_editar_datos',
-            'medico' => 'medico/med_editar_datos',
-            'asistente' => 'asistente/asi_editar_datos',
-            'administrador' => 'administrador/adm_editar_datos'
+   public function index() {
+    AuthHelper::checkRole(['paciente', 'medico', 'asistente', 'administrador'], true);
+    $this->rol = AuthHelper::getCurrentRole();
+    $this->id = $_SESSION['usuario'];
+    
+    $vistas = [
+        'paciente' => 'paciente/pac_editar_datos',
+        'medico' => 'medico/med_editar_datos',
+        'asistente' => 'asistente/asi_editar_datos',
+        'administrador' => 'administrador/adm_editar_datos'
+    ];
+    
+    if (isset($vistas[$this->rol])) {
+        $options = [
+            'title' => 'Mi Perfil - BioVital',
+            'breadcrumbs' => ViewHelper::generateBreadcrumbs('Mi Perfil'),
+            'active_page' => 'perfil',
+            'css' => '<link rel="stylesheet" href="' . APP_URL . '/css/dashboard-utils.css">'
         ];
         
-        if (isset($vistas[$this->rol])) {
-            renderView($vistas[$this->rol]);
-        } else {
-            redirect('login');
-        }
+        $data = [
+            'nombre_usuario' => $_SESSION['nombre_us'] ?? 'Usuario',
+            'id_medico' => $this->id,
+            'avatar_actual' => !empty($_SESSION['avatar']) ? $_SESSION['avatar'] : APP_URL . '/img/avatarDES.jpg'
+        ];
+        
+        ViewHelper::renderDashboard($vistas[$this->rol], $data, $options);
+    } else {
+        redirect('login');
     }
+}
     
     public function getDatos() {
         $controllerName = ucfirst($this->rol) . 'Controller';
@@ -92,5 +112,6 @@ class PerfilController {
         
         jsonResponse(['resultado' => trim($resultado)]);
     }
+    
 }
 ?>

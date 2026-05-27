@@ -21,7 +21,7 @@ class LoginAdministrador {
         $usuario = $query->fetch(PDO::FETCH_OBJ);
         
         if($usuario) {
-            // 🔐 VERIFICAR CONTRASEÑA CON password_verify
+           
             if(password_verify($pass, $usuario->password_hash)) {
                 $this->objetos = array($usuario);
                 return $this->objetos;

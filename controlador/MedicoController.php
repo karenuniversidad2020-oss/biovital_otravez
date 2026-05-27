@@ -19,55 +19,54 @@ class MedicoController {
     }
     
     // API: Buscar médico (para mostrar datos)
-    public function buscar() {
-        $id_medico = $_POST['dato'] ?? $_POST['id_medico'] ?? 0;
-        $id_sesion = $_SESSION['usuario'];
-        
-        // Si viene como 'dato' desde medico.js
-        if ($id_medico == 0 && isset($_POST['dato'])) {
-            $id_medico = $_POST['dato'];
-        }
-        
-        if($id_medico != $id_sesion) {
-            jsonResponse(['error' => 'No autorizado para ver este perfil']);
-            return;
-        }
-        
-        $medico = new Medico();
-        $fecha_actual = new DateTime();
-        $medico->obtener_datos($id_medico);
-        
-        if(empty($medico->objetos)) {
-            jsonResponse(['error' => 'No se encontró el médico']);
-            return;
-        }
-        
-        $json = array();
-        foreach ($medico->objetos as $objeto) {
-            $fecha_nacimiento = $objeto->fecha_nacimiento_medico;
-            $nacimiento = new DateTime($fecha_nacimiento);
-            $edad = $nacimiento->diff($fecha_actual);
-            
-            $avatar_path = (!empty($objeto->avatar_medico) && $objeto->avatar_medico != 'avatarDES.jpg') 
-                           ? APP_URL . '/img/' . $objeto->avatar_medico 
-                           : APP_URL . '/img/avatarDES.jpg';
-            
-            $json = array(
-                'nombre' => $objeto->nombre_medico,
-                'apellidos' => $objeto->apellido_medico,
-                'fecha_nacimiento' => $edad->y,
-                'cedula' => $objeto->cedula_medico,
-                'tipo' => $objeto->nombre_tipo,
-                'telefono' => $objeto->telefono_medico,
-                'direccion' => $objeto->direccion_medico,
-                'correo' => $objeto->correo_medico,
-                'sexo' => $objeto->sexo_medico,
-                'adicional' => $objeto->adicional_medico,
-                'avatar' => $avatar_path
-            );
-        }
-        jsonResponse($json);
+   public function buscar() {
+    $id_medico = $_POST['dato'] ?? $_POST['id_medico'] ?? 0;
+    $id_sesion = $_SESSION['usuario'];
+    
+    error_log("MedicoController::buscar - ID: $id_medico, Sesión: $id_sesion");
+    
+    if($id_medico != $id_sesion) {
+        ApiResponse::error('No autorizado para ver este perfil', 'unauthorized', [], 403);
+        return;
     }
+    
+    $medico = new Medico();
+    $fecha_actual = new DateTime();
+    $medico->obtener_datos($id_medico);
+    
+    if(empty($medico->objetos)) {
+        ApiResponse::notFound('Médico');
+        return;
+    }
+    
+    $json = array();
+    foreach ($medico->objetos as $objeto) {
+        $fecha_nacimiento = $objeto->fecha_nacimiento_medico;
+        $nacimiento = new DateTime($fecha_nacimiento);
+        $edad = $nacimiento->diff($fecha_actual);
+        
+        $avatar_path = (!empty($objeto->avatar_medico) && $objeto->avatar_medico != 'avatarDES.jpg') 
+                       ? APP_URL . '/img/' . $objeto->avatar_medico 
+                       : APP_URL . '/img/avatarDES.jpg';
+        
+        $json = array(
+            'nombre' => $objeto->nombre_medico ?? '',
+            'apellidos' => $objeto->apellido_medico ?? '',
+            'fecha_nacimiento' => $edad->y,
+            'cedula' => $objeto->cedula_medico ?? '',
+            'tipo' => $objeto->nombre_tipo ?? 'Médico',
+            'telefono' => $objeto->telefono_medico ?? '',
+            'direccion' => $objeto->direccion_medico ?? '',
+            'correo' => $objeto->correo_medico ?? '',
+            'sexo' => $objeto->sexo_medico ?? '',
+            'adicional' => $objeto->adicional_medico ?? '',
+            'avatar' => $avatar_path
+        );
+    }
+    
+    // Devolver en formato ApiResponse
+    ApiResponse::success($json, 'datos_cargados', 'Datos del médico cargados correctamente');
+}
     
     // API: Capturar datos para editar (CORREGIDO)
     public function capturarDatos() {
@@ -194,23 +193,21 @@ public function editarUsuario() {
     }
     
     // API: Mis estadísticas
-    public function misEstadisticas() {
+   public function misEstadisticas() {
         $id_medico = $_POST['id_medico'] ?? 0;
         $id_sesion = $_SESSION['usuario'];
         
-        if($id_medico != $id_sesion) {
-            jsonResponse(['error' => 'No autorizado']);
+        error_log("misEstadisticas - ID: $id_medico, Sesión: $id_sesion");
+        
+        if ($id_medico != $id_sesion) {
+            ApiResponse::unauthorized('No autorizado');
             return;
         }
         
         $medico = new Medico();
-        $total_recetas = $medico->contarRecetas($id_medico);
-        $total_pacientes = $medico->contarPacientes($id_medico);
+        $estadisticas = $medico->obtenerEstadisticasCompletas($id_medico);
         
-        jsonResponse([
-            'total_recetas' => $total_recetas,
-            'total_pacientes' => $total_pacientes
-        ]);
+        ApiResponse::success($estadisticas, 'estadisticas', 'Estadísticas cargadas correctamente');
     }
     
     // API: Listar pacientes del médico
@@ -238,6 +235,59 @@ public function editarUsuario() {
             );
         }
         jsonResponse($resultado);
+    }
+    public function actividadReciente() {
+        $id_medico = $_POST['id_medico'] ?? 0;
+        $id_sesion = $_SESSION['usuario'];
+        
+        error_log("actividadReciente - ID: $id_medico, Sesión: $id_sesion");
+        
+        if ($id_medico != $id_sesion) {
+            ApiResponse::unauthorized('No autorizado');
+            return;
+        }
+        
+        $medico = new Medico();
+        $actividades = $medico->obtenerActividadReciente($id_medico);
+        
+        ApiResponse::success($actividades, 'actividad_cargada', 'Actividad reciente cargada correctamente');
+    }
+ public function pacientes() {
+    AuthHelper::checkRole('medico', true);
+    
+    $options = [
+        'title' => 'Mis Pacientes - BioVital',
+        'breadcrumbs' => [
+            ['label' => 'Inicio', 'url' => APP_URL . '/panel/medico'],
+            ['label' => 'Mis Pacientes']
+        ],
+        'active_page' => 'pacientes',
+        'css' => '<link rel="stylesheet" href="' . APP_URL . '/css/dashboard-utils.css">',
+        'scripts' => '<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>'
+    ];
+    
+    $data = [
+        'nombre_usuario' => $_SESSION['nombre_us'] ?? 'Usuario',
+        'id_medico' => $_SESSION['usuario'] ?? 0
+    ];
+    
+    ViewHelper::renderDashboard('medico/med_pacientes', $data, $options);
+}
+ public function proximasCitas() {
+        $id_medico = $_POST['id_medico'] ?? 0;
+        $id_sesion = $_SESSION['usuario'];
+        
+        error_log("proximasCitas - ID: $id_medico, Sesión: $id_sesion");
+        
+        if ($id_medico != $id_sesion) {
+            ApiResponse::unauthorized('No autorizado');
+            return;
+        }
+        
+        $medico = new Medico();
+        $citas = $medico->obtenerProximasCitas($id_medico);
+        
+        ApiResponse::success($citas, 'citas_cargadas', 'Próximas citas cargadas correctamente');
     }
 }
 ?>

@@ -1,3 +1,6 @@
+<?php
+// vista/registro_asistente.php
+?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -7,7 +10,7 @@
     
     <!-- ==================== VARIABLE GLOBAL APP_URL ==================== -->
     <script>
-        var APP_URL = '<?php echo rtrim(dirname($_SERVER['SCRIPT_NAME']), '/'); ?>';
+        var APP_URL = '<?php echo APP_URL; ?>';
         console.log('APP_URL definida:', APP_URL);
     </script>
     
@@ -255,10 +258,9 @@
                     </button>
                 </div>
                   <!-- ==================== redirecciona a login ==================== -->
-                <div class="login-link">
-                 <a href="<?php echo APP_URL; ?>/login/asistente" class="login-link">
-                  <i class="fas fa-sign-in-alt"></i> ¿Ya tienes cuenta? Inicia sesión aquí</a>
-               </div>
+              <div class="login-link">
+    <a href="http://localhost/biovital/"><i class="fas fa-sign-in-alt"></i> ¿Ya tienes cuenta? Inicia sesión aquí</a>
+</div>
   <!-- ==================== FIN ==================== -->
              
             </div>
