@@ -1,16 +1,24 @@
 /**
+<<<<<<< HEAD
  * CSRF Protection - Versión corregida
  * NO genera tokens falsos. Si falla el servidor, muestra error y bloquea formularios.
+=======
+ * CSRF Protection - Generación y manejo de tokens
+ * Versión simplificada que no depende de funciones externas
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb
  */
 
 var CSRF = (function() {
     // Almacenar token en memoria
     var currentToken = null;
     var tokenExpiry = null;
+<<<<<<< HEAD
     var isInitialized = false;
     var initError = null;
     var retryCount = 0;
     var maxRetries = 3;
+=======
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb
     
     // Verificar que APP_URL esté definida
     if (typeof APP_URL === 'undefined') {
@@ -18,6 +26,7 @@ var CSRF = (function() {
         window.APP_URL = '';
     }
     
+<<<<<<< HEAD
     // Mostrar error al usuario
     function showError(mensaje) {
         console.error('[CSRF] ' + mensaje);
@@ -46,16 +55,34 @@ var CSRF = (function() {
     function fetchTokenFromServer(callback) {
         var tokenUrl = APP_URL + '/api/csrf/token';
         console.log('[CSRF] Obteniendo token desde:', tokenUrl);
+=======
+    // Función para generar un token aleatorio (fallback)
+    function generateToken() {
+        return Math.random().toString(36).substring(2, 15) + 
+               Math.random().toString(36).substring(2, 15) + 
+               Date.now().toString(36);
+    }
+    
+    // Obtener token del servidor
+    function fetchToken() {
+        var tokenUrl = APP_URL + '/api/csrf/token';
+        console.log('Obteniendo token CSRF desde:', tokenUrl);
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb
         
         $.ajax({
             url: tokenUrl,
             type: 'POST',
             dataType: 'json',
+<<<<<<< HEAD
             timeout: 8000, // 8 segundos de timeout
+=======
+            async: false,
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb
             success: function(response) {
                 if (response && response.status === 'success' && response.csrf_token) {
                     currentToken = response.csrf_token;
                     tokenExpiry = Date.now() + 3600000;
+<<<<<<< HEAD
                     console.log('[CSRF] Token obtenido correctamente');
                     if (callback) callback(true, currentToken);
                 } else {
@@ -67,10 +94,24 @@ var CSRF = (function() {
                 console.error('[CSRF] Error al obtener token - Status:', status, 'Error:', error);
                 console.error('[CSRF] Respuesta del servidor:', xhr.responseText);
                 if (callback) callback(false, null);
+=======
+                    console.log('Token CSRF obtenido correctamente');
+                } else {
+                    console.error('Respuesta inválida del servidor CSRF');
+                    currentToken = generateToken();
+                    tokenExpiry = Date.now() + 3600000;
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('Error al obtener token CSRF:', error);
+                currentToken = generateToken();
+                tokenExpiry = Date.now() + 3600000;
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb
             }
         });
     }
     
+<<<<<<< HEAD
     // Intentar obtener token con reintentos
     function fetchTokenWithRetry(callback, attempt) {
         attempt = attempt || 0;
@@ -161,6 +202,29 @@ var CSRF = (function() {
         
         if (typeof data === 'object' && data !== null) {
             data.csrf_token = token;
+=======
+    // Inicializar token
+    function init() {
+        fetchToken();
+        // Renovar token cada 50 minutos
+        setInterval(function() {
+            fetchToken();
+        }, 50 * 60 * 1000);
+    }
+    
+    // Obtener token actual
+    function getToken() {
+        if (!currentToken || (tokenExpiry && Date.now() > tokenExpiry)) {
+            fetchToken();
+        }
+        return currentToken;
+    }
+    
+    // Agregar token a los datos de una petición AJAX
+    function addTokenToData(data) {
+        if (typeof data === 'object' && data !== null) {
+            data.csrf_token = getToken();
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb
         }
         return data;
     }
@@ -169,6 +233,7 @@ var CSRF = (function() {
     function setupAjaxInterceptor() {
         $(document).ajaxSend(function(event, xhr, settings) {
             if (settings.type === 'POST' && settings.data) {
+<<<<<<< HEAD
                 var token = getToken();
                 if (!token) {
                     console.error('[CSRF] Petición POST bloqueada: token CSRF no disponible');
@@ -181,16 +246,29 @@ var CSRF = (function() {
                 if (typeof settings.data === 'string') {
                     if (settings.data.indexOf('csrf_token=') === -1) {
                         settings.data += '&csrf_token=' + encodeURIComponent(token);
+=======
+                if (typeof settings.data === 'string') {
+                    if (settings.data.indexOf('csrf_token=') === -1) {
+                        settings.data += '&csrf_token=' + encodeURIComponent(getToken());
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb
                     }
                 } 
                 else if (settings.data instanceof FormData) {
                     if (!settings.data.has('csrf_token')) {
+<<<<<<< HEAD
                         settings.data.append('csrf_token', token);
+=======
+                        settings.data.append('csrf_token', getToken());
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb
                     }
                 }
                 else if (typeof settings.data === 'object') {
                     if (!settings.data.csrf_token) {
+<<<<<<< HEAD
                         settings.data.csrf_token = token;
+=======
+                        settings.data.csrf_token = getToken();
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb
                     }
                 }
             }
@@ -199,6 +277,7 @@ var CSRF = (function() {
     
     // Agregar token a formularios HTML
     function addTokenToForms() {
+<<<<<<< HEAD
         if (!currentToken) return;
         
         $('form').each(function() {
@@ -210,10 +289,18 @@ var CSRF = (function() {
                 $(this).append('<input type="hidden" name="csrf_token" value="' + currentToken + '">');
             } else {
                 $(this).find('input[name="csrf_token"]').val(currentToken);
+=======
+        $('form').each(function() {
+            if ($(this).find('input[name="csrf_token"]').length === 0) {
+                $(this).append('<input type="hidden" name="csrf_token" value="' + getToken() + '">');
+            } else {
+                $(this).find('input[name="csrf_token"]').val(getToken());
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb
             }
         });
     }
     
+<<<<<<< HEAD
     // Actualizar tokens periódicamente (cada 30 minutos)
     function setupFormUpdater() {
         setInterval(function() {
@@ -234,6 +321,17 @@ var CSRF = (function() {
         return isInitialized && currentToken !== null;
     }
     
+=======
+    // Actualizar tokens periódicamente
+    function setupFormUpdater() {
+        setInterval(function() {
+            $('form input[name="csrf_token"]').each(function() {
+                $(this).val(getToken());
+            });
+        }, 30 * 60 * 1000);
+    }
+    
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb
     // API pública
     return {
         init: init,
@@ -241,13 +339,18 @@ var CSRF = (function() {
         addTokenToData: addTokenToData,
         setupAjaxInterceptor: setupAjaxInterceptor,
         addTokenToForms: addTokenToForms,
+<<<<<<< HEAD
         setupFormUpdater: setupFormUpdater,
         isReady: isReady
+=======
+        setupFormUpdater: setupFormUpdater
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb
     };
 })();
 
 // Inicializar cuando el documento esté listo
 $(document).ready(function() {
+<<<<<<< HEAD
     console.log('[CSRF] Inicializando protección CSRF...');
     CSRF.init(function(success) {
         if (success) {
@@ -256,4 +359,11 @@ $(document).ready(function() {
             console.error('[CSRF] No se pudo activar la protección CSRF');
         }
     });
+=======
+    console.log('Inicializando CSRF...');
+    CSRF.init();
+    CSRF.setupAjaxInterceptor();
+    CSRF.addTokenToForms();
+    CSRF.setupFormUpdater();
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb
 });

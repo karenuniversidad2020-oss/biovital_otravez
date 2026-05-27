@@ -1,5 +1,8 @@
 <?php
+<<<<<<< HEAD
 
+=======
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb
 include_once 'Conexion.php';
 
 class Paciente {
@@ -11,6 +14,7 @@ class Paciente {
         $this->acceso = $db->pdo;
     }
     
+<<<<<<< HEAD
     // ==================== MÉTODOS PRINCIPALES ====================
     
    
@@ -50,6 +54,20 @@ class Paciente {
    
    function editar($id_paciente, $telefono, $direccion, $correo, $sexo, $adicional) {
     try {
+=======
+    function obtener_datos($id) {
+        $sql = "SELECT rp.*, tp.nombre_tipo 
+                FROM registro_paciente rp
+                INNER JOIN tipo_paciente tp ON rp.paciente_tipo = tp.id_tipo_us 
+                WHERE rp.id_paciente = :id";
+        $query = $this->acceso->prepare($sql);
+        $query->execute(array(':id' => $id));
+        $this->objetos = $query->fetchAll();
+        return $this->objetos;
+    }
+    
+    function editar($id_paciente, $telefono, $direccion, $correo, $sexo, $adicional) {
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb
         $sql = "UPDATE registro_paciente SET 
                 telefono_paciente = :telefono,
                 direccion_paciente = :direccion,
@@ -66,6 +84,7 @@ class Paciente {
             ':sexo' => $sexo,
             ':adicional' => $adicional
         ));
+<<<<<<< HEAD
         return ['success' => true, 'message' => 'editado'];
     } catch(PDOException $e) {
         error_log("Error en editar paciente: " . $e->getMessage());
@@ -76,6 +95,13 @@ class Paciente {
     
    function cambiar_photo($id_paciente, $nombre) {
     try {
+=======
+    }
+    
+    // CORREGIDO: Retorna el nombre del avatar anterior como string
+    function cambiar_photo($id_paciente, $nombre) {
+        // Primero obtener el avatar actual
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb
         $sql = "SELECT avatar_paciente FROM registro_paciente WHERE id_paciente = :id";
         $query = $this->acceso->prepare($sql);
         $query->execute(array(':id' => $id_paciente));
@@ -83,10 +109,15 @@ class Paciente {
         
         $avatar_anterior = $resultado ? $resultado->avatar_paciente : 'avatarDES.jpg';
         
+<<<<<<< HEAD
+=======
+        // Actualizar con el nuevo avatar
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb
         $sql = "UPDATE registro_paciente SET avatar_paciente = :nombre WHERE id_paciente = :id";
         $query = $this->acceso->prepare($sql);
         $query->execute(array(':id' => $id_paciente, ':nombre' => $nombre));
         
+<<<<<<< HEAD
         return $avatar_anterior;
     } catch(PDOException $e) {
         error_log("Error en cambiar_photo: " . $e->getMessage());
@@ -126,6 +157,24 @@ class Paciente {
             }
             
             // Insertar el nuevo paciente
+=======
+        // Retornar el nombre del avatar anterior como string
+        return $avatar_anterior;
+    }
+    
+    function crear($nombre, $apellidos, $fecha_nacimiento, $cedula, $telefono, $direccion, $correo, $sexo, $adicional, $password_hash, $tipo, $avatar) {
+        try {
+            $sql = "SELECT id_paciente FROM registro_paciente WHERE cedula_paciente = :cedula OR correo_paciente = :correo";
+            $query = $this->acceso->prepare($sql);
+            $query->execute(array(':cedula' => $cedula, ':correo' => $correo));
+            $this->objetos = $query->fetchAll();
+            
+            if(!empty($this->objetos)) {
+                echo 'existe';
+                return;
+            }
+            
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb
             $sql = "INSERT INTO registro_paciente(
                 nombre_paciente, apellido_paciente, fecha_nacimiento_pac, 
                 cedula_paciente, telefono_paciente, direccion_paciente, 
@@ -154,6 +203,7 @@ class Paciente {
             
             if($resultado) {
                 $id_paciente = $this->acceso->lastInsertId();
+<<<<<<< HEAD
                 $loginResult = $this->crearLogin($id_paciente, $password_hash);
                 
                 if ($loginResult['success']) {
@@ -199,6 +249,32 @@ class Paciente {
     
     
     function contarRecetas($id_paciente) {
+=======
+                $this->crearLogin($id_paciente, $password_hash);
+                echo 'add';
+            } else {
+                echo 'error_bd';
+            }
+        } catch(PDOException $e) {
+            error_log("Error en crear paciente: " . $e->getMessage());
+            echo 'error_exception';
+        }
+    }
+    
+    function crearLogin($id_paciente, $password_hash) {
+        $sql = "INSERT INTO login_paciente(id_paciente, password_hash, status) 
+                VALUES (:id_paciente, :password_hash, 'activo')";
+        $query = $this->acceso->prepare($sql);
+        $query->execute(array(
+            ':id_paciente' => $id_paciente,
+            ':password_hash' => $password_hash
+        ));
+    }
+    
+    function contarRecetas($id_paciente) {
+        if($this->acceso === null) return 0;
+        
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb
         try {
             $sql = "SELECT COUNT(*) as total FROM recetas WHERE id_paciente = :id_paciente AND estado = 1";
             $query = $this->acceso->prepare($sql);
@@ -206,11 +282,15 @@ class Paciente {
             $resultado = $query->fetch(PDO::FETCH_OBJ);
             return $resultado->total ?? 0;
         } catch(PDOException $e) {
+<<<<<<< HEAD
             error_log("Error en contarRecetas: " . $e->getMessage());
+=======
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb
             return 0;
         }
     }
     
+<<<<<<< HEAD
     function obtenerResumenRecetas($id_paciente, $meses = 6) {
         try {
             $sql = "SELECT 
@@ -482,6 +562,10 @@ class Paciente {
     function obtenerHistorialCitas($id_paciente, $limit = 10) {
         // TODO: Implementar cuando el módulo de citas esté listo
         return [];
+=======
+    function contarProximasCitas($id_paciente) {
+        return 0;
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb
     }
 }
 ?>

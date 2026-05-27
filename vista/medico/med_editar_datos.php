@@ -203,7 +203,11 @@ $nombre_usuario = $_SESSION['nombre_us'];
 <aside class="main-sidebar sidebar-dark-primary elevation-4">
     <a href="<?php echo APP_URL; ?>/panel/medico" class="brand-link">
         <img src="<?php echo APP_URL; ?>/img/logo_azul.png" alt="Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
+<<<<<<< HEAD
         <span class="brand-text font-weight-light">BioVital</span>
+=======
+        <span class="brand-text font-weight-light">BIOVITAL</span>
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb
     </a>
     <div class="sidebar">
         <div class="user-panel mt-3 pb-3 mb-3 d-flex">

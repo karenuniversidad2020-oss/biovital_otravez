@@ -1,4 +1,8 @@
 <?php
+<<<<<<< HEAD
+=======
+// NO iniciar sesión aquí - el Front Controller ya lo hace
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb
 if($_SESSION['us_tipo'] != 4 || $_SESSION['rol'] != 'administrador'){
     header('Location: ' . APP_URL . '/login/administrador');
     exit();
@@ -16,6 +20,10 @@ $nombre_usuario = $_SESSION['nombre_us'] ?? 'Administrador';
     <script>
         var APP_URL = '<?php echo APP_URL; ?>';
     </script>
+<<<<<<< HEAD
+=======
+
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="<?php echo APP_URL; ?>/js/config.js"></script>
     <script src="<?php echo APP_URL; ?>/js/csrf.js"></script>
@@ -46,6 +54,7 @@ $nombre_usuario = $_SESSION['nombre_us'] ?? 'Administrador';
 <aside class="main-sidebar sidebar-dark-primary elevation-4">
     <a href="<?php echo APP_URL; ?>/panel/administrador" class="brand-link">
         <img src="<?php echo APP_URL; ?>/img/logo_azul.png" alt="Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
+<<<<<<< HEAD
         <span class="brand-text font-weight-light">BioVital</span>
     </a>
     <div class="sidebar">
@@ -53,6 +62,15 @@ $nombre_usuario = $_SESSION['nombre_us'] ?? 'Administrador';
             <div class="image">
                 <img id="avatar_nav" src="<?php echo APP_URL; ?>/img/avatar.png" class="img-circle elevation-2" alt="User Image">
             </div>
+=======
+        <span class="brand-text font-weight-light">BIOVITAL</span>
+    </a>
+    <div class="sidebar">
+        <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+           <div class="image">
+    <img id="avatar_nav" src="<?php echo APP_URL; ?>/img/avatar.png" class="img-circle elevation-2" alt="User Image">
+</div>
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb
             <div class="info">
                 <a href="#" class="d-block"><?php echo htmlspecialchars($nombre_usuario); ?></a>
             </div>
@@ -77,6 +95,7 @@ $nombre_usuario = $_SESSION['nombre_us'] ?? 'Administrador';
                         <p>Usuarios</p>
                     </a>
                 </li>
+<<<<<<< HEAD
 
                
                 <li class="nav-header">
@@ -90,6 +109,13 @@ $nombre_usuario = $_SESSION['nombre_us'] ?? 'Administrador';
                 </li>
                 <li class="nav-item">
                     <a href="<?php echo APP_URL; ?>/consultorios" class="nav-link active">
+=======
+                <li class="nav-header">
+                    <i class="fas fa-hospital-user"></i> Clínica
+                </li>
+                <li class="nav-item">
+                    <a href="<?php echo APP_URL; ?>/consultorios" class="nav-link">
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb
                         <i class="nav-icon fas fa-building"></i>
                         <p>Consultorios</p>
                     </a>

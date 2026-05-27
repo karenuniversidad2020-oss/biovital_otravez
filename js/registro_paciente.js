@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 
 
 $(document).ready(function() {
@@ -9,6 +10,10 @@ $(document).ready(function() {
     
     console.log('APP_URL:', APP_URL);
     
+=======
+//***   crear_paciente */
+$(document).ready(function() {
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb
     $('#form-registro').submit(function(e) {
         e.preventDefault();
         
@@ -51,6 +56,7 @@ $(document).ready(function() {
             direccion_completa += (direccion_completa ? ' - ' : '') + direccion_detallada;
         }
         
+<<<<<<< HEAD
         // Obtener el token CSRF
         var csrf_token = $('input[name="csrf_token"]').val();
         
@@ -66,6 +72,20 @@ $(document).ready(function() {
             adicional: $('#adicional').val().trim(),
             pass: pass,
             csrf_token: csrf_token
+=======
+        var datos = {
+            funcion: 'crear_paciente',
+            nombre: $('#nombre').val(),
+            apellidos: $('#apellidos').val(),
+            fecha_nacimiento: $('#fecha_nacimiento').val(),
+            cedula: $('#cedula').val(),
+            telefono: $('#telefono').val(),
+            direccion: direccion_completa,  // Guardamos la dirección completa
+            correo: $('#correo').val(),
+            sexo: $('#sexo').val(),
+            adicional: $('#adicional').val(),
+            pass: pass
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb
         };
         
         console.log('Enviando datos:', datos);
@@ -74,9 +94,14 @@ $(document).ready(function() {
         var originalText = $submitBtn.html();
         $submitBtn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Creando cuenta...');
         
+<<<<<<< HEAD
        
         $.ajax({
             url: APP_URL + '/api/registro/paciente',  // ← Ruta corregida
+=======
+        $.ajax({
+            url: '../controlador/RegistroPacienteController.php',
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb
             type: 'POST',
             data: datos,
             dataType: 'json',
@@ -85,8 +110,12 @@ $(document).ready(function() {
                 if(response.success) {
                     mostrarExito(response.message);
                     setTimeout(function() {
+<<<<<<< HEAD
                         // Redirigir al login del paciente con la ruta amigable
                         window.location.href = APP_URL + '/login/paciente';
+=======
+                        window.location.href = '../vista/login_paciente.php';
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb
                     }, 2000);
                 } else {
                     mostrarError(response.message);
@@ -95,6 +124,7 @@ $(document).ready(function() {
             },
             error: function(xhr, status, error) {
                 console.error('Error:', error);
+<<<<<<< HEAD
                 console.error('Respuesta del servidor:', xhr.responseText);
                 
                 let errorMsg = 'Error de conexión: ' + xhr.status;
@@ -105,6 +135,10 @@ $(document).ready(function() {
                 }
                 
                 mostrarError(errorMsg);
+=======
+                console.error('Respuesta:', xhr.responseText);
+                mostrarError('Error de conexión: ' + xhr.status);
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb
                 $submitBtn.prop('disabled', false).html(originalText);
             }
         });

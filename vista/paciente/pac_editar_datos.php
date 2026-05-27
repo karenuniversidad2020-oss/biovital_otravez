@@ -203,7 +203,11 @@ $nombre_usuario = $_SESSION['nombre_us'];
 <aside class="main-sidebar sidebar-dark-primary elevation-4">
     <a href="<?php echo APP_URL; ?>/panel/paciente" class="brand-link">
         <img src="<?php echo APP_URL; ?>/img/logo_azul.png" alt="Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
+<<<<<<< HEAD
         <span class="brand-text font-weight-light">BioVital</span>
+=======
+        <span class="brand-text font-weight-light">BIOVITAL</span>
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb
     </a>
     <div class="sidebar">
         <div class="user-panel mt-3 pb-3 mb-3 d-flex">
@@ -441,6 +445,7 @@ $nombre_usuario = $_SESSION['nombre_us'];
                                 </div>
                                 
                                 <!-- Sistema de Ubicación -->
+<<<<<<< HEAD
                                <h5 class="mt-4 mb-3"><i class="fas fa-map-marker-alt text-primary"></i> Ubicación</h5>
 <hr>
 
@@ -489,6 +494,56 @@ $nombre_usuario = $_SESSION['nombre_us'];
 </div>
 
 <input type="hidden" id="direccion" name="direccion">
+=======
+                                <h5 class="mt-4 mb-3"><i class="fas fa-map-marker-alt text-primary"></i> Ubicación</h5>
+                                <hr>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="estado">Estado</label>
+                                            <select class="form-control" id="estado" disabled>
+                                                <option value="">Seleccione un estado...</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="ciudad">Ciudad</label>
+                                            <select class="form-control" id="ciudad" disabled>
+                                                <option value="">Seleccione un estado primero...</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="municipio">Municipio</label>
+                                            <select class="form-control" id="municipio" disabled>
+                                                <option value="">Seleccione un estado primero...</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="parroquia">Parroquia</label>
+                                            <select class="form-control" id="parroquia" disabled>
+                                                <option value="">Seleccione un municipio primero...</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="direccion_detallada">Dirección Detallada</label>
+                                    <input type="text" class="form-control" id="direccion_detallada" placeholder="Av. Principal, Edificio, Número, etc." disabled>
+                                    <small class="form-text text-muted">Ej: Av. Principal, Edificio Central, Casa #123</small>
+                                </div>
+
+                                <input type="hidden" id="direccion" name="direccion">
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb
                                 
                                 <div class="form-group">
                                     <label for="correo" class="required-field">Correo Electrónico</label>

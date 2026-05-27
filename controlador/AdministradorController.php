@@ -20,6 +20,7 @@ class AdministradorController {
     }
     
     // Buscar administrador (cargar datos)
+<<<<<<< HEAD
    public function buscar() {
     $id_administrador = $_POST['dato'] ?? $_POST['id_administrador'] ?? 0;
     $id_sesion = $_SESSION['usuario'];
@@ -159,6 +160,88 @@ private function parsearDireccion($direccion_completa) {
     return $resultado;
 }
     
+=======
+    public function buscar() {
+        $id_administrador = $_POST['dato'] ?? $_POST['id_administrador'] ?? 0;
+        $id_sesion = $_SESSION['usuario'];
+        
+        error_log("AdministradorController::buscar - ID: $id_administrador, Sesión: $id_sesion");
+        
+        if($id_administrador != $id_sesion) {
+            jsonResponse(['error' => 'No autorizado']);
+            return;
+        }
+        
+        $administrador = new Administrador();
+        $fecha_actual = new DateTime();
+        $administrador->obtener_datos($id_administrador);
+        
+        if(empty($administrador->objetos)) {
+            jsonResponse(['error' => 'No se encontró el administrador']);
+            return;
+        }
+        
+        $json = array();
+        foreach ($administrador->objetos as $objeto) {
+            $fecha_nacimiento = $objeto->fecha_nacimiento_administrador;
+            $nacimiento = new DateTime($fecha_nacimiento);
+            $edad = $nacimiento->diff($fecha_actual);
+            
+            $avatar_path = (!empty($objeto->avatar_administrador) && $objeto->avatar_administrador != 'avatarDES.jpg') 
+                           ? APP_URL . '/img/' . $objeto->avatar_administrador 
+                           : APP_URL . '/img/avatarDES.jpg';
+            
+            $json = array(
+                'nombre' => $objeto->nombre_administrador ?? '',
+                'apellidos' => $objeto->apellido_administrador ?? '',
+                'fecha_nacimiento' => $edad->y,
+                'cedula' => $objeto->cedula_administrador ?? '',
+                'tipo' => $objeto->nombre_tipo ?? 'Administrador',
+                'telefono' => $objeto->telefono_administrador ?? '',
+                'direccion' => $objeto->direccion_administrador ?? '',
+                'correo' => $objeto->correo_administrador ?? '',
+                'sexo' => $objeto->sexo_administrador ?? '',
+                'adicional' => $objeto->adicional_administrador ?? '',
+                'avatar' => $avatar_path
+            );
+        }
+        jsonResponse($json);
+    }
+    
+    // Capturar datos para edición
+    public function capturarDatos() {
+        $id_administrador = $_POST['id_administrador'] ?? 0;
+        $id_sesion = $_SESSION['usuario'];
+        
+        error_log("AdministradorController::capturarDatos - ID: $id_administrador, Sesión: $id_sesion");
+        
+        if($id_administrador != $id_sesion) {
+            jsonResponse(['error' => 'No autorizado']);
+            return;
+        }
+        
+        $administrador = new Administrador();
+        $administrador->obtener_datos($id_administrador);
+        
+        if(empty($administrador->objetos)) {
+            jsonResponse(['error' => 'No se encontró el administrador']);
+            return;
+        }
+        
+        $json = array();
+        foreach ($administrador->objetos as $objeto) {
+            $json = array(
+                'telefono' => $objeto->telefono_administrador ?? '',
+                'direccion' => $objeto->direccion_administrador ?? '',
+                'correo' => $objeto->correo_administrador ?? '',
+                'sexo' => $objeto->sexo_administrador ?? '',
+                'adicional' => $objeto->adicional_administrador ?? ''
+            );
+        }
+        jsonResponse($json);
+    }
+    
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb
     // Editar administrador
     public function editarUsuario() {
         $id_administrador = $_POST['id_administrador'] ?? 0;

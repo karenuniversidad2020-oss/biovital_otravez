@@ -1,9 +1,15 @@
 <?php
+<<<<<<< HEAD
 // controlador/PageController.php
 class PageController {
     
     public function home() {
         // Si el usuario ya está logueado, redirigir a su panel
+=======
+class PageController {
+    
+    public function home() {
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb
         if (isset($_SESSION['usuario']) && isset($_SESSION['rol'])) {
             $redirects = [
                 'paciente' => 'panel/paciente',
@@ -16,6 +22,7 @@ class PageController {
                 return;
             }
         }
+<<<<<<< HEAD
         
         // Si hay una solicitud de login pendiente (después de registro o clic directo)
         if (isset($_SESSION['open_login'])) {
@@ -46,6 +53,20 @@ class PageController {
         // Esta es la forma más confiable, no depende de sesiones
         header('Location: ' . APP_URL . '/?openLogin=' . $rol);
         exit();
+=======
+        renderView('home');
+        
+    } public function loginRedirect() {
+        // Obtener el rol de los parámetros de la ruta
+        // (disponible gracias a la captura que hicimos en routes.php)
+        $rol = $_GET['rol'] ?? 'paciente';
+
+        // Establecer una variable de sesión para que home.php sepa qué modal abrir
+        $_SESSION['open_login'] = $rol;
+
+        // Finalmente, cargar la vista home, que al iniciarse leerá esta variable
+        $this->home();
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb
     }
 }
 ?>

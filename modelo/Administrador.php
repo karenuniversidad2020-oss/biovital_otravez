@@ -1,5 +1,8 @@
 <?php
+<<<<<<< HEAD
 
+=======
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb
 include_once 'Conexion.php';
 
 class Administrador {
@@ -9,6 +12,7 @@ class Administrador {
     public function __construct() {
         $db = new Conexion();
         $this->acceso = $db->pdo;
+<<<<<<< HEAD
     }    
     // ==================== MÉTODOS PRINCIPALES ====================
     
@@ -112,6 +116,72 @@ class Administrador {
             }
             
             // Insertar el nuevo administrador
+=======
+    }
+    
+    // modelo/Administrador.php - Método obtener_datos
+function obtener_datos($id) {
+    $sql = "SELECT ra.*, tp.nombre_tipo 
+            FROM registro_administrador ra
+            INNER JOIN tipo_paciente tp ON ra.administrador_tipo = tp.id_tipo_us 
+            WHERE ra.id_administrador = :id";
+    $query = $this->acceso->prepare($sql);
+    $query->execute(array(':id' => $id));
+    $this->objetos = $query->fetchAll();
+    return $this->objetos;
+}
+
+    function editar($id_administrador, $telefono, $direccion, $correo, $sexo, $adicional) {
+        $sql = "UPDATE registro_administrador SET 
+                telefono_administrador = :telefono,
+                direccion_administrador = :direccion,
+                correo_administrador = :correo,
+                sexo_administrador = :sexo,
+                adicional_administrador = :adicional 
+                WHERE id_administrador = :id";
+        $query = $this->acceso->prepare($sql);
+        $query->execute(array(
+            ':id' => $id_administrador,
+            ':telefono' => $telefono,
+            ':direccion' => $direccion,
+            ':correo' => $correo,
+            ':sexo' => $sexo,
+            ':adicional' => $adicional
+        ));
+    }
+    
+    // modelo/Administrador.php
+     function cambiar_photo($id_administrador, $nombre) {   
+    // Primero obtener el avatar actual
+    $sql = "SELECT avatar_administrador FROM registro_administrador WHERE id_administrador = :id";
+    $query = $this->acceso->prepare($sql);
+    $query->execute(array(':id' => $id_administrador));
+    $resultado = $query->fetch(PDO::FETCH_OBJ);
+    
+    $avatar_anterior = $resultado ? $resultado->avatar_administrador : 'avatarDES.jpg';
+    
+    // Actualizar con el nuevo avatar
+    $sql = "UPDATE registro_administrador SET avatar_administrador = :nombre WHERE id_administrador = :id";
+    $query = $this->acceso->prepare($sql);
+    $query->execute(array(':id' => $id_administrador, ':nombre' => $nombre));
+    
+    // Retornar el avatar anterior para poder eliminar el archivo
+    return $avatar_anterior;
+}
+
+    function crear($nombre, $apellidos, $fecha_nacimiento, $cedula, $telefono, $direccion, $correo, $sexo, $adicional, $password_hash, $tipo, $avatar) {
+        try {
+            $sql = "SELECT id_administrador FROM registro_administrador WHERE cedula_administrador = :cedula OR correo_administrador = :correo";
+            $query = $this->acceso->prepare($sql);
+            $query->execute(array(':cedula' => $cedula, ':correo' => $correo));
+            $this->objetos = $query->fetchAll();
+            
+            if(!empty($this->objetos)) {
+                echo 'existe';
+                return;
+            }
+            
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb
             $sql = "INSERT INTO registro_administrador(
                 nombre_administrador, apellido_administrador, fecha_nacimiento_administrador, 
                 cedula_administrador, telefono_administrador, direccion_administrador, 
@@ -140,6 +210,7 @@ class Administrador {
             
             if($resultado) {
                 $id_administrador = $this->acceso->lastInsertId();
+<<<<<<< HEAD
                 $loginResult = $this->crearLogin($id_administrador, $password_hash);
                 
                 if ($loginResult['success']) {
@@ -483,3 +554,27 @@ class Administrador {
     }
 }
 ?>
+=======
+                $this->crearLogin($id_administrador, $password_hash);
+                echo 'add';
+            } else {
+                echo 'error_bd';
+            }
+        } catch(PDOException $e) {
+            error_log("Error en crear administrador: " . $e->getMessage());
+            echo 'error_exception';
+        }
+    }
+    
+    function crearLogin($id_administrador, $password_hash) {
+        $sql = "INSERT INTO login_administrador(id_administrador, password_hash, status) 
+                VALUES (:id_administrador, :password_hash, 'activo')";
+        $query = $this->acceso->prepare($sql);
+        $query->execute(array(
+            ':id_administrador' => $id_administrador,
+            ':password_hash' => $password_hash
+        ));
+    }
+}
+?>
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb

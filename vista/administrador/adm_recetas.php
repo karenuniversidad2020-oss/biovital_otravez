@@ -1,4 +1,8 @@
 <?php
+<<<<<<< HEAD
+=======
+// NO iniciar sesión aquí - el Front Controller ya lo hace
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb
 if($_SESSION['us_tipo'] != 4 || $_SESSION['rol'] != 'administrador'){
     header('Location: ' . APP_URL . '/login/administrador');
     exit();
@@ -98,10 +102,17 @@ $nombre_usuario = $_SESSION['nombre_us'] ?? 'Administrador';
 </nav>
 
 <!-- Main Sidebar Container -->
+<<<<<<< HEAD
  <aside class="main-sidebar sidebar-dark-primary elevation-4">
     <a href="<?php echo APP_URL; ?>/panel/administrador" class="brand-link">
         <img src="<?php echo APP_URL; ?>/img/logo_azul.png" alt="Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
         <span class="brand-text font-weight-light">BioVital</span>
+=======
+<aside class="main-sidebar sidebar-dark-primary elevation-4">
+    <a href="<?php echo APP_URL; ?>/panel/administrador" class="brand-link">
+        <img src="<?php echo APP_URL; ?>/img/logo_azul.png" alt="Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
+        <span class="brand-text font-weight-light">BIOVITAL</span>
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb
     </a>
     <div class="sidebar">
         <div class="user-panel mt-3 pb-3 mb-3 d-flex">
@@ -132,6 +143,7 @@ $nombre_usuario = $_SESSION['nombre_us'] ?? 'Administrador';
                         <p>Usuarios</p>
                     </a>
                 </li>
+<<<<<<< HEAD
 
                
                 <li class="nav-header">
@@ -143,6 +155,11 @@ $nombre_usuario = $_SESSION['nombre_us'] ?? 'Administrador';
                         <p>Especialidades</p>
                     </a>
                 </li>
+=======
+                <li class="nav-header">
+                    <i class="fas fa-hospital-user"></i> Clínica
+                </li>
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb
                 <li class="nav-item">
                     <a href="<?php echo APP_URL; ?>/consultorios" class="nav-link">
                         <i class="nav-icon fas fa-building"></i>
@@ -413,6 +430,7 @@ $(document).ready(function() {
             url: APP_URL + '/api/recetas/estadisticas',
             type: 'POST',
             dataType: 'json',
+<<<<<<< HEAD
             success: function(response) {
                 console.log('Estadísticas recibidas:', response);
                 
@@ -422,28 +440,41 @@ $(document).ready(function() {
                     data = response.data;
                 }
                 
+=======
+            success: function(data) {
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb
                 $('#total_recetas').text(data.total_recetas || 0);
                 $('#total_medicos').text(data.total_medicos || 0);
                 $('#total_pacientes').text(data.total_pacientes || 0);
                 $('#recetas_mes').text(data.recetas_mes || 0);
             },
+<<<<<<< HEAD
             error: function(xhr, status, error) {
                 console.error('Error al cargar estadísticas:', error);
                 $('#total_recetas').text('0');
                 $('#total_medicos').text('0');
                 $('#total_pacientes').text('0');
                 $('#recetas_mes').text('0');
+=======
+            error: function() {
+                console.log('Error al cargar estadísticas');
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb
             }
         });
     }
 
     function listar_recetas() {
+<<<<<<< HEAD
         $('#tabla_recetas').html('<tr><td colspan="9" class="text-center"><div class="spinner-border text-primary"></div><p>Cargando recetas...</p></td></tr>');
+=======
+        $('#tabla_recetas').html('<td><td colspan="9" class="text-center"><div class="spinner-border text-primary"></div><p>Cargando recetas...</p></td></tr>');
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb
         
         $.ajax({
             url: APP_URL + '/api/recetas/listar',
             type: 'POST',
             dataType: 'json',
+<<<<<<< HEAD
             success: function(response) {
                 console.log('Respuesta recetas:', response);
                 
@@ -473,6 +504,15 @@ $(document).ready(function() {
                 } else {
                     for (let i = 0; i < recetas.length; i++) {
                         let receta = recetas[i];
+=======
+            success: function(recetas) {
+                let html = '';
+                
+                if (!recetas || recetas.length === 0) {
+                    html = '<tr><td colspan="9" class="text-center text-muted">No hay recetas registradas</td></tr>';
+                } else {
+                    for (let receta of recetas) {
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb
                         html += `
                             <tr>
                                 <td><span class="badge badge-secondary">${receta.id_receta || ''}</span></td>
@@ -487,7 +527,11 @@ $(document).ready(function() {
                                     <button class="btn btn-info btn-sm btn-ver-detalle" data-id="${receta.id_receta}">
                                         <i class="fas fa-eye"></i> Ver
                                     </button>
+<<<<<<< HEAD
                                  </td>
+=======
+                                </td>
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb
                             </tr>
                         `;
                     }
@@ -515,6 +559,7 @@ $(document).ready(function() {
             type: 'POST',
             data: { id_receta: id },
             dataType: 'json',
+<<<<<<< HEAD
             success: function(response) {
                 console.log('Detalle receta:', response);
                 
@@ -569,6 +614,50 @@ $(document).ready(function() {
                 } else {
                     $('#detalle_receta_content').html('<div class="alert alert-danger">Error al cargar los detalles de la receta</div>');
                 }
+=======
+            success: function(receta) {
+                let html = `
+                    <div class="receta-detalle">
+                        <div class="row mb-3">
+                            <div class="col-md-12 text-center">
+                                <h3 class="text-primary">RECETA MÉDICA</h3>
+                                <hr>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><strong><i class="fas fa-id-badge"></i> ID Receta:</strong> ${receta.id_receta}</p>
+                                <p><strong><i class="fas fa-capsules"></i> Medicamento:</strong> ${escapeHtml(receta.nombre_medicamento)}</p>
+                                <p><strong><i class="fas fa-trademark"></i> Marca:</strong> ${escapeHtml(receta.marca)}</p>
+                                <p><strong><i class="fas fa-cubes"></i> Cantidad:</strong> ${escapeHtml(receta.cantidad)}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong><i class="fas fa-clock"></i> Dosis:</strong> ${escapeHtml(receta.dosis || 'No especificada')}</p>
+                                <p><strong><i class="fas fa-calendar-day"></i> Fecha:</strong> ${receta.fecha_receta}</p>
+                                <p><strong><i class="fas fa-user-injured"></i> Paciente ID:</strong> ${receta.id_paciente || 'N/A'}</p>
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-md-12">
+                                <div class="card">
+                                    <div class="card-header bg-info text-white">
+                                        <strong><i class="fas fa-stethoscope"></i> Instrucciones</strong>
+                                    </div>
+                                    <div class="card-body">
+                                        ${escapeHtml(receta.instrucciones) || '<em class="text-muted">Sin instrucciones adicionales</em>'}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-md-12 text-muted text-center">
+                                <small>Documento generado electrónicamente por BioVital - Sistema de Gestión Médica</small>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                $('#detalle_receta_content').html(html);
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb
             },
             error: function(xhr, status, error) {
                 console.error('Error al obtener detalle:', error);
@@ -588,5 +677,9 @@ $(document).ready(function() {
     }
 });
 </script>
+<<<<<<< HEAD
+=======
+
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb
 </body>
 </html>

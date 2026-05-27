@@ -1,4 +1,8 @@
 <?php
+<<<<<<< HEAD
+=======
+// NO iniciar sesión aquí - el Front Controller ya lo hace
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb
 if($_SESSION['us_tipo'] != 4 || $_SESSION['rol'] != 'administrador'){
     header('Location: ' . APP_URL . '/login/administrador');
     exit();
@@ -125,10 +129,17 @@ $nombre_usuario = $_SESSION['nombre_us'] ?? 'Administrador';
 </nav>
 
 <!-- Main Sidebar Container -->
+<<<<<<< HEAD
  <aside class="main-sidebar sidebar-dark-primary elevation-4">
     <a href="<?php echo APP_URL; ?>/panel/administrador" class="brand-link">
         <img src="<?php echo APP_URL; ?>/img/logo_azul.png" alt="Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
         <span class="brand-text font-weight-light">BioVital</span>
+=======
+<aside class="main-sidebar sidebar-dark-primary elevation-4">
+    <a href="<?php echo APP_URL; ?>/panel/administrador" class="brand-link">
+        <img src="<?php echo APP_URL; ?>/img/logo_azul.png" alt="Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
+        <span class="brand-text font-weight-light">BIOVITAL</span>
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb
     </a>
     <div class="sidebar">
         <div class="user-panel mt-3 pb-3 mb-3 d-flex">
@@ -158,6 +169,7 @@ $nombre_usuario = $_SESSION['nombre_us'] ?? 'Administrador';
                         <i class="nav-icon fas fa-users"></i>
                         <p>Usuarios</p>
                     </a>
+<<<<<<< HEAD
                 </li>               
                 <li class="nav-header">
                     <i class="fas fa-hospital-user"></i> Clínica
@@ -168,6 +180,12 @@ $nombre_usuario = $_SESSION['nombre_us'] ?? 'Administrador';
                         <p>Especialidades</p>
                     </a>
                 </li>
+=======
+                </li>
+                <li class="nav-header">
+                    <i class="fas fa-hospital-user"></i> Clínica
+                </li>
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb
                 <li class="nav-item">
                     <a href="<?php echo APP_URL; ?>/consultorios" class="nav-link active">
                         <i class="nav-icon fas fa-building"></i>
@@ -211,6 +229,10 @@ $nombre_usuario = $_SESSION['nombre_us'] ?? 'Administrador';
             </div>
         </div>
     </section>
+<<<<<<< HEAD
+=======
+
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb
     <section class="content">
         <div class="container-fluid">
             
@@ -220,6 +242,10 @@ $nombre_usuario = $_SESSION['nombre_us'] ?? 'Administrador';
                 <p>Gestiona las sedes, horarios y asignación de médicos a cada consultorio.</p>
                 <div class="bv-role-tag"><i class="fas fa-hospital-user"></i> Infraestructura</div>
             </div>
+<<<<<<< HEAD
+=======
+
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb
             <!-- Stats Cards -->
             <div class="row">
                 <div class="col-md-3 col-sm-6 col-12">
@@ -260,6 +286,10 @@ $nombre_usuario = $_SESSION['nombre_us'] ?? 'Administrador';
                     </div>
                 </div>
             </div>
+<<<<<<< HEAD
+=======
+
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb
             <!-- Search Bar -->
             <div class="row mt-3">
                 <div class="col-12">

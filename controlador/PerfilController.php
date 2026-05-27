@@ -4,11 +4,18 @@ class PerfilController {
     private $rol;
     private $id;
     
+<<<<<<< HEAD
    public function __construct() {
     AuthHelper::checkRole(['paciente', 'medico', 'asistente', 'administrador'], true);
     $this->rol = AuthHelper::getCurrentRole();
     $this->id = $_SESSION['usuario'];
 }
+=======
+    public function __construct() {
+        $this->rol = $_SESSION['rol'];
+        $this->id = $_SESSION['usuario'];
+    }
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb
     
     public function index() {
         $vistas = [
@@ -93,6 +100,9 @@ class PerfilController {
         
         jsonResponse(['resultado' => trim($resultado)]);
     }
+<<<<<<< HEAD
     
+=======
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb
 }
 ?>

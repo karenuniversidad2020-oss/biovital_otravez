@@ -1,13 +1,18 @@
 <?php
+<<<<<<< HEAD
 // vista/paciente/pac_recetas.php - CORREGIDO
 // Maneja correctamente el formato ApiResponse
 
 // Verificar autenticación y rol
+=======
+
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb
 if($_SESSION['us_tipo'] != 1 || $_SESSION['rol'] != 'paciente'){
     header('Location: ' . APP_URL . '/login/paciente');
     exit();
 }
 
+<<<<<<< HEAD
 // Incluir Security para CSRF si es necesario
 $securityPath = dirname(__DIR__, 2) . '/modelo/Security.php';
 if (file_exists($securityPath)) {
@@ -16,6 +21,9 @@ if (file_exists($securityPath)) {
 
 $nombre_usuario = $_SESSION['nombre_us'] ?? 'Usuario';
 $id_paciente = $_SESSION['usuario'];
+=======
+// Usar rutas absolutas con dirname()
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb
 ?>
 <!DOCTYPE html>
 <html>
@@ -26,9 +34,12 @@ $id_paciente = $_SESSION['usuario'];
 
     <script>
         var APP_URL = '<?php echo APP_URL; ?>';
+<<<<<<< HEAD
         var ID_PACIENTE = <?php echo json_encode($id_paciente); ?>;
         console.log('APP_URL:', APP_URL);
         console.log('ID_PACIENTE:', ID_PACIENTE);
+=======
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb
     </script>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -38,6 +49,7 @@ $id_paciente = $_SESSION['usuario'];
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="<?php echo APP_URL; ?>/css/css/all.min.css">
     <link rel="stylesheet" href="<?php echo APP_URL; ?>/css/adminlte.min.css">
+<<<<<<< HEAD
     <link rel="stylesheet" href="<?php echo APP_URL; ?>/css/dashboard.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
@@ -96,6 +108,11 @@ $id_paciente = $_SESSION['usuario'];
             color: var(--bv-primary);
         }
     </style>
+=======
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
+    
+    <title>Paciente | Mis Recetas</title>
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb
 </head>
 <body class="hold-transition sidebar-mini">
 <div class="wrapper">
@@ -108,9 +125,13 @@ $id_paciente = $_SESSION['usuario'];
         </li>
     </ul>
     <ul class="navbar-nav ml-auto">
+<<<<<<< HEAD
         <a href="<?php echo APP_URL; ?>/logout" class="btn btn-danger btn-sm">
             <i class="fas fa-sign-out-alt"></i> Cerrar sesión
         </a>
+=======
+        <a href="<?php echo APP_URL; ?>/logout" class="btn btn-danger btn-sm">Cerrar sesión</a>
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb
     </ul>
 </nav>
 
@@ -118,7 +139,11 @@ $id_paciente = $_SESSION['usuario'];
 <aside class="main-sidebar sidebar-dark-primary elevation-4">
     <a href="<?php echo APP_URL; ?>/panel/paciente" class="brand-link">
         <img src="<?php echo APP_URL; ?>/img/logo_azul.png" alt="Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
+<<<<<<< HEAD
         <span class="brand-text font-weight-light">BioVital</span>
+=======
+        <span class="brand-text font-weight-light">BIOVITAL</span>
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb
     </a>
     <div class="sidebar">
         <div class="user-panel mt-3 pb-3 mb-3 d-flex">
@@ -126,29 +151,44 @@ $id_paciente = $_SESSION['usuario'];
                 <img id="avatar4" src="<?php echo APP_URL; ?>/img/avatar.png" class="img-circle elevation-2" alt="User Image">
             </div>
             <div class="info">
+<<<<<<< HEAD
                 <a href="#" class="d-block"><?php echo htmlspecialchars($nombre_usuario); ?></a>
+=======
+                <a href="#" class="d-block"><?php echo htmlspecialchars($_SESSION['nombre_us'] ?? 'Usuario'); ?></a>
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb
             </div>
         </div>
         <nav class="mt-2">
             <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu">
+<<<<<<< HEAD
                 <li class="nav-header">
                     <i class="fas fa-user-injured"></i> Usuario
                 </li>
+=======
+                <li class="nav-header">Usuario</li>
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb
                 <li class="nav-item">
                     <a href="<?php echo APP_URL; ?>/perfil" class="nav-link">
                         <i class="nav-icon fas fa-user-cog"></i>
                         <p>Datos personales</p>
                     </a>
                 </li>
+<<<<<<< HEAD
                 <li class="nav-header">
                     <i class="fas fa-clinic-medical"></i> Clínica
                 </li>
                 <li class="nav-item">
                     <a href="<?php echo APP_URL; ?>/paciente/recetas" class="nav-link active">
+=======
+                <li class="nav-header">Clínica</li>
+                <li class="nav-item">
+                    <a href="<?php echo APP_URL; ?>/paciente/recetas" class="nav-link">
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb
                         <i class="nav-icon fas fa-prescription-bottle-alt"></i>
                         <p>Mis Recetas</p>
                     </a>
                 </li>
+<<<<<<< HEAD
                 <li class="nav-header">
                     <i class="fas fa-calendar-alt"></i> Citas
                 </li>
@@ -156,6 +196,12 @@ $id_paciente = $_SESSION['usuario'];
                     <a href="#" class="nav-link">
                         <i class="nav-icon fas fa-calendar-alt"></i>
                         <p>Mis Citas</p>
+=======
+                <li class="nav-item">
+                    <a href="<?php echo APP_URL; ?>/documentos" class="nav-link">
+                        <i class="nav-icon fas fa-file-medical"></i>
+                        <p>Documentos médicos</p>
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb
                     </a>
                 </li>
             </ul>
@@ -163,7 +209,11 @@ $id_paciente = $_SESSION['usuario'];
     </div>
 </aside>
 
+<<<<<<< HEAD
 <!-- Content Wrapper -->
+=======
+
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb
 <div class="content-wrapper">
     <section class="content-header">
         <div class="container-fluid">
@@ -171,18 +221,22 @@ $id_paciente = $_SESSION['usuario'];
                 <div class="col-sm-6">
                     <h1><i class="fas fa-prescription-bottle-alt"></i> Mis Recetas Médicas</h1>
                 </div>
+<<<<<<< HEAD
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
                         <li class="breadcrumb-item"><a href="<?php echo APP_URL; ?>/panel/paciente">Home</a></li>
                         <li class="breadcrumb-item active">Mis Recetas</li>
                     </ol>
                 </div>
+=======
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb
             </div>
         </div>
     </section>
 
     <section class="content">
         <div class="container-fluid">
+<<<<<<< HEAD
             
             <!-- Welcome Banner -->
             <div class="bv-welcome-banner bv-animate">
@@ -238,15 +292,25 @@ $id_paciente = $_SESSION['usuario'];
             </div>
 
             <!-- Tabla de Recetas -->
+=======
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb
             <div class="row">
                 <div class="col-12">
                     <div class="card">
                         <div class="card-header">
+<<<<<<< HEAD
                             <h3 class="card-title"><i class="fas fa-list"></i> Listado de Recetas</h3>
                             <div class="card-tools">
                                 <button class="btn btn-default btn-sm" id="btnRefresh">
                                     <i class="fas fa-sync-alt"></i> Actualizar
                                 </button>
+=======
+                            <h3 class="card-title">Listado de Recetas</h3>
+                            <div class="card-tools">
+                                <div class="input-group input-group-sm" style="width: 200px;">
+                                    <input type="text" id="buscar_receta" class="form-control float-right" placeholder="Buscar...">
+                                </div>
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb
                             </div>
                         </div>
                         <div class="card-body table-responsive p-0">
@@ -260,6 +324,7 @@ $id_paciente = $_SESSION['usuario'];
                                         <th>Dosis</th>
                                         <th>Médico</th>
                                         <th>Fecha</th>
+<<<<<<< HEAD
                                         <th>Acciones</th>
                                     </tr>
                                 </thead>
@@ -270,6 +335,12 @@ $id_paciente = $_SESSION['usuario'];
                                         </div>
                                         <p>Cargando recetas...</p>
                                     </td></tr>
+=======
+                                    </tr>
+                                </thead>
+                                <tbody id="tabla_recetas">
+                                    <tr><td colspan="7" class="text-center">Cargando recetas...</td</tr>
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb
                                 </tbody>
                             </table>
                         </div>
@@ -280,6 +351,7 @@ $id_paciente = $_SESSION['usuario'];
     </section>
 </div>
 
+<<<<<<< HEAD
 <footer class="main-footer">
     <div class="float-right d-none d-sm-block">
         <b>Version</b> 1.0.0
@@ -401,10 +473,26 @@ $(document).ready(function() {
 
     function listar_recetas() {
         $('#tabla_recetas').html('<tr><td colspan="8" class="text-center"><div class="spinner-border text-primary"></div><p>Cargando recetas...</p></td></tr>');
+=======
+<script>
+$(document).ready(function() {
+    listar_recetas();
+
+    $('#buscar_receta').on('keyup', function() {
+        let value = $(this).val().toLowerCase();
+        $('#tabla_recetas tr').filter(function() {
+            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+        });
+    });
+
+    function listar_recetas() {
+        $('#tabla_recetas').html('<tr><td colspan="7" class="text-center">Cargando recetas...<div class="spinner-border spinner-border-sm ml-2"></div></td></tr>');
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb
         
         $.ajax({
             url: APP_URL + '/api/recetas/mis-recetas',
             type: 'POST',
+<<<<<<< HEAD
             data: { id_paciente: ID_PACIENTE },
             dataType: 'json',
             success: function(response) {
@@ -554,6 +642,38 @@ $(document).ready(function() {
         });
     });
 
+=======
+            data: { id_paciente: <?php echo $_SESSION['usuario']; ?> },
+            dataType: 'json',
+            success: function(recetas) {
+                let html = '';
+                if (!recetas || recetas.length === 0) {
+                    html = '<tr><td colspan="7" class="text-center">No hay recetas registradas</td></tr>';
+                } else {
+                    for (let receta of recetas) {
+                        html += `
+                            <tr>
+                                <td>${receta.id_receta}</td>
+                                <td><strong>${escapeHtml(receta.nombre_medicamento)}</strong></td>
+                                <td>${escapeHtml(receta.marca)}</td>
+                                <td>${escapeHtml(receta.cantidad)}</td>
+                                <td>${escapeHtml(receta.dosis || '-')}</td>
+                                <td>${escapeHtml(receta.medico || 'N/A')}</td>
+                                <td>${receta.fecha_receta}</td>
+                            </tr>
+                        `;
+                    }
+                }
+                $('#tabla_recetas').html(html);
+            },
+            error: function(xhr, status, error) {
+                console.error('Error:', error);
+                $('#tabla_recetas').html('<tr><td colspan="7" class="text-center text-danger">Error al cargar recetas</td></tr>');
+            }
+        });
+    }
+    
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb
     function escapeHtml(str) {
         if (!str) return '';
         return str
@@ -566,4 +686,10 @@ $(document).ready(function() {
 });
 </script>
 
+<<<<<<< HEAD
 <?php include_once dirname(__DIR__) . '/layouts/footer.php'; ?>
+=======
+<?php
+include_once dirname(__DIR__) . '/layouts/footer.php';
+?>
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb

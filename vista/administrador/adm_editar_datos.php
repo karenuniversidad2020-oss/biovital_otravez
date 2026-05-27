@@ -1,5 +1,9 @@
 <?php
+<<<<<<< HEAD
 
+=======
+// NO session_start() - el Front Controller ya lo hace
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb
 if($_SESSION['us_tipo'] != 4 || $_SESSION['rol'] != 'administrador'){
     header('Location: ' . APP_URL . '/login/administrador');
     exit();
@@ -7,6 +11,7 @@ if($_SESSION['us_tipo'] != 4 || $_SESSION['rol'] != 'administrador'){
 
 $id_administrador = $_SESSION['usuario'];
 $nombre_usuario = $_SESSION['nombre_us'];
+<<<<<<< HEAD
 
 // Incluir Security para CSRF
 $securityPath = dirname(__DIR__, 2) . '/modelo/Security.php';
@@ -14,6 +19,8 @@ if (!file_exists($securityPath)) {
     die("Error: No se encuentra Security.php");
 }
 include_once $securityPath;
+=======
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb
 ?>
 <!DOCTYPE html>
 <html>
@@ -24,9 +31,13 @@ include_once $securityPath;
 
     <script>
         var APP_URL = '<?php echo APP_URL; ?>';
+<<<<<<< HEAD
         var ID_ADMINISTRADOR = <?php echo json_encode($id_administrador); ?>;
         console.log('APP_URL:', APP_URL);
         console.log('ID_ADMINISTRADOR:', ID_ADMINISTRADOR);
+=======
+        console.log('APP_URL:', APP_URL);
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb
     </script>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -208,7 +219,11 @@ include_once $securityPath;
 <aside class="main-sidebar sidebar-dark-primary elevation-4">
     <a href="<?php echo APP_URL; ?>/panel/administrador" class="brand-link">
         <img src="<?php echo APP_URL; ?>/img/logo_azul.png" alt="Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
+<<<<<<< HEAD
         <span class="brand-text font-weight-light">BioVital</span>
+=======
+        <span class="brand-text font-weight-light">BIOVITAL</span>
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb
     </a>
     <div class="sidebar">
         <div class="user-panel mt-3 pb-3 mb-3 d-flex">
@@ -243,12 +258,15 @@ include_once $securityPath;
                     <i class="fas fa-hospital-user"></i> Clínica
                 </li>
                 <li class="nav-item">
+<<<<<<< HEAD
                     <a href="<?php echo APP_URL; ?>/especialidades" class="nav-link">
                         <i class="nav-icon fas fa-stethoscope"></i>
                         <p>Especialidades</p>
                     </a>
                 </li>
                 <li class="nav-item">
+=======
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb
                     <a href="<?php echo APP_URL; ?>/consultorios" class="nav-link">
                         <i class="nav-icon fas fa-building"></i>
                         <p>Consultorios</p>
@@ -260,6 +278,7 @@ include_once $securityPath;
                         <p>Recetas</p>
                     </a>
                 </li>
+<<<<<<< HEAD
                 <li class="nav-header">
                     <i class="fas fa-chart-bar"></i> Reportes
                 </li>
@@ -269,6 +288,8 @@ include_once $securityPath;
                         <p>Estadísticas</p>
                     </a>
                 </li>
+=======
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb
             </ul>
         </nav>
     </div>
@@ -559,6 +580,10 @@ include_once $securityPath;
         </div>
     </section>
 </div>
+<<<<<<< HEAD
+=======
+
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb
 <footer class="main-footer">
     <div class="float-right d-none d-sm-block">
         <b>Version</b> 1.0.0
@@ -570,6 +595,7 @@ include_once $securityPath;
 
 <script src="<?php echo APP_URL; ?>/js/adminlte.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+<<<<<<< HEAD
 
 <script>
 // Script de carga de datos del administrador 
@@ -1522,5 +1548,10 @@ function cargarEstadosFallback() {
 
 <script src="<?php echo APP_URL; ?>/js/adminlte.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+=======
+<script src="<?php echo APP_URL; ?>/js/administrador.js"></script>
+<script src="<?php echo APP_URL; ?>/js/ubicacion.js"></script>
+
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb
 </body>
 </html>
