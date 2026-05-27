@@ -1,10 +1,13 @@
 RewriteEngine On
 RewriteBase /biovital/
 
+<<<<<<< HEAD
+=======
 # Redirigir www a no-www (opcional)
 RewriteCond %{HTTP_HOST} ^www\.(.*)$ [NC]
 RewriteRule ^(.*)$ http://%1/$1 [R=301,L]
 
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb
 # Si el archivo o directorio existe, sírvelo directamente
 RewriteCond %{REQUEST_FILENAME} -f [OR]
 RewriteCond %{REQUEST_FILENAME} -d

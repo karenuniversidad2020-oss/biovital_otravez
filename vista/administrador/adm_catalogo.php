@@ -1,9 +1,15 @@
 <?php
+<<<<<<< HEAD
+AuthHelper::checkRoleAndType('administrador', 4, true);
+
+$nombre_usuario = htmlspecialchars($_SESSION['nombre_us'] ?? 'Usuario');
+=======
 if($_SESSION['us_tipo'] != 4 || $_SESSION['rol'] != 'administrador'){
     header('Location: ' . APP_URL . '/login/administrador');
     exit();
 }
 $nombre_usuario = htmlspecialchars($_SESSION['nombre_us'] ?? 'Administrador');
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb
 ?>
 <!DOCTYPE html>
 <html>
@@ -41,6 +47,77 @@ $nombre_usuario = htmlspecialchars($_SESSION['nombre_us'] ?? 'Administrador');
 
     <!-- Main Sidebar -->
     <aside class="main-sidebar sidebar-dark-primary elevation-4">
+<<<<<<< HEAD
+    <a href="<?php echo APP_URL; ?>/panel/administrador" class="brand-link">
+        <img src="<?php echo APP_URL; ?>/img/logo_azul.png" alt="Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
+        <span class="brand-text font-weight-light">BioVital</span>
+    </a>
+    <div class="sidebar">
+        <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+            <div class="image">
+                <img id="avatar_nav" src="<?php echo APP_URL; ?>/img/avatar.png" class="img-circle elevation-2" alt="User Image">
+            </div>
+            <div class="info">
+                <a href="#" class="d-block"><?php echo htmlspecialchars($nombre_usuario); ?></a>
+            </div>
+        </div>
+        <nav class="mt-2">
+            <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu">
+                <li class="nav-header">
+                    <i class="fas fa-user-shield"></i> Usuario
+                </li>
+                <li class="nav-item">
+                    <a href="<?php echo APP_URL; ?>/perfil" class="nav-link">
+                        <i class="nav-icon fas fa-user-cog"></i>
+                        <p>Datos personales</p>
+                    </a>
+                </li>
+                <li class="nav-header">
+                    <i class="fas fa-chart-line"></i> Gestión
+                </li>
+                <li class="nav-item">
+                    <a href="<?php echo APP_URL; ?>/administrador/usuarios" class="nav-link">
+                        <i class="nav-icon fas fa-users"></i>
+                        <p>Usuarios</p>
+                    </a>
+                </li>
+
+               
+                <li class="nav-header">
+                    <i class="fas fa-hospital-user"></i> Clínica
+                </li>
+                 <li class="nav-item">
+                    <a href="<?php echo APP_URL; ?>/especialidades" class="nav-link">
+                        <i class="nav-icon fas fa-stethoscope"></i>
+                        <p>Especialidades</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="<?php echo APP_URL; ?>/consultorios" class="nav-link">
+                        <i class="nav-icon fas fa-building"></i>
+                        <p>Consultorios</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="<?php echo APP_URL; ?>/recetas" class="nav-link">
+                        <i class="nav-icon fas fa-prescription-bottle-alt"></i>
+                        <p>Recetas</p>
+                    </a>
+                </li>
+                <li class="nav-header">
+                    <i class="fas fa-chart-bar"></i> Reportes
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="nav-icon fas fa-chart-bar"></i>
+                        <p>Estadísticas</p>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</aside>
+=======
         <a href="<?php echo APP_URL; ?>/panel/administrador" class="brand-link">
             <img src="<?php echo APP_URL; ?>/img/logo_azul.png" alt="Logo" class="brand-image img-circle elevation-3" style="opacity:.8">
             <span class="brand-text font-weight-light">BIOVITAL</span>
@@ -89,6 +166,7 @@ $nombre_usuario = htmlspecialchars($_SESSION['nombre_us'] ?? 'Administrador');
             </nav>
         </div>
     </aside>
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb
 
     <!-- Content Wrapper -->
     <div class="content-wrapper">
@@ -188,7 +266,10 @@ $nombre_usuario = htmlspecialchars($_SESSION['nombre_us'] ?? 'Administrador');
         <div class="float-right d-none d-sm-block"><b>Version</b> 1.0.0</div>
         <strong>Copyright © 2026 BioVital.</strong> Todos los derechos reservados.
     </footer>
+<<<<<<< HEAD
+=======
 
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb
 </div>
 
 <script src="<?php echo APP_URL; ?>/js/adminlte.min.js"></script>

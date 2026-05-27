@@ -6,7 +6,11 @@ const navMenu = document.getElementById('navMenu');
 document.addEventListener('DOMContentLoaded', function () {
   setupNavigation();
   setupScrollEffects();
+<<<<<<< HEAD
+  // El carrusel ahora es nativo de Bootstrap 4, no necesita JS manual
+=======
   setupCarousel();
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb
   setupSpecialtyCards();
   setupAnimations();
   setupCounters();
@@ -59,6 +63,8 @@ function setupScrollEffects() {
   });
 }
 
+<<<<<<< HEAD
+=======
 // ========== CAROUSEL ==========
 function setupCarousel() {
   var track = document.querySelector('.carousel-track');
@@ -127,6 +133,7 @@ function setupCarousel() {
   startAutoPlay();
 }
 
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb
 // ========== SPECIALTY CARDS ==========
 function setupSpecialtyCards() {
   var specialtyInfo = {
@@ -177,7 +184,10 @@ function closeSpecialtyModal() {
   document.getElementById('specialtyModal').classList.remove('show');
 }
 
+<<<<<<< HEAD
+=======
 // Close modal on outside click or Escape
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb
 window.addEventListener('click', function (e) {
   var modal = document.getElementById('specialtyModal');
   if (e.target === modal) closeSpecialtyModal();
@@ -254,7 +264,10 @@ function openLogin(role, iconClass) {
 
     showView('login-view');
 
+<<<<<<< HEAD
+=======
     // Scroll al login
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb
     setTimeout(function () {
         var el = document.getElementById('login-view');
         if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -274,6 +287,17 @@ $(document).ready(function () {
         submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verificando...';
 
         $.ajax({
+<<<<<<< HEAD
+            url: APP_URL + '/login',
+            type: 'POST',
+            data: $(this).serialize(),
+            dataType: 'json',
+            success: function (response) {
+                if (response.success) {
+                    submitBtn.innerHTML = '<i class="fas fa-check-circle"></i> ¡Acceso concedido!';
+                    window.location.href = APP_URL + '/' + response.redirect;
+                } else {
+=======
             url: APP_URL + '/login',  // ✅ Verifica que APP_URL esté definida correctamente
             type: 'POST',
             data: $(this).serialize(),
@@ -285,6 +309,7 @@ $(document).ready(function () {
         // response.redirect ya tiene el formato "panel/paciente"
         window.location.href = APP_URL + '/' + response.redirect;
     } else {
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb
                     loginErrorMsg.textContent = response.error || 'Cédula o contraseña incorrecta';
                     loginError.classList.add('show');
                     submitBtn.disabled = false;
@@ -299,7 +324,11 @@ $(document).ready(function () {
             }
         });
     });
+<<<<<<< HEAD
+});
+=======
 });;
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb
 
 // ========== MAP ==========
 function showMap(location) {
@@ -333,4 +362,8 @@ function setupContactForm() {
       }, 1500);
     });
   }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb

@@ -19,6 +19,57 @@ class MedicoController {
     }
     
     // API: Buscar médico (para mostrar datos)
+<<<<<<< HEAD
+   public function buscar() {
+    $id_medico = $_POST['dato'] ?? $_POST['id_medico'] ?? 0;
+    $id_sesion = $_SESSION['usuario'];
+    
+    error_log("MedicoController::buscar - ID: $id_medico, Sesión: $id_sesion");
+    
+    if($id_medico != $id_sesion) {
+        ApiResponse::error('No autorizado para ver este perfil', 'unauthorized', [], 403);
+        return;
+    }
+    
+    $medico = new Medico();
+    $fecha_actual = new DateTime();
+    $medico->obtener_datos($id_medico);
+    
+    if(empty($medico->objetos)) {
+        ApiResponse::notFound('Médico');
+        return;
+    }
+    
+    $json = array();
+    foreach ($medico->objetos as $objeto) {
+        $fecha_nacimiento = $objeto->fecha_nacimiento_medico;
+        $nacimiento = new DateTime($fecha_nacimiento);
+        $edad = $nacimiento->diff($fecha_actual);
+        
+        $avatar_path = (!empty($objeto->avatar_medico) && $objeto->avatar_medico != 'avatarDES.jpg') 
+                       ? APP_URL . '/img/' . $objeto->avatar_medico 
+                       : APP_URL . '/img/avatarDES.jpg';
+        
+        $json = array(
+            'nombre' => $objeto->nombre_medico ?? '',
+            'apellidos' => $objeto->apellido_medico ?? '',
+            'fecha_nacimiento' => $edad->y,
+            'cedula' => $objeto->cedula_medico ?? '',
+            'tipo' => $objeto->nombre_tipo ?? 'Médico',
+            'telefono' => $objeto->telefono_medico ?? '',
+            'direccion' => $objeto->direccion_medico ?? '',
+            'correo' => $objeto->correo_medico ?? '',
+            'sexo' => $objeto->sexo_medico ?? '',
+            'adicional' => $objeto->adicional_medico ?? '',
+            'avatar' => $avatar_path
+        );
+    }
+    
+    // Devolver en formato ApiResponse
+    ApiResponse::success($json, 'datos_cargados', 'Datos del médico cargados correctamente');
+}
+    
+=======
     public function buscar() {
         $id_medico = $_POST['dato'] ?? $_POST['id_medico'] ?? 0;
         $id_sesion = $_SESSION['usuario'];
@@ -69,6 +120,7 @@ class MedicoController {
         jsonResponse($json);
     }
     
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb
     // API: Capturar datos para editar (CORREGIDO)
     public function capturarDatos() {
         $id_medico = $_POST['id_medico'] ?? 0;

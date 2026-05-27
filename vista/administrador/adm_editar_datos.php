@@ -1,5 +1,9 @@
 <?php
+<<<<<<< HEAD
+
+=======
 // NO session_start() - el Front Controller ya lo hace
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb
 if($_SESSION['us_tipo'] != 4 || $_SESSION['rol'] != 'administrador'){
     header('Location: ' . APP_URL . '/login/administrador');
     exit();
@@ -7,6 +11,16 @@ if($_SESSION['us_tipo'] != 4 || $_SESSION['rol'] != 'administrador'){
 
 $id_administrador = $_SESSION['usuario'];
 $nombre_usuario = $_SESSION['nombre_us'];
+<<<<<<< HEAD
+
+// Incluir Security para CSRF
+$securityPath = dirname(__DIR__, 2) . '/modelo/Security.php';
+if (!file_exists($securityPath)) {
+    die("Error: No se encuentra Security.php");
+}
+include_once $securityPath;
+=======
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb
 ?>
 <!DOCTYPE html>
 <html>
@@ -17,7 +31,13 @@ $nombre_usuario = $_SESSION['nombre_us'];
 
     <script>
         var APP_URL = '<?php echo APP_URL; ?>';
+<<<<<<< HEAD
+        var ID_ADMINISTRADOR = <?php echo json_encode($id_administrador); ?>;
         console.log('APP_URL:', APP_URL);
+        console.log('ID_ADMINISTRADOR:', ID_ADMINISTRADOR);
+=======
+        console.log('APP_URL:', APP_URL);
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb
     </script>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -199,7 +219,11 @@ $nombre_usuario = $_SESSION['nombre_us'];
 <aside class="main-sidebar sidebar-dark-primary elevation-4">
     <a href="<?php echo APP_URL; ?>/panel/administrador" class="brand-link">
         <img src="<?php echo APP_URL; ?>/img/logo_azul.png" alt="Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
+<<<<<<< HEAD
+        <span class="brand-text font-weight-light">BioVital</span>
+=======
         <span class="brand-text font-weight-light">BIOVITAL</span>
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb
     </a>
     <div class="sidebar">
         <div class="user-panel mt-3 pb-3 mb-3 d-flex">
@@ -234,6 +258,15 @@ $nombre_usuario = $_SESSION['nombre_us'];
                     <i class="fas fa-hospital-user"></i> Clínica
                 </li>
                 <li class="nav-item">
+<<<<<<< HEAD
+                    <a href="<?php echo APP_URL; ?>/especialidades" class="nav-link">
+                        <i class="nav-icon fas fa-stethoscope"></i>
+                        <p>Especialidades</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+=======
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb
                     <a href="<?php echo APP_URL; ?>/consultorios" class="nav-link">
                         <i class="nav-icon fas fa-building"></i>
                         <p>Consultorios</p>
@@ -245,6 +278,18 @@ $nombre_usuario = $_SESSION['nombre_us'];
                         <p>Recetas</p>
                     </a>
                 </li>
+<<<<<<< HEAD
+                <li class="nav-header">
+                    <i class="fas fa-chart-bar"></i> Reportes
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="nav-icon fas fa-chart-bar"></i>
+                        <p>Estadísticas</p>
+                    </a>
+                </li>
+=======
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb
             </ul>
         </nav>
     </div>
@@ -535,7 +580,10 @@ $nombre_usuario = $_SESSION['nombre_us'];
         </div>
     </section>
 </div>
+<<<<<<< HEAD
+=======
 
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb
 <footer class="main-footer">
     <div class="float-right d-none d-sm-block">
         <b>Version</b> 1.0.0
@@ -547,8 +595,963 @@ $nombre_usuario = $_SESSION['nombre_us'];
 
 <script src="<?php echo APP_URL; ?>/js/adminlte.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+<<<<<<< HEAD
+
+<script>
+// Script de carga de datos del administrador 
+$(document).ready(function() {
+    var id_usuario = $('#id_usuario').val();
+    var edit = false;
+    
+    console.log('=== INICIANDO CARGA DE PERFIL ===');
+    console.log('ID Usuario:', id_usuario);
+    console.log('APP_URL:', APP_URL);
+    
+    if (!id_usuario || id_usuario === '') {
+        console.error('ERROR: ID de administrador no encontrado');
+        $('#nombre_us').html('Error: Sesión no válida');
+        return;
+    }
+    
+    // Función para cargar datos del administrador
+    function cargarDatosAdministrador() {
+        console.log('Cargando datos del administrador...');
+        
+        $.ajax({
+            url: APP_URL + '/api/administradores/buscar',
+            type: 'POST',
+            data: { id_administrador: id_usuario, dato: id_usuario },
+            dataType: 'json',
+            timeout: 10000,
+            success: function(response) {
+                console.log('Respuesta del servidor:', response);
+                
+                // Verificar si la respuesta tiene el formato ApiResponse
+                var datos = response;
+                if (response.data && response.success) {
+                    datos = response.data;
+                }
+                
+                if (datos.error) {
+                    console.error('Error:', datos.error);
+                    $('#nombre_us').html('Error: ' + datos.error);
+                    return;
+                }
+                
+                // Actualizar UI con los datos
+                $('#nombre_us').html(datos.nombre || '');
+                $('#apellidos_us').html(datos.apellidos || '');
+                $('#edad').html(datos.fecha_nacimiento || '');
+                $('#cedula_us').html(datos.cedula || '');
+                $('#telefono_us').html(datos.telefono || '');
+                $('#correo_us').html(datos.correo || '');
+                $('#sexo_us').html(datos.sexo || '');
+                $('#adicional_us').html(datos.adicional || '');
+                
+                // Mostrar dirección
+                if (datos.direccion) {
+                    $('#direccion_us').html(datos.direccion);
+                } else {
+                    $('#direccion_us').html('-');
+                }
+                
+                // Actualizar avatar
+                if (datos.avatar) {
+                    var avatarUrl = datos.avatar;
+                    var timestamp = new Date().getTime();
+                    avatarUrl = avatarUrl + '?t=' + timestamp;
+                    
+                    $('#avatar1, #avatar2, #avatar3, #avatar4, #avatar_nav').attr('src', avatarUrl);
+                    console.log('Avatar actualizado:', avatarUrl);
+                } else {
+                    var defaultAvatar = APP_URL + '/img/avatarDES.jpg?t=' + new Date().getTime();
+                    $('#avatar1, #avatar2, #avatar3, #avatar4, #avatar_nav').attr('src', defaultAvatar);
+                }
+                
+                console.log('Datos cargados correctamente');
+            },
+            error: function(xhr, status, error) {
+                console.error('Error en la petición AJAX:', error);
+                console.error('Respuesta del servidor:', xhr.responseText);
+                $('#nombre_us').html('Error de conexión: ' + status);
+            }
+        });
+    }
+    
+    // Cargar datos al iniciar
+    cargarDatosAdministrador();
+    
+   // Botón editar - VERSIÓN CORREGIDA CON CARGA DE UBICACIÓN
+$(document).on('click', '.edit', function(e) {
+    e.preventDefault();
+    edit = true;
+    
+    console.log('Editando administrador ID:', id_usuario);
+    
+    var $btn = $(this);
+    var originalText = $btn.html();
+    $btn.html('<i class="fas fa-spinner fa-spin"></i> Cargando...');
+    
+    $.ajax({
+        url: APP_URL + '/api/administradores/capturar-datos',
+        type: 'POST',
+        data: { id_administrador: id_usuario },
+        dataType: 'json',
+        success: function(response) {
+            var datos = response;
+            if (response.data && response.success) {
+                datos = response.data;
+            }
+            
+            console.log('Datos a editar:', datos);
+            
+            if (datos.error) {
+                alert('Error: ' + datos.error);
+                return;
+            }
+            
+            // Cargar datos básicos en los campos
+            $('#telefono').val(datos.telefono || '');
+            $('#correo').val(datos.correo || '');
+            $('#sexo').val(datos.sexo || '');
+            $('#adicional').val(datos.adicional || '');
+            $('#direccion_detallada').val(datos.direccion_detallada || '');
+            
+            // Habilitar campos de edición
+            $('#telefono, #correo, #sexo, #adicional, #estado, #ciudad, #municipio, #parroquia, #direccion_detallada').prop('disabled', false);
+            
+            // ==================== CARGAR UBICACIÓN EN LOS SELECTS ====================
+            if (datos.estado && datos.estado !== '') {
+                // Primero cargar la lista de estados
+                cargarEstadosConSeleccion(datos.estado, datos.ciudad, datos.municipio, datos.parroquia);
+            } else {
+                // Si no hay ubicación guardada, solo cargar estados
+                cargarEstados();
+            }
+            
+            // Cambiar estilo del botón guardar
+            $('.btn-outline-success')
+                .removeClass('btn-outline-success')
+                .addClass('btn-success')
+                .prop('disabled', false);
+            
+            $('#editado').show(1000);
+            setTimeout(function() { $('#editado').hide(2000); }, 2000);
+        },
+        error: function(xhr, status, error) {
+            console.error('Error al capturar datos:', error);
+            alert('Error al cargar datos para edición: ' + status);
+        },
+        complete: function() {
+            $btn.html(originalText);
+        }
+    });
+});
+
+// ==================== FUNCIONES DE UBICACIÓN ====================
+
+
+function cargarEstadosConSeleccion(estadoSeleccionado, ciudadSeleccionada, municipioSeleccionado, parroquiaSeleccionada) {
+    console.log('Cargando estados con selección:', {estadoSeleccionado, ciudadSeleccionada, municipioSeleccionado, parroquiaSeleccionada});
+    
+    $.ajax({
+        url: APP_URL + '/api/ubicacion/estados',
+        type: 'POST',
+        dataType: 'json',
+        success: function(response) {
+            console.log('Respuesta estados API:', response);
+            
+            // Manejar el formato de respuesta de ApiResponse
+            var estados = [];
+            if (response.success && response.data) {
+                estados = response.data;
+            } else if (Array.isArray(response)) {
+                estados = response;
+            } else if (response.estados) {
+                estados = response.estados;
+            } else {
+                estados = response;
+            }
+            
+            console.log('Estados procesados:', estados);
+            
+            if (!Array.isArray(estados) || estados.length === 0) {
+                console.error('No se recibieron estados válidos');
+                cargarEstadosFallbackConSeleccion(estadoSeleccionado, ciudadSeleccionada, municipioSeleccionado, parroquiaSeleccionada);
+                return;
+            }
+            
+            let options = '<option value="">Seleccione un estado...</option>';
+            let estadoId = null;
+            
+            for (let i = 0; i < estados.length; i++) {
+                let estado = estados[i];
+                let id = estado.id_estado || estado.id;
+                let nombre = estado.estado || estado.nombre;
+                options += `<option value="${id}">${nombre}</option>`;
+                if (nombre === estadoSeleccionado) {
+                    estadoId = id;
+                }
+            }
+            $('#estado').html(options).prop('disabled', false);
+            
+            if (estadoId) {
+                $('#estado').val(estadoId);
+                // Cargar ciudades, municipios y parroquias
+                cargarCiudadesConSeleccion(estadoId, ciudadSeleccionada, municipioSeleccionado, parroquiaSeleccionada);
+                cargarMunicipiosConSeleccion(estadoId, ciudadSeleccionada, municipioSeleccionado, parroquiaSeleccionada);
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error('Error al cargar estados:', error);
+            cargarEstadosFallbackConSeleccion(estadoSeleccionado, ciudadSeleccionada, municipioSeleccionado, parroquiaSeleccionada);
+        }
+    });
+}
+
+function cargarCiudadesConSeleccion(id_estado, ciudadSeleccionada, municipioSeleccionado, parroquiaSeleccionada) {
+    if (!id_estado) return;
+    
+    $.ajax({
+        url: APP_URL + '/api/ubicacion/ciudades',
+        type: 'POST',
+        data: { id_estado: id_estado },
+        dataType: 'json',
+        success: function(response) {
+            console.log('Respuesta ciudades API:', response);
+            
+            // Manejar el formato de respuesta de ApiResponse
+            var ciudades = [];
+            if (response.success && response.data) {
+                ciudades = response.data;
+            } else if (Array.isArray(response)) {
+                ciudades = response;
+            } else if (response.ciudades) {
+                ciudades = response.ciudades;
+            } else {
+                ciudades = response;
+            }
+            
+            if (!Array.isArray(ciudades) || ciudades.length === 0) {
+                $('#ciudad').html('<option value="">No hay ciudades disponibles</option>').prop('disabled', false);
+                return;
+            }
+            
+            let options = '<option value="">Seleccione una ciudad...</option>';
+            let ciudadId = null;
+            
+            for (let i = 0; i < ciudades.length; i++) {
+                let ciudad = ciudades[i];
+                let id = ciudad.id_ciudad || ciudad.id;
+                let nombre = ciudad.ciudad || ciudad.nombre;
+                options += `<option value="${id}">${nombre}</option>`;
+                if (nombre === ciudadSeleccionada) {
+                    ciudadId = id;
+                }
+            }
+            $('#ciudad').html(options).prop('disabled', false);
+            
+            if (ciudadId) {
+                $('#ciudad').val(ciudadId);
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error('Error al cargar ciudades:', error);
+            $('#ciudad').html('<option value="">Error al cargar ciudades</option>').prop('disabled', false);
+        }
+    });
+}
+
+function cargarMunicipiosConSeleccion(id_estado, ciudadSeleccionada, municipioSeleccionado, parroquiaSeleccionada) {
+    if (!id_estado) return;
+    
+    $.ajax({
+        url: APP_URL + '/api/ubicacion/municipios',
+        type: 'POST',
+        data: { id_estado: id_estado },
+        dataType: 'json',
+        success: function(response) {
+            console.log('Respuesta municipios API:', response);
+            
+            // Manejar el formato de respuesta de ApiResponse
+            var municipios = [];
+            if (response.success && response.data) {
+                municipios = response.data;
+            } else if (Array.isArray(response)) {
+                municipios = response;
+            } else if (response.municipios) {
+                municipios = response.municipios;
+            } else {
+                municipios = response;
+            }
+            
+            if (!Array.isArray(municipios) || municipios.length === 0) {
+                $('#municipio').html('<option value="">No hay municipios disponibles</option>').prop('disabled', false);
+                $('#parroquia').html('<option value="">Seleccione un municipio primero...</option>').prop('disabled', true);
+                return;
+            }
+            
+            let options = '<option value="">Seleccione un municipio...</option>';
+            let municipioId = null;
+            
+            for (let i = 0; i < municipios.length; i++) {
+                let municipio = municipios[i];
+                let id = municipio.id_municipio || municipio.id;
+                let nombre = municipio.municipio || municipio.nombre;
+                options += `<option value="${id}">${nombre}</option>`;
+                if (nombre === municipioSeleccionado) {
+                    municipioId = id;
+                }
+            }
+            $('#municipio').html(options).prop('disabled', false);
+            
+            if (municipioId) {
+                $('#municipio').val(municipioId);
+                // Cargar parroquias del municipio seleccionado
+                cargarParroquiasConSeleccion(municipioId, parroquiaSeleccionada);
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error('Error al cargar municipios:', error);
+            $('#municipio').html('<option value="">Error al cargar municipios</option>').prop('disabled', false);
+        }
+    });
+}
+
+function cargarParroquiasConSeleccion(id_municipio, parroquiaSeleccionada) {
+    if (!id_municipio) return;
+    
+    $.ajax({
+        url: APP_URL + '/api/ubicacion/parroquias',
+        type: 'POST',
+        data: { id_municipio: id_municipio },
+        dataType: 'json',
+        success: function(response) {
+            console.log('Respuesta parroquias API:', response);
+            
+            // Manejar el formato de respuesta de ApiResponse
+            var parroquias = [];
+            if (response.success && response.data) {
+                parroquias = response.data;
+            } else if (Array.isArray(response)) {
+                parroquias = response;
+            } else if (response.parroquias) {
+                parroquias = response.parroquias;
+            } else {
+                parroquias = response;
+            }
+            
+            if (!Array.isArray(parroquias) || parroquias.length === 0) {
+                $('#parroquia').html('<option value="">No hay parroquias disponibles</option>').prop('disabled', false);
+                return;
+            }
+            
+            let options = '<option value="">Seleccione una parroquia...</option>';
+            let parroquiaId = null;
+            
+            for (let i = 0; i < parroquias.length; i++) {
+                let parroquia = parroquias[i];
+                let id = parroquia.id_parroquia || parroquia.id;
+                let nombre = parroquia.parroquia || parroquia.nombre;
+                options += `<option value="${id}">${nombre}</option>`;
+                if (nombre === parroquiaSeleccionada) {
+                    parroquiaId = id;
+                }
+            }
+            $('#parroquia').html(options).prop('disabled', false);
+            
+            if (parroquiaId) {
+                $('#parroquia').val(parroquiaId);
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error('Error al cargar parroquias:', error);
+            $('#parroquia').html('<option value="">Error al cargar parroquias</option>').prop('disabled', false);
+        }
+    });
+}
+
+function cargarEstadosFallbackConSeleccion(estadoSeleccionado, ciudadSeleccionada, municipioSeleccionado, parroquiaSeleccionada) {
+    console.log('Usando fallback de estados');
+    const estados = [
+        {id_estado: 1, estado: 'Amazonas'}, {id_estado: 2, estado: 'Anzoátegui'},
+        {id_estado: 3, estado: 'Apure'}, {id_estado: 4, estado: 'Aragua'},
+        {id_estado: 5, estado: 'Barinas'}, {id_estado: 6, estado: 'Bolívar'},
+        {id_estado: 7, estado: 'Carabobo'}, {id_estado: 8, estado: 'Cojedes'},
+        {id_estado: 9, estado: 'Delta Amacuro'}, {id_estado: 10, estado: 'Falcón'},
+        {id_estado: 11, estado: 'Guárico'}, {id_estado: 12, estado: 'Lara'},
+        {id_estado: 13, estado: 'Mérida'}, {id_estado: 14, estado: 'Miranda'},
+        {id_estado: 15, estado: 'Monagas'}, {id_estado: 16, estado: 'Nueva Esparta'},
+        {id_estado: 17, estado: 'Portuguesa'}, {id_estado: 18, estado: 'Sucre'},
+        {id_estado: 19, estado: 'Táchira'}, {id_estado: 20, estado: 'Trujillo'},
+        {id_estado: 21, estado: 'La Guaira'}, {id_estado: 22, estado: 'Yaracuy'},
+        {id_estado: 23, estado: 'Zulia'}, {id_estado: 24, estado: 'Distrito Capital'}
+    ];
+    
+    let options = '<option value="">Seleccione un estado...</option>';
+    let estadoId = null;
+    
+    for (let i = 0; i < estados.length; i++) {
+        options += `<option value="${estados[i].id_estado}">${estados[i].estado}</option>`;
+        if (estados[i].estado === estadoSeleccionado) {
+            estadoId = estados[i].id_estado;
+        }
+    }
+    $('#estado').html(options).prop('disabled', false);
+    
+    if (estadoId) {
+        $('#estado').val(estadoId);
+        // En fallback, también cargar ciudades, municipios y parroquias si es necesario
+        if (ciudadSeleccionada) {
+            setTimeout(function() {
+                cargarCiudadesFallback(estadoId, ciudadSeleccionada, municipioSeleccionado, parroquiaSeleccionada);
+            }, 100);
+        }
+    }
+}
+
+function cargarCiudadesFallback(id_estado, ciudadSeleccionada, municipioSeleccionado, parroquiaSeleccionada) {
+    // Fallback con datos locales para ciudades
+    const ciudadesPorEstado = {
+        5: [{id_ciudad: 75, ciudad: 'Barinas'}, {id_ciudad: 76, ciudad: 'Barinitas'}, {id_ciudad: 77, ciudad: 'Barrancas'}],
+        14: [{id_ciudad: 279, ciudad: 'Los Teques'}, {id_ciudad: 275, ciudad: 'Guarenas'}, {id_ciudad: 276, ciudad: 'Guatire'}]
+    };
+    
+    let ciudades = ciudadesPorEstado[id_estado] || [];
+    let options = '<option value="">Seleccione una ciudad...</option>';
+    let ciudadId = null;
+    
+    for (let i = 0; i < ciudades.length; i++) {
+        options += `<option value="${ciudades[i].id_ciudad}">${ciudades[i].ciudad}</option>`;
+        if (ciudades[i].ciudad === ciudadSeleccionada) {
+            ciudadId = ciudades[i].id_ciudad;
+        }
+    }
+    $('#ciudad').html(options).prop('disabled', false);
+    
+    if (ciudadId) {
+        $('#ciudad').val(ciudadId);
+    }
+}
+
+// Función para cargar estados sin selección (para nuevos registros)
+function cargarEstados() {
+    $.ajax({
+        url: APP_URL + '/api/ubicacion/estados',
+        type: 'POST',
+        dataType: 'json',
+        success: function(response) {
+            var estados = [];
+            if (response.success && response.data) {
+                estados = response.data;
+            } else if (Array.isArray(response)) {
+                estados = response;
+            } else {
+                estados = response;
+            }
+            
+            if (!Array.isArray(estados)) {
+                estados = [];
+            }
+            
+            let options = '<option value="">Seleccione un estado...</option>';
+            for (let i = 0; i < estados.length; i++) {
+                let estado = estados[i];
+                let id = estado.id_estado || estado.id;
+                let nombre = estado.estado || estado.nombre;
+                options += `<option value="${id}">${nombre}</option>`;
+            }
+            $('#estado').html(options).prop('disabled', false);
+        },
+        error: function() {
+            cargarEstadosFallback();
+        }
+    });
+}
+
+function cargarEstadosFallback() {
+    const estados = [
+        {id_estado: 1, estado: 'Amazonas'}, {id_estado: 2, estado: 'Anzoátegui'},
+        {id_estado: 3, estado: 'Apure'}, {id_estado: 4, estado: 'Aragua'},
+        {id_estado: 5, estado: 'Barinas'}, {id_estado: 6, estado: 'Bolívar'},
+        {id_estado: 7, estado: 'Carabobo'}, {id_estado: 8, estado: 'Cojedes'},
+        {id_estado: 9, estado: 'Delta Amacuro'}, {id_estado: 10, estado: 'Falcón'},
+        {id_estado: 11, estado: 'Guárico'}, {id_estado: 12, estado: 'Lara'},
+        {id_estado: 13, estado: 'Mérida'}, {id_estado: 14, estado: 'Miranda'},
+        {id_estado: 15, estado: 'Monagas'}, {id_estado: 16, estado: 'Nueva Esparta'},
+        {id_estado: 17, estado: 'Portuguesa'}, {id_estado: 18, estado: 'Sucre'},
+        {id_estado: 19, estado: 'Táchira'}, {id_estado: 20, estado: 'Trujillo'},
+        {id_estado: 21, estado: 'La Guaira'}, {id_estado: 22, estado: 'Yaracuy'},
+        {id_estado: 23, estado: 'Zulia'}, {id_estado: 24, estado: 'Distrito Capital'}
+    ];
+    let options = '<option value="">Seleccione un estado...</option>';
+    for (let i = 0; i < estados.length; i++) {
+        options += `<option value="${estados[i].id_estado}">${estados[i].estado}</option>`;
+    }
+    $('#estado').html(options).prop('disabled', false);
+}
+    
+    // Formulario de edición - Guardar cambios
+    $('#form-usuario').submit(function(e) {
+        e.preventDefault();
+        
+        if (!edit) {
+            alert('Primero haga clic en "Editar"');
+            return false;
+        }
+        
+        // Construir dirección completa
+        var estado_nombre = $('#estado option:selected').text();
+        var ciudad_nombre = $('#ciudad option:selected').text();
+        var municipio_nombre = $('#municipio option:selected').text();
+        var parroquia_nombre = $('#parroquia option:selected').text();
+        var direccion_detallada = $('#direccion_detallada').val();
+        
+        var direccion_completa = '';
+        
+        if (estado_nombre && estado_nombre !== 'Seleccione un estado...' && estado_nombre !== '') {
+            direccion_completa = estado_nombre;
+        }
+        if (ciudad_nombre && ciudad_nombre !== 'Seleccione una ciudad...' && ciudad_nombre !== '' && ciudad_nombre !== 'Cargando ciudades...') {
+            direccion_completa += (direccion_completa ? ', ' : '') + ciudad_nombre;
+        }
+        if (municipio_nombre && municipio_nombre !== 'Seleccione un municipio...' && municipio_nombre !== '' && municipio_nombre !== 'Cargando municipios...') {
+            direccion_completa += (direccion_completa ? ', ' : '') + municipio_nombre;
+        }
+        if (parroquia_nombre && parroquia_nombre !== 'Seleccione una parroquia...' && parroquia_nombre !== '' && parroquia_nombre !== 'Cargando parroquias...') {
+            direccion_completa += (direccion_completa ? ', ' : '') + parroquia_nombre;
+        }
+        if (direccion_detallada && direccion_detallada !== '') {
+            direccion_completa += (direccion_completa ? ' - ' : '') + direccion_detallada;
+        }
+        
+        var telefono = $('#telefono').val();
+        var correo = $('#correo').val();
+        var sexo = $('#sexo').val();
+        var adicional = $('#adicional').val();
+        
+        console.log('Guardando datos:', {id_usuario, direccion_completa, telefono, correo, sexo, adicional});
+        
+        var $btn = $(this).find('button[type="submit"]');
+        var originalText = $btn.html();
+        $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Guardando...');
+        
+        $.ajax({
+            url: APP_URL + '/api/administradores/editar',
+            type: 'POST',
+            data: {
+                id_administrador: id_usuario,
+                telefono: telefono,
+                direccion: direccion_completa,
+                correo: correo,
+                sexo: sexo,
+                adicional: adicional
+            },
+            dataType: 'json',
+            success: function(response) {
+                console.log('Respuesta del servidor:', response);
+                
+                if (response.success) {
+                    $('#editado').show(1000);
+                    setTimeout(function() { 
+                        $('#editado').hide(2000); 
+                    }, 3000);
+                    
+                    edit = false;
+                    
+                    // Deshabilitar campos después de guardar
+                    $('#telefono, #correo, #sexo, #adicional, #estado, #ciudad, #municipio, #parroquia, #direccion_detallada').prop('disabled', true);
+                    
+                    // Restaurar estilo del botón guardar
+                    $('.btn-success')
+                        .removeClass('btn-success')
+                        .addClass('btn-outline-success')
+                        .prop('disabled', true);
+                    
+                    // Recargar datos del administrador
+                    cargarDatosAdministrador();
+                    
+                    alert('¡Datos actualizados correctamente!');
+                } else {
+                    $('#noeditado').show(1000);
+                    setTimeout(function() { 
+                        $('#noeditado').hide(2000); 
+                    }, 3000);
+                    alert(response.error || 'Error al guardar los cambios');
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('Error en AJAX:', error);
+                $('#noeditado').show(1000);
+                setTimeout(function() { 
+                    $('#noeditado').hide(2000); 
+                }, 3000);
+                alert('Error de conexión: ' + status);
+            },
+            complete: function() {
+                $btn.prop('disabled', false).html(originalText);
+            }
+        });
+        
+        return false;
+    });
+    
+    // Cambiar contraseña
+    $('#form-pass').submit(function(e) {
+        e.preventDefault();
+        
+        var oldpass = $('#oldpass').val();
+        var newpass = $('#newpass').val();
+        
+        if (newpass.length < 6) {
+            alert('La nueva contraseña debe tener al menos 6 caracteres');
+            return false;
+        }
+        
+        var $btn = $(this).find('button[type="submit"]');
+        var originalText = $btn.html();
+        $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i>');
+        
+        $.ajax({
+            url: APP_URL + '/api/administradores/cambiar-password',
+            type: 'POST',
+            data: {
+                id_administrador: id_usuario,
+                oldpass: oldpass,
+                newpass: newpass
+            },
+            dataType: 'json',
+            success: function(response) {
+                if (response.resultado === 'update') {
+                    $('#update').show(1000);
+                    setTimeout(function() { 
+                        $('#update').hide(2000); 
+                        $('#cambiocontra').modal('hide');
+                    }, 2000);
+                    $('#form-pass').trigger('reset');
+                } else {
+                    $('#noupdate').show(1000);
+                    setTimeout(function() { 
+                        $('#noupdate').hide(2000); 
+                    }, 2000);
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('Error al cambiar contraseña:', error);
+                alert('Error de conexión: ' + status);
+            },
+            complete: function() {
+                $btn.prop('disabled', false).html(originalText);
+            }
+        });
+    });
+    
+    // Cambiar foto
+    $('#form-photo').submit(function(e) {
+        e.preventDefault();
+        
+        var fileInput = $(this).find('input[type="file"]')[0];
+        if (!fileInput.files || fileInput.files.length === 0) {
+            alert('Por favor seleccione una imagen');
+            return;
+        }
+        
+        var formData = new FormData(this);
+        formData.append('id_administrador', id_usuario);
+        
+        var $btn = $(this).find('button[type="submit"]');
+        var originalText = $btn.html();
+        $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Subiendo...');
+        
+        $.ajax({
+            url: APP_URL + '/api/administradores/cambiar-foto',
+            type: 'POST',
+            data: formData,
+            cache: false,
+            processData: false,
+            contentType: false,
+            dataType: 'json',
+            success: function(response) {
+                if (response.alert === 'edit') {
+                    var timestamp = new Date().getTime();
+                    var nuevaRuta = response.ruta + '?t=' + timestamp;
+                    
+                    $('#avatar1, #avatar2, #avatar3, #avatar4, #avatar_nav').attr('src', nuevaRuta);
+                    
+                    $('#edit').show(1000);
+                    setTimeout(function() { 
+                        $('#edit').hide(2000); 
+                    }, 3000);
+                    
+                    $('#form-photo').trigger('reset');
+                    
+                    setTimeout(function() { 
+                        $('#cambiophoto').modal('hide'); 
+                    }, 1500);
+                    
+                } else {
+                    $('#noedit').show(1000);
+                    setTimeout(function() { 
+                        $('#noedit').hide(2000); 
+                    }, 3000);
+                    alert(response.error || 'Error al cambiar la foto');
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('Error al cambiar foto:', error);
+                $('#noedit').show(1000);
+                setTimeout(function() { 
+                    $('#noedit').hide(2000); 
+                }, 3000);
+                alert('Error al cambiar la foto. Verifique el tipo de archivo (JPG, PNG, GIF)');
+            },
+            complete: function() {
+                $btn.prop('disabled', false).html(originalText);
+            }
+        });
+    });
+});
+// ==================== FUNCIONES DE UBICACIÓN Y EVENTOS ====================
+
+// Eventos de cambio para selects de ubicación
+$(document).on('change', '#estado', function() {
+    var id_estado = $(this).val();
+    console.log('Cambió estado, ID:', id_estado);
+    
+    if (id_estado) {
+        cargarCiudades(id_estado);
+        cargarMunicipios(id_estado);
+    } else {
+        $('#ciudad').html('<option value="">Seleccione un estado primero...</option>').prop('disabled', true);
+        $('#municipio').html('<option value="">Seleccione un estado primero...</option>').prop('disabled', true);
+        $('#parroquia').html('<option value="">Seleccione un municipio primero...</option>').prop('disabled', true);
+    }
+});
+
+$(document).on('change', '#municipio', function() {
+    var id_municipio = $(this).val();
+    console.log('Cambió municipio, ID:', id_municipio);
+    
+    if (id_municipio) {
+        cargarParroquias(id_municipio);
+    } else {
+        $('#parroquia').html('<option value="">Seleccione un municipio primero...</option>').prop('disabled', true);
+    }
+});
+
+// Función para cargar ciudades
+function cargarCiudades(id_estado) {
+    if (!id_estado) return;
+    
+    console.log('Cargando ciudades para estado ID:', id_estado);
+    
+    $.ajax({
+        url: APP_URL + '/api/ubicacion/ciudades',
+        type: 'POST',
+        data: { id_estado: id_estado },
+        dataType: 'json',
+        success: function(response) {
+            console.log('Respuesta ciudades:', response);
+            
+            // Manejar formato ApiResponse
+            var ciudades = [];
+            if (response.success && response.data) {
+                ciudades = response.data;
+            } else if (Array.isArray(response)) {
+                ciudades = response;
+            } else if (response.ciudades) {
+                ciudades = response.ciudades;
+            } else {
+                ciudades = response;
+            }
+            
+            if (!Array.isArray(ciudades)) {
+                ciudades = [];
+            }
+            
+            let options = '<option value="">Seleccione una ciudad...</option>';
+            for (let i = 0; i < ciudades.length; i++) {
+                let ciudad = ciudades[i];
+                let id = ciudad.id_ciudad || ciudad.id;
+                let nombre = ciudad.ciudad || ciudad.nombre;
+                options += `<option value="${id}">${nombre}</option>`;
+            }
+            $('#ciudad').html(options).prop('disabled', false);
+        },
+        error: function(xhr, status, error) {
+            console.error('Error al cargar ciudades:', error);
+            $('#ciudad').html('<option value="">Error al cargar ciudades</option>').prop('disabled', false);
+        }
+    });
+}
+
+// Función para cargar municipios
+function cargarMunicipios(id_estado) {
+    if (!id_estado) return;
+    
+    console.log('Cargando municipios para estado ID:', id_estado);
+    
+    $.ajax({
+        url: APP_URL + '/api/ubicacion/municipios',
+        type: 'POST',
+        data: { id_estado: id_estado },
+        dataType: 'json',
+        success: function(response) {
+            console.log('Respuesta municipios:', response);
+            
+            // Manejar formato ApiResponse
+            var municipios = [];
+            if (response.success && response.data) {
+                municipios = response.data;
+            } else if (Array.isArray(response)) {
+                municipios = response;
+            } else if (response.municipios) {
+                municipios = response.municipios;
+            } else {
+                municipios = response;
+            }
+            
+            if (!Array.isArray(municipios)) {
+                municipios = [];
+            }
+            
+            let options = '<option value="">Seleccione un municipio...</option>';
+            for (let i = 0; i < municipios.length; i++) {
+                let municipio = municipios[i];
+                let id = municipio.id_municipio || municipio.id;
+                let nombre = municipio.municipio || municipio.nombre;
+                options += `<option value="${id}">${nombre}</option>`;
+            }
+            $('#municipio').html(options).prop('disabled', false);
+        },
+        error: function(xhr, status, error) {
+            console.error('Error al cargar municipios:', error);
+            $('#municipio').html('<option value="">Error al cargar municipios</option>').prop('disabled', false);
+        }
+    });
+}
+
+// Función para cargar parroquias
+function cargarParroquias(id_municipio) {
+    if (!id_municipio) return;
+    
+    console.log('Cargando parroquias para municipio ID:', id_municipio);
+    
+    $.ajax({
+        url: APP_URL + '/api/ubicacion/parroquias',
+        type: 'POST',
+        data: { id_municipio: id_municipio },
+        dataType: 'json',
+        success: function(response) {
+            console.log('Respuesta parroquias:', response);
+            
+            // Manejar formato ApiResponse
+            var parroquias = [];
+            if (response.success && response.data) {
+                parroquias = response.data;
+            } else if (Array.isArray(response)) {
+                parroquias = response;
+            } else if (response.parroquias) {
+                parroquias = response.parroquias;
+            } else {
+                parroquias = response;
+            }
+            
+            if (!Array.isArray(parroquias)) {
+                parroquias = [];
+            }
+            
+            let options = '<option value="">Seleccione una parroquia...</option>';
+            for (let i = 0; i < parroquias.length; i++) {
+                let parroquia = parroquias[i];
+                let id = parroquia.id_parroquia || parroquia.id;
+                let nombre = parroquia.parroquia || parroquia.nombre;
+                options += `<option value="${id}">${nombre}</option>`;
+            }
+            $('#parroquia').html(options).prop('disabled', false);
+        },
+        error: function(xhr, status, error) {
+            console.error('Error al cargar parroquias:', error);
+            $('#parroquia').html('<option value="">Error al cargar parroquias</option>').prop('disabled', false);
+        }
+    });
+}
+
+// Función para cargar estados sin selección (para nuevos registros)
+function cargarEstados() {
+    console.log('Cargando lista de estados...');
+    
+    $.ajax({
+        url: APP_URL + '/api/ubicacion/estados',
+        type: 'POST',
+        dataType: 'json',
+        success: function(response) {
+            console.log('Respuesta estados:', response);
+            
+            // Manejar formato ApiResponse
+            var estados = [];
+            if (response.success && response.data) {
+                estados = response.data;
+            } else if (Array.isArray(response)) {
+                estados = response;
+            } else if (response.estados) {
+                estados = response.estados;
+            } else {
+                estados = response;
+            }
+            
+            if (!Array.isArray(estados)) {
+                estados = [];
+            }
+            
+            let options = '<option value="">Seleccione un estado...</option>';
+            for (let i = 0; i < estados.length; i++) {
+                let estado = estados[i];
+                let id = estado.id_estado || estado.id;
+                let nombre = estado.estado || estado.nombre;
+                options += `<option value="${id}">${nombre}</option>`;
+            }
+            $('#estado').html(options).prop('disabled', false);
+        },
+        error: function(xhr, status, error) {
+            console.error('Error al cargar estados:', error);
+            cargarEstadosFallback();
+        }
+    });
+}
+
+// Función fallback para estados
+function cargarEstadosFallback() {
+    console.log('Usando fallback de estados');
+    const estados = [
+        {id_estado: 1, estado: 'Amazonas'}, {id_estado: 2, estado: 'Anzoátegui'},
+        {id_estado: 3, estado: 'Apure'}, {id_estado: 4, estado: 'Aragua'},
+        {id_estado: 5, estado: 'Barinas'}, {id_estado: 6, estado: 'Bolívar'},
+        {id_estado: 7, estado: 'Carabobo'}, {id_estado: 8, estado: 'Cojedes'},
+        {id_estado: 9, estado: 'Delta Amacuro'}, {id_estado: 10, estado: 'Falcón'},
+        {id_estado: 11, estado: 'Guárico'}, {id_estado: 12, estado: 'Lara'},
+        {id_estado: 13, estado: 'Mérida'}, {id_estado: 14, estado: 'Miranda'},
+        {id_estado: 15, estado: 'Monagas'}, {id_estado: 16, estado: 'Nueva Esparta'},
+        {id_estado: 17, estado: 'Portuguesa'}, {id_estado: 18, estado: 'Sucre'},
+        {id_estado: 19, estado: 'Táchira'}, {id_estado: 20, estado: 'Trujillo'},
+        {id_estado: 21, estado: 'La Guaira'}, {id_estado: 22, estado: 'Yaracuy'},
+        {id_estado: 23, estado: 'Zulia'}, {id_estado: 24, estado: 'Distrito Capital'}
+    ];
+    
+    let options = '<option value="">Seleccione un estado...</option>';
+    for (let i = 0; i < estados.length; i++) {
+        options += `<option value="${estados[i].id_estado}">${estados[i].estado}</option>`;
+    }
+    $('#estado').html(options).prop('disabled', false);
+}
+</script>
+
+<script src="<?php echo APP_URL; ?>/js/adminlte.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+=======
 <script src="<?php echo APP_URL; ?>/js/administrador.js"></script>
 <script src="<?php echo APP_URL; ?>/js/ubicacion.js"></script>
 
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb
 </body>
 </html>

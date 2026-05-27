@@ -1,5 +1,8 @@
 <?php
+<<<<<<< HEAD
+=======
 // NO iniciar sesión aquí - el Front Controller ya lo hace
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb
 if($_SESSION['us_tipo'] != 4 || $_SESSION['rol'] != 'administrador'){
     header('Location: ' . APP_URL . '/login/administrador');
     exit();
@@ -74,6 +77,18 @@ $id_consultorio = isset($_GET['id']) ? intval($_GET['id']) : 0;
 </nav>
 
 <!-- Main Sidebar Container -->
+<<<<<<< HEAD
+ <aside class="main-sidebar sidebar-dark-primary elevation-4">
+    <a href="<?php echo APP_URL; ?>/panel/administrador" class="brand-link">
+        <img src="<?php echo APP_URL; ?>/img/logo_azul.png" alt="Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
+        <span class="brand-text font-weight-light">BioVital</span>
+    </a>
+    <div class="sidebar">
+        <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+            <div class="image">
+                <img id="avatar_nav" src="<?php echo APP_URL; ?>/img/avatar.png" class="img-circle elevation-2" alt="User Image">
+            </div>
+=======
 <aside class="main-sidebar sidebar-dark-primary elevation-4">
     <a href="<?php echo APP_URL; ?>/panel/administrador" class="brand-link">
         <img src="<?php echo APP_URL; ?>/img/logo_azul.png" alt="Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
@@ -84,6 +99,7 @@ $id_consultorio = isset($_GET['id']) ? intval($_GET['id']) : 0;
            <div class="image">
     <img id="avatar_nav" src="<?php echo APP_URL; ?>/img/avatar.png" class="img-circle elevation-2" alt="User Image">
 </div>
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb
             <div class="info">
                 <a href="#" class="d-block"><?php echo htmlspecialchars($nombre_usuario); ?></a>
             </div>
@@ -107,12 +123,27 @@ $id_consultorio = isset($_GET['id']) ? intval($_GET['id']) : 0;
                         <i class="nav-icon fas fa-users"></i>
                         <p>Usuarios</p>
                     </a>
+<<<<<<< HEAD
+                </li>               
+                <li class="nav-header">
+                    <i class="fas fa-hospital-user"></i> Clínica
+                </li>
+                 <li class="nav-item">
+                    <a href="<?php echo APP_URL; ?>/especialidades" class="nav-link">
+                        <i class="nav-icon fas fa-stethoscope"></i>
+                        <p>Especialidades</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="<?php echo APP_URL; ?>/consultorios" class="nav-link active">
+=======
                 </li>
                 <li class="nav-header">
                     <i class="fas fa-hospital-user"></i> Clínica
                 </li>
                 <li class="nav-item">
                     <a href="<?php echo APP_URL; ?>/consultorios" class="nav-link">
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb
                         <i class="nav-icon fas fa-building"></i>
                         <p>Consultorios</p>
                     </a>
@@ -137,8 +168,12 @@ $id_consultorio = isset($_GET['id']) ? intval($_GET['id']) : 0;
     </div>
 </aside>
 
+<<<<<<< HEAD
+<!-- **********************Content Wrapper************************** -->
+=======
 
 <!-- Content Wrapper -->
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb
 <div class="content-wrapper">
     <section class="content-header">
         <div class="container-fluid">
@@ -233,7 +268,10 @@ $id_consultorio = isset($_GET['id']) ? intval($_GET['id']) : 0;
                                         </div>
                                     </div>
                                 </div>
+<<<<<<< HEAD
+=======
 
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="form-group">
@@ -252,16 +290,24 @@ $id_consultorio = isset($_GET['id']) ? intval($_GET['id']) : 0;
                                         </div>
                                     </div>
                                 </div>
+<<<<<<< HEAD
+=======
 
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb
                                 <div class="form-group">
                                     <label class="required-field">Dirección Detallada</label>
                                     <input type="text" class="form-control" id="direccion" name="direccion" required placeholder="Av. Principal, Edificio, Número, etc.">
                                     <small class="form-text text-muted">Ej: Av. Principal, Edificio Central, Piso 3, Oficina 5</small>
                                 </div>
+<<<<<<< HEAD
+                                <h4 class="mt-4"><i class="fas fa-address-card"></i> Datos de Contacto</h4>
+                                <hr>                                
+=======
 
                                 <h4 class="mt-4"><i class="fas fa-address-card"></i> Datos de Contacto</h4>
                                 <hr>
                                 
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="form-group">
@@ -275,8 +321,12 @@ $id_consultorio = isset($_GET['id']) ? intval($_GET['id']) : 0;
                                             <input type="email" class="form-control" id="email" name="email" placeholder="Ej: consultorio@correo.com">
                                         </div>
                                     </div>
+<<<<<<< HEAD
+                                </div>                                
+=======
                                 </div>
                                 
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb
                                 <button type="submit" class="btn btn-warning btn-lg btn-block">
                                     <i class="fas fa-save"></i> Actualizar Consultorio
                                 </button>
@@ -323,9 +373,13 @@ $id_consultorio = isset($_GET['id']) ? intval($_GET['id']) : 0;
     </div>
     <strong>Copyright &copy; 2024 BioVital.</strong> Todos los derechos reservados.
 </footer>
+<<<<<<< HEAD
+</div>
+=======
 
 </div>
 
+>>>>>>> d2039bf34adef6d12dd6c79371df596a3d39fedb
 <script src="<?php echo APP_URL; ?>/js/adminlte.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
 <script src="<?php echo APP_URL; ?>/js/consultorio.js"></script>
