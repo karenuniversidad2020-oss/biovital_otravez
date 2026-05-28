@@ -141,6 +141,14 @@ $titulo_pagina = $titulo_pagina ?? 'BioVital - Panel';
             <!-- Sidebar Menu -->
             <nav class="mt-2">
                 <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu">
+                    <!-- Inicio / Dashboard -->
+                    <li class="nav-item">
+                        <a href="<?php echo APP_URL; ?>/panel/<?php echo $current_role; ?>" class="nav-link <?php echo ($active_page ?? '') === 'dashboard' ? 'active' : ''; ?>">
+                            <i class="nav-icon fas fa-home"></i>
+                            <p>Inicio</p>
+                        </a>
+                    </li>
+                    <li class="nav-divider"></li>
                     <!-- Menú según el rol -->
                     <?php if ($current_role === 'administrador'): ?>
                         <!-- Menú de Administrador -->
